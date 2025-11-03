@@ -1,14 +1,29 @@
 {
   "name": "office-editor4ai",
   "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "description": "Office AddIn for AI - Multi-platform support for Excel, Word, and PowerPoint",
+  "private": true,
   "scripts": {
-    "build": "tsc",
-    "lint": "pnpm -s lint:office && pnpm -s lint:eslint",
-    "lint:office": "office-addin-lint check",
-    "lint:eslint": "eslint \"src/**/*.{ts,tsx,js}\"",
-    "lint:fix": "eslint \"src/**/*.{ts,tsx,js}\" --fix",
+    "preinstall": "npx only-allow pnpm",
+    "install:all": "pnpm install",
+    "build": "pnpm -r --parallel build",
+    "build:dev": "pnpm -r --parallel build:dev",
+    "dev:excel": "pnpm --filter excel-editor4ai dev-server",
+    "dev:word": "pnpm --filter word-editor4ai dev-server",
+    "dev:ppt": "pnpm --filter ppt-editor4ai dev-server",
+    "start:excel": "pnpm --filter excel-editor4ai start",
+    "start:word": "pnpm --filter word-editor4ai start",
+    "start:ppt": "pnpm --filter ppt-editor4ai start",
+    "stop:excel": "pnpm --filter excel-editor4ai stop",
+    "stop:word": "pnpm --filter word-editor4ai stop",
+    "stop:ppt": "pnpm --filter ppt-editor4ai stop",
+    "validate:excel": "pnpm --filter excel-editor4ai validate",
+    "validate:word": "pnpm --filter word-editor4ai validate",
+    "validate:ppt": "pnpm --filter ppt-editor4ai validate",
+    "validate:all": "pnpm -r --parallel validate",
+    "lint": "pnpm -r --parallel lint",
+    "lint:fix": "pnpm -r --parallel lint:fix",
+    "clean": "pnpm -r exec rm -rf node_modules dist && rm -rf node_modules",
     "yo:office": "yo office"
   },
   "devDependencies": {
@@ -20,5 +35,8 @@
     "typescript-eslint": "^8.46.2",
     "yo": "^5.0.0"
   },
-  "private": true
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
 }

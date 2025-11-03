@@ -1,5 +1,5 @@
 {
-  "name": "office-addin-taskpane-react",
+  "name": "excel-editor4ai",
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   "config": {
     "app_to_debug": "excel",
     "app_type_to_debug": "desktop",
-    "dev_server_port": 3000
+    "dev_server_port": 3001
   },
   "scripts": {
     "build": "webpack --mode production",

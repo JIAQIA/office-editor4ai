@@ -1,0 +1,9 @@
+# pnpm workspace 配置 | pnpm workspace configuration
+# 定义 monorepo 中的所有包 | Define all packages in the monorepo
+packages:
+  # 三个 Office AddIn 应用 | Three Office AddIn applications
+  - 'excel-editor4ai'
+  - 'word-editor4ai'
+  - 'ppt-editor4ai'
+  # 如果未来有共享包，可以添加到这里 | Add shared packages here in the future
+  # - 'packages/*'
