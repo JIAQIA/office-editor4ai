@@ -154,6 +154,9 @@ pnpm lint:fix
 ```bash
 # 删除所有 node_modules 和构建产物 | Remove all node_modules and build artifacts
 pnpm clean
+
+# 清理 Office AddIn 缓存（解决加载问题）| Clear Office AddIn cache (fixes loading issues)
+pnpm clear-cache
 ```
 
 ## 🔧 在子项目中工作 | Working in Sub-projects
@@ -228,18 +231,32 @@ pnpm -r add <package-name>
    - Word: 3002
    - PowerPoint: 3003
    
-   请勿修改这些端口，以避免冲突。  
-   Do not modify these ports to avoid conflicts.
+   请勿修改这些端口，以避免冲突。端口配置需要在三个地方保持一致：  
+   Do not modify these ports to avoid conflicts. Port configuration must be consistent in three places:
+   - `package.json` 中的 `config.dev_server_port`
+   - `manifest.xml` 中的所有 URL
+   - `webpack.config.js` 中的 `urlDev`
 
-2. **清单文件** | **Manifest Files**  
+2. **工作目录问题** | **Working Directory Issue**  
+   ⚠️ **重要**: 从根目录运行的命令会自动切换到正确的子目录。如果遇到加载问题，可以直接在子目录中运行命令：  
+   ⚠️ **Important**: Commands run from root will automatically switch to the correct subdirectory. If you encounter loading issues, you can run commands directly in subdirectories:
+   ```bash
+   cd ppt-editor4ai && pnpm start
+   ```
+
+3. **清单文件** | **Manifest Files**  
    每个插件都有自己的 `manifest.xml` 文件，用于定义插件的元数据和权限。  
    Each add-in has its own `manifest.xml` file defining metadata and permissions.
 
-3. **共享代码** | **Shared Code**  
+4. **Office 缓存** | **Office Cache**  
+   如果修改了 `manifest.xml` 或端口配置后插件无法加载，运行 `pnpm clear-cache` 清理 Office 缓存。  
+   If the add-in fails to load after modifying `manifest.xml` or port configuration, run `pnpm clear-cache` to clear Office cache.
+
+5. **共享代码** | **Shared Code**  
    如果需要在多个插件之间共享代码，建议创建一个 `packages/shared` 目录，并在 `pnpm-workspace.yaml` 中添加配置。  
    If you need to share code between add-ins, consider creating a `packages/shared` directory and adding it to `pnpm-workspace.yaml`.
 
-4. **调试证书** | **Debug Certificates**  
+6. **调试证书** | **Debug Certificates**  
    首次运行时，Office AddIn 工具会自动生成自签名证书用于 HTTPS 调试。  
    On first run, Office AddIn tools will automatically generate self-signed certificates for HTTPS debugging.
 

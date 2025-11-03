@@ -146,19 +146,38 @@ pnpm install
 
 ### 问题 3: Office 无法加载插件 | Office Can't Load Add-in
 
+**症状** | **Symptom**: Office 显示"加载项错误"或插件无法加载
+
 **检查清单** | **Checklist**:
 1. ✅ 开发服务器是否正在运行？ | Is the dev server running?
 2. ✅ 证书是否已信任？ | Is the certificate trusted?
 3. ✅ manifest.xml 中的 URL 是否正确？ | Is the URL in manifest.xml correct?
 4. ✅ 端口号是否匹配？ | Does the port number match?
+5. ✅ 端口配置在三个地方是否一致？ | Is port configuration consistent in three places?
+   - `package.json` → `config.dev_server_port`
+   - `manifest.xml` → 所有 `localhost` URL
+   - `webpack.config.js` → `urlDev` 变量
 
+**解决方案** | **Solution**:
 ```bash
-# 重新验证清单 | Re-validate manifest
-pnpm validate:excel
+# 1. 清理 Office 缓存 | Clear Office cache
+pnpm clear-cache
 
-# 停止并重启 | Stop and restart
-pnpm stop:excel
-pnpm start:excel
+# 2. 关闭 Office 应用 | Close Office application
+# 手动关闭或使用命令 | Manually or use command:
+killall "Microsoft PowerPoint"  # 或 Excel/Word
+
+# 3. 重新验证清单 | Re-validate manifest
+pnpm validate:ppt
+
+# 4. 重启开发服务器 | Restart dev server
+pnpm dev:ppt
+
+# 5. 在新终端中启动插件 | Start add-in in new terminal
+pnpm start:ppt
+
+# 如果仍然失败，尝试直接在子目录运行 | If still failing, try running directly in subdirectory
+cd ppt-editor4ai && pnpm start
 ```
 
 ### 问题 4: TypeScript 编译错误 | TypeScript Compilation Error
