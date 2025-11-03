@@ -1,0 +1,24 @@
+{
+  "name": "office-editor4ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "lint": "pnpm -s lint:office && pnpm -s lint:eslint",
+    "lint:office": "office-addin-lint check",
+    "lint:eslint": "eslint \"src/**/*.{ts,tsx,js}\"",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx,js}\" --fix",
+    "yo:office": "yo office"
+  },
+  "devDependencies": {
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint-plugin-office-addins": "^4.0.3",
+    "generator-office": "^3.0.2",
+    "office-addin-lint": "^3.0.3",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.46.2",
+    "yo": "^5.0.0"
+  },
+  "private": true
+}
