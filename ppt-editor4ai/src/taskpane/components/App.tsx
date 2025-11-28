@@ -18,7 +18,7 @@ import ToolsDebugPage from "./ToolsDebugPage";
 const useStyles = makeStyles({
   root: {
     display: "flex",
-    minHeight: "100vh",
+    height: "100vh",
     width: "100%",
     overflow: "hidden",
   },

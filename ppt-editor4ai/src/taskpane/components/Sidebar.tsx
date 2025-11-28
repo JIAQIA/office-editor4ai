@@ -16,7 +16,6 @@ import {
   Wrench24Regular, 
   TextGrammarSettings24Regular,
   ChevronDown24Regular,
-  ChevronRight24Regular,
   Navigation24Regular,
   Dismiss24Regular
 } from "@fluentui/react-icons";
@@ -53,6 +52,7 @@ const useStyles = makeStyles({
     border: "none",
     backgroundColor: "transparent",
     cursor: "pointer",
+    height: "36px",
     minHeight: "36px",
     minWidth: "unset",
     ":hover": {
@@ -75,8 +75,10 @@ const useStyles = makeStyles({
     backgroundColor: "transparent",
     cursor: "pointer",
     transition: "background-color 0.2s",
-    minHeight: "40px",
+    height: "44px",
+    minHeight: "44px",
     minWidth: "unset",
+    overflow: "hidden",
   },
   menuItemCollapsed: {
     padding: "10px 4px",
@@ -95,6 +97,7 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     width: "100%",
+    overflow: "hidden",
   },
   icon: {
     marginRight: "10px",
@@ -111,13 +114,33 @@ const useStyles = makeStyles({
     fontSize: tokens.fontSizeBase300,
     fontWeight: tokens.fontWeightRegular,
     flex: 1,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    opacity: 1,
+    transition: "opacity 0.2s ease",
   },
   chevron: {
     fontSize: "16px",
     marginLeft: "auto",
+    flexShrink: 0,
+    transition: "transform 0.3s ease",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
   submenu: {
     paddingLeft: "12px",
+    overflow: "hidden",
+    maxHeight: "500px",
+    opacity: 1,
+    transform: "translateY(0)",
+    transition: "max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease",
+  },
+  submenuCollapsed: {
+    maxHeight: "0",
+    opacity: 0,
+    transform: "translateY(-10px)",
   },
   submenuItem: {
     width: "100%",
@@ -127,6 +150,9 @@ const useStyles = makeStyles({
     backgroundColor: "transparent",
     cursor: "pointer",
     transition: "background-color 0.2s",
+    height: "40px",
+    minHeight: "40px",
+    overflow: "hidden",
   },
   submenuItemActive: {
     backgroundColor: tokens.colorNeutralBackground3Selected,
@@ -195,19 +221,20 @@ const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <>
               <span className={styles.label}>工具调试页</span>
-              {toolsExpanded ? (
-                <ChevronDown24Regular className={styles.chevron} />
-              ) : (
-                <ChevronRight24Regular className={styles.chevron} />
-              )}
+              <div 
+                className={styles.chevron}
+                style={{ transform: toolsExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+              >
+                <ChevronDown24Regular />
+              </div>
             </>
           )}
         </div>
       </Button>
 
       {/* 工具调试页二级菜单 */}
-      {!isCollapsed && toolsExpanded && (
-        <div className={styles.submenu}>
+      {!isCollapsed && (
+        <div className={`${styles.submenu} ${!toolsExpanded ? styles.submenuCollapsed : ""}`}>
           <Button
             appearance="subtle"
             className={`${styles.submenuItem} ${
