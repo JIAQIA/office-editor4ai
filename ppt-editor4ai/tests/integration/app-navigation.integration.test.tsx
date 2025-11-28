@@ -13,9 +13,10 @@ import { screen } from '@testing-library/react';
 import { renderWithProviders, userEvent } from '../utils/test-utils';
 import App from '../../src/taskpane/components/App';
 
-// 模拟 taskpane 模块 | Mock taskpane module
-vi.mock('../../src/taskpane/taskpane', () => ({
-  insertText: vi.fn(),
+// 模拟 ppt-tools 模块 | Mock ppt-tools module
+vi.mock('../../src/ppt-tools', () => ({
+  insertText: vi.fn().mockResolvedValue(undefined),
+  getCurrentSlideElements: vi.fn().mockResolvedValue([]),
 }));
 
 describe('应用导航集成测试 | Application Navigation Integration Tests', () => {
@@ -42,14 +43,14 @@ describe('应用导航集成测试 | Application Navigation Integration Tests', 
       if (textInsertionButton) {
         await user.click(textInsertionButton);
         // 应该导航到工具页面 | Should navigate to tools page
-        expect(screen.getByText('文本插入工具')).toBeInTheDocument();
+        expect(screen.getByText('在幻灯片中插入文本框，支持自定义位置')).toBeInTheDocument();
       }
     }
   });
 
   it('应该能够在工具页面使用文本插入功能 | should be able to use text insertion feature on tools page', async () => {
     const user = userEvent.setup();
-    const { insertText } = await import('../../src/taskpane/taskpane');
+    const pptTools = await import('../../src/ppt-tools');
     
     renderWithProviders(<App />);
 
@@ -80,7 +81,7 @@ describe('应用导航集成测试 | Application Navigation Integration Tests', 
       const insertButton = screen.getByRole('button', { name: '确认插入' });
       await user.click(insertButton);
 
-      expect(insertText).toHaveBeenCalledWith('导航测试文本', undefined, undefined);
+      expect(pptTools.insertText).toHaveBeenCalledWith('导航测试文本', undefined, undefined);
     }
   });
 

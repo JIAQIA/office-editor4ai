@@ -17,7 +17,8 @@ import {
   TextGrammarSettings24Regular,
   ChevronDown24Regular,
   Navigation24Regular,
-  Dismiss24Regular
+  Dismiss24Regular,
+  List24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -247,6 +248,21 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <TextGrammarSettings24Regular className={styles.icon} />
               <span className={styles.label}>文本插入工具</span>
+            </div>
+          </Button>
+          
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "tools" && currentTool === "elements-list"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("tools", "elements-list")}
+          >
+            <div className={styles.menuItemContent}>
+              <List24Regular className={styles.icon} />
+              <span className={styles.label}>元素列表</span>
             </div>
           </Button>
         </div>

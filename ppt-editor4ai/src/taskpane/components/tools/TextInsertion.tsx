@@ -1,13 +1,12 @@
 import * as React from "react";
 import { useState } from "react";
 import { Button, Field, Textarea, Input, tokens, makeStyles } from "@fluentui/react-components";
+import { insertText } from "../../../ppt-tools";
 
 /* global HTMLTextAreaElement, HTMLInputElement */
 
 interface TextInsertionProps {
-  // 插入文本的回调函数 / Callback function to insert text
-  // 参数: 文本内容, X坐标(可选), Y坐标(可选) / Parameters: text content, X coordinate(optional), Y coordinate(optional)
-  insertText: (text: string, left?: number, top?: number) => void;
+  // 不再需要传入 insertText 回调，直接使用工具函数
 }
 
 const useStyles = makeStyles({
@@ -57,7 +56,7 @@ const useStyles = makeStyles({
   },
 });
 
-const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) => {
+const TextInsertion: React.FC<TextInsertionProps> = () => {
   // 文本内容状态 / Text content state
   const [text, setText] = useState<string>("Some text.");
   // 位置坐标状态 / Position coordinates state
@@ -69,7 +68,7 @@ const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) 
     const leftValue = left.trim() === "" ? undefined : parseFloat(left);
     const topValue = top.trim() === "" ? undefined : parseFloat(top);
     
-    await props.insertText(text, leftValue, topValue);
+    await insertText(text, leftValue, topValue);
   };
 
   const handleTextChange = async (event: React.ChangeEvent<HTMLTextAreaElement>) => {

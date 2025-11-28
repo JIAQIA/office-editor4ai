@@ -10,8 +10,7 @@
 
 import * as React from "react";
 import { makeStyles, tokens } from "@fluentui/react-components";
-import TextInsertion from "./TextInsertion";
-import { insertText } from "../taskpane";
+import { getToolConfig } from "./tools/toolsConfig";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -49,33 +48,36 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
   // 根据选中的工具渲染不同的组件
   // Render different components based on selected tool
   const renderTool = () => {
-    switch (selectedTool) {
-      case "text-insertion":
-        return (
-          <>
-            <h1 className={styles.title}>
-              文本插入工具
-            </h1>
-            <p className={styles.subtitle}>
-              在幻灯片中插入文本框，支持自定义位置
-            </p>
-            <div className={styles.toolContainer}>
-              <TextInsertion insertText={insertText} />
-            </div>
-          </>
-        );
-      default:
-        return (
-          <>
-            <h1 className={styles.title}>
-              请选择工具
-            </h1>
-            <p className={styles.subtitle}>
-              从左侧菜单选择要调试的工具
-            </p>
-          </>
-        );
+    // 获取工具配置
+    const toolConfig = getToolConfig(selectedTool);
+    
+    if (toolConfig) {
+      return (
+        <>
+          <h1 className={styles.title}>
+            {toolConfig.title}
+          </h1>
+          <p className={styles.subtitle}>
+            {toolConfig.subtitle}
+          </p>
+          <div className={styles.toolContainer}>
+            {toolConfig.component}
+          </div>
+        </>
+      );
     }
+    
+    // 默认状态：未选择工具
+    return (
+      <>
+        <h1 className={styles.title}>
+          请选择工具
+        </h1>
+        <p className={styles.subtitle}>
+          从左侧菜单选择要调试的工具
+        </p>
+      </>
+    );
   };
 
   return <div className={styles.container}>{renderTool()}</div>;

@@ -37,12 +37,53 @@ global.Office = {
 // 模拟 PowerPoint 对象 | Mock PowerPoint object
 global.PowerPoint = {
   run: vi.fn((callback) => {
+    const mockShape = {
+      id: 'mock-shape-id',
+      type: 'TextBox',
+      left: 100,
+      top: 100,
+      width: 300,
+      height: 100,
+      name: 'Mock Shape',
+      fill: {
+        setSolidColor: vi.fn(),
+      },
+      lineFormat: {
+        color: 'black',
+        weight: 1,
+        dashStyle: 'Solid',
+      },
+      textFrame: {
+        textRange: {
+          text: 'Mock text',
+          load: vi.fn(),
+        },
+        load: vi.fn(),
+      },
+      load: vi.fn(),
+    };
+
+    const mockSlide = {
+      shapes: {
+        addTextBox: vi.fn().mockReturnValue(mockShape),
+        getItemAt: vi.fn().mockReturnValue(mockShape),
+        items: [mockShape],
+        load: vi.fn(),
+      },
+      load: vi.fn(),
+    };
+
     const context = {
       presentation: {
         slides: {
-          getItemAt: vi.fn(),
-          add: vi.fn(),
+          getItemAt: vi.fn().mockReturnValue(mockSlide),
+          add: vi.fn().mockReturnValue(mockSlide),
+          load: vi.fn(),
         },
+        getSelectedSlides: vi.fn(() => ({
+          getItemAt: vi.fn().mockReturnValue(mockSlide),
+          load: vi.fn(),
+        })),
         load: vi.fn(),
       },
       sync: vi.fn().mockResolvedValue(undefined),

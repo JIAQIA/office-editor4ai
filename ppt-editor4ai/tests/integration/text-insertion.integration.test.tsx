@@ -10,45 +10,13 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
-import { renderWithProviders, userEvent, mockPowerPointRun } from '../utils/test-utils';
+import { renderWithProviders, userEvent } from '../utils/test-utils';
 import ToolsDebugPage from '../../src/taskpane/components/ToolsDebugPage';
 
-// 模拟 taskpane 模块 | Mock taskpane module
-vi.mock('../../src/taskpane/taskpane', () => ({
-  insertText: vi.fn(async (text: string, left?: number, top?: number) => {
-    // 模拟 PowerPoint.run 调用 | Mock PowerPoint.run call
-    const mockContext = {
-      presentation: {
-        getSelectedSlides: vi.fn().mockReturnValue({
-          getItemAt: vi.fn().mockReturnValue({
-            shapes: {
-              addTextBox: vi.fn().mockReturnValue({
-                fill: {
-                  setSolidColor: vi.fn(),
-                },
-                lineFormat: {
-                  color: '',
-                  weight: 0,
-                  dashStyle: '',
-                },
-              }),
-            },
-          }),
-        }),
-      },
-      sync: vi.fn().mockResolvedValue(undefined),
-    };
-
-    await globalThis.PowerPoint.run(async (_context: any) => {
-      const slide = mockContext.presentation.getSelectedSlides().getItemAt(0);
-      if (left !== undefined && top !== undefined) {
-        slide.shapes.addTextBox(text, { left, top, width: 300, height: 100 });
-      } else {
-        slide.shapes.addTextBox(text);
-      }
-      await mockContext.sync();
-    });
-  }),
+// 模拟 ppt-tools 模块 | Mock ppt-tools module
+vi.mock('../../src/ppt-tools', () => ({
+  insertText: vi.fn().mockResolvedValue(undefined),
+  getCurrentSlideElements: vi.fn().mockResolvedValue([]),
 }));
 
 describe('文本插入功能集成测试 | Text Insertion Feature Integration Tests', () => {
@@ -70,7 +38,7 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
 
   it('应该能够完成完整的文本插入流程（不带坐标）| should complete full text insertion flow (without coordinates)', async () => {
     const user = userEvent.setup();
-    const { insertText } = await import('../../src/taskpane/taskpane');
+    const pptTools = await import('../../src/ppt-tools');
     
     renderWithProviders(<ToolsDebugPage selectedTool="text-insertion" />);
 
@@ -85,13 +53,13 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
 
     // 验证 insertText 被调用 | Verify insertText was called
     await waitFor(() => {
-      expect(insertText).toHaveBeenCalledWith('集成测试文本', undefined, undefined);
+      expect(pptTools.insertText).toHaveBeenCalledWith('集成测试文本', undefined, undefined);
     });
   });
 
   it('应该能够完成完整的文本插入流程（带坐标）| should complete full text insertion flow (with coordinates)', async () => {
     const user = userEvent.setup();
-    const { insertText } = await import('../../src/taskpane/taskpane');
+    const pptTools = await import('../../src/ppt-tools');
     
     renderWithProviders(<ToolsDebugPage selectedTool="text-insertion" />);
 
@@ -112,7 +80,7 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
 
     // 验证 insertText 被正确调用 | Verify insertText was called correctly
     await waitFor(() => {
-      expect(insertText).toHaveBeenCalledWith('带坐标的文本', 100, 200);
+      expect(pptTools.insertText).toHaveBeenCalledWith('带坐标的文本', 100, 200);
     });
   });
 
@@ -125,7 +93,7 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
 
   it('应该能够连续插入多个文本 | should be able to insert multiple texts consecutively', async () => {
     const user = userEvent.setup();
-    const { insertText } = await import('../../src/taskpane/taskpane');
+    const pptTools = await import('../../src/ppt-tools');
     
     renderWithProviders(<ToolsDebugPage selectedTool="text-insertion" />);
 
@@ -138,7 +106,7 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
     await user.click(insertButton);
 
     await waitFor(() => {
-      expect(insertText).toHaveBeenCalledWith('第一段文本', undefined, undefined);
+      expect(pptTools.insertText).toHaveBeenCalledWith('第一段文本', undefined, undefined);
     });
 
     // 第二次插入 | Second insertion
@@ -147,14 +115,14 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
     await user.click(insertButton);
 
     await waitFor(() => {
-      expect(insertText).toHaveBeenCalledWith('第二段文本', undefined, undefined);
-      expect(insertText).toHaveBeenCalledTimes(2);
+      expect(pptTools.insertText).toHaveBeenCalledWith('第二段文本', undefined, undefined);
+      expect(pptTools.insertText).toHaveBeenCalledTimes(2);
     });
   });
 
   it('应该正确处理边界坐标值 | should correctly handle boundary coordinate values', async () => {
     const user = userEvent.setup();
-    const { insertText } = await import('../../src/taskpane/taskpane');
+    const pptTools = await import('../../src/ppt-tools');
     
     renderWithProviders(<ToolsDebugPage selectedTool="text-insertion" />);
 
@@ -168,7 +136,7 @@ describe('文本插入功能集成测试 | Text Insertion Feature Integration Te
     await user.click(insertButton);
 
     await waitFor(() => {
-      expect(insertText).toHaveBeenCalledWith('Some text.', 720, 540);
+      expect(pptTools.insertText).toHaveBeenCalledWith('Some text.', 720, 540);
     });
   });
 });
