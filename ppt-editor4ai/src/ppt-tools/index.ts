@@ -12,5 +12,5 @@ export { insertText, insertTextToSlide } from "./textInsertion";
 export type { TextInsertionOptions } from "./textInsertion";
 
 // 元素列表工具
-export { getSlideElements, getCurrentSlideElements } from "./elementsList";
+export { getSlideElements, getCurrentSlideElements, getSlideElementsByPageNumber } from "./elementsList";
 export type { SlideElement, GetElementsOptions } from "./elementsList";

@@ -37,13 +37,22 @@ ppt-tools/
 ### 在 React 组件中使用
 
 ```typescript
-import { insertText, getCurrentSlideElements } from '../../../ppt-tools';
+import { insertText, getCurrentSlideElements, getSlideElements, getSlideElementsByPageNumber } from '../../../ppt-tools';
 
 // 插入文本
 await insertText("Hello World", 100, 100);
 
-// 获取元素列表
+// 获取当前页元素列表
 const elements = await getCurrentSlideElements();
+
+// 获取指定页码的元素列表（页码从1开始）
+const page3Elements = await getSlideElementsByPageNumber(3);
+
+// 使用配置获取元素
+const elementsWithOptions = await getSlideElements({ 
+  slideNumber: 2,  // 第2页
+  includeText: true 
+});
 ```
 
 ### 在 Socket.IO 中使用
@@ -76,8 +85,11 @@ socket.on('insertText', async (data) => {
 - `insertTextToSlide(options)` - 完整版本，支持更多配置
 
 ### elementsList.ts
-- `getCurrentSlideElements()` - 获取当前幻灯片元素
+- `getCurrentSlideElements()` - 获取当前选中幻灯片的元素
 - `getSlideElements(options)` - 获取指定幻灯片元素，支持配置
+  - `slideNumber?: number` - 页码（从1开始），不填则使用当前页
+  - `includeText?: boolean` - 是否包含文本内容，默认为 true
+- `getSlideElementsByPageNumber(slideNumber, includeText?)` - 按页码获取元素的便捷方法
 
 ## 注意事项
 

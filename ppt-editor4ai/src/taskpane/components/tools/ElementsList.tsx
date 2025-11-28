@@ -10,8 +10,8 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Button, makeStyles, tokens, Spinner } from "@fluentui/react-components";
-import { getCurrentSlideElements, type SlideElement } from "../../../ppt-tools";
+import { Button, makeStyles, tokens, Spinner, Input, Label } from "@fluentui/react-components";
+import { getSlideElements, type SlideElement } from "../../../ppt-tools";
 
 const useStyles = makeStyles({
   container: {
@@ -20,6 +20,16 @@ const useStyles = makeStyles({
     alignItems: "center",
     width: "100%",
     gap: "16px",
+  },
+  inputContainer: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    marginBottom: "8px",
+  },
+  inputField: {
+    width: "100%",
   },
   buttonContainer: {
     width: "100%",
@@ -115,14 +125,34 @@ const ElementsList: React.FC = () => {
   const [elements, setElements] = useState<SlideElement[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [slideNumber, setSlideNumber] = useState<string>("");
 
   const fetchElements = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const elementsList = await getCurrentSlideElements();
+      // 解析页码输入
+      const pageNum = slideNumber.trim() === "" ? undefined : parseInt(slideNumber, 10);
+      
+      // 验证页码
+      if (pageNum !== undefined && (isNaN(pageNum) || pageNum < 1)) {
+        setError("页码必须是大于0的整数");
+        setLoading(false);
+        return;
+      }
+      
+      const elementsList = await getSlideElements({ 
+        slideNumber: pageNum,
+        includeText: true 
+      });
+      
       setElements(elementsList);
+      
+      // 如果返回空数组，显示提示
+      if (elementsList.length === 0 && pageNum !== undefined) {
+        setError(`页码 ${pageNum} 不存在或没有元素`);
+      }
     } catch (err) {
       console.error("获取元素列表失败:", err);
       setError(err instanceof Error ? err.message : "获取元素列表失败");
@@ -133,6 +163,22 @@ const ElementsList: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.inputContainer}>
+        <Label htmlFor="slideNumber">
+          页码（可选，不填则使用当前页）
+        </Label>
+        <Input
+          id="slideNumber"
+          type="number"
+          min="1"
+          placeholder="请输入页码，从1开始"
+          value={slideNumber}
+          onChange={(e) => setSlideNumber(e.target.value)}
+          className={styles.inputField}
+          disabled={loading}
+        />
+      </div>
+      
       <div className={styles.buttonContainer}>
         <Button 
           appearance="primary" 
@@ -152,7 +198,7 @@ const ElementsList: React.FC = () => {
 
       {!loading && !error && elements.length === 0 && (
         <div className={styles.emptyState}>
-          点击上方按钮获取当前幻灯片的元素列表
+          输入页码（可选）并点击按钮获取元素列表
         </div>
       )}
 

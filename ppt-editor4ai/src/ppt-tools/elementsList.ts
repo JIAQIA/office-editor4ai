@@ -21,28 +21,56 @@ export interface SlideElement {
 }
 
 export interface GetElementsOptions {
-  slideIndex?: number; // 幻灯片索引，默认为当前选中的第一张
+  slideNumber?: number; // 幻灯片页码（从1开始），不填则使用当前页
   includeText?: boolean; // 是否包含文本内容，默认为 true
 }
 
 /**
  * 获取指定幻灯片的所有元素
  * @param options 获取选项
- * @returns Promise<SlideElement[]> 元素列表
+ * @returns Promise<SlideElement[]> 元素列表，如果页码不存在则返回空数组
  */
 export async function getSlideElements(options: GetElementsOptions = {}): Promise<SlideElement[]> {
-  const { slideIndex = 0, includeText = true } = options;
+  const { slideNumber, includeText = true } = options;
 
   try {
     const elementsList: SlideElement[] = [];
 
     await PowerPoint.run(async (context) => {
-      // 获取幻灯片
       const slides = context.presentation.slides;
-      const selectedSlide = slides.getItemAt(slideIndex);
+      slides.load("items");
+      await context.sync();
+
+      // 确定要获取的幻灯片
+      let targetSlide: PowerPoint.Slide;
+      
+      if (slideNumber !== undefined) {
+        // 使用指定的页码（从1开始）
+        const slideIndex = slideNumber - 1;
+        
+        // 验证页码是否存在
+        if (slideIndex < 0 || slideIndex >= slides.items.length) {
+          console.warn(`页码 ${slideNumber} 不存在，总共有 ${slides.items.length} 页`);
+          return; // 返回空数组
+        }
+        
+        targetSlide = slides.items[slideIndex];
+      } else {
+        // 使用当前选中的幻灯片
+        const selectedSlides = context.presentation.getSelectedSlides();
+        selectedSlides.load("items");
+        await context.sync();
+        
+        if (selectedSlides.items.length === 0) {
+          console.warn("没有选中的幻灯片");
+          return; // 返回空数组
+        }
+        
+        targetSlide = selectedSlides.items[0];
+      }
 
       // 加载幻灯片的形状集合
-      const shapes = selectedSlide.shapes;
+      const shapes = targetSlide.shapes;
       shapes.load("items");
 
       await context.sync();
@@ -99,5 +127,18 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
  * @returns Promise<SlideElement[]> 元素列表
  */
 export async function getCurrentSlideElements(): Promise<SlideElement[]> {
-  return getSlideElements({ slideIndex: 0, includeText: true });
+  return getSlideElements({ includeText: true });
+}
+
+/**
+ * 获取指定页码幻灯片的所有元素
+ * @param slideNumber 页码（从1开始）
+ * @param includeText 是否包含文本内容
+ * @returns Promise<SlideElement[]> 元素列表，如果页码不存在则返回空数组
+ */
+export async function getSlideElementsByPageNumber(
+  slideNumber: number,
+  includeText: boolean = true
+): Promise<SlideElement[]> {
+  return getSlideElements({ slideNumber, includeText });
 }
