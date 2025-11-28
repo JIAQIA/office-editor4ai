@@ -76,10 +76,12 @@ const useStyles = makeStyles({
     cursor: "pointer",
     transition: "background-color 0.2s",
     minHeight: "40px",
+    minWidth: "unset",
   },
   menuItemCollapsed: {
     padding: "10px 4px",
     justifyContent: "center",
+    minWidth: "unset",
   },
   menuItemActive: {
     backgroundColor: tokens.colorNeutralBackground3Selected,
@@ -96,11 +98,14 @@ const useStyles = makeStyles({
   },
   icon: {
     marginRight: "10px",
-    fontSize: "20px",
+    fontSize: "24px",
+    width: "24px",
+    height: "24px",
+    flexShrink: 0,
   },
   iconCollapsed: {
     marginRight: "0",
-    fontSize: "22px",
+    fontSize: "24px",
   },
   label: {
     fontSize: tokens.fontSizeBase300,
