@@ -20,4 +20,22 @@ export default tseslint.config(
     ? officeAddins.configs.react 
     : [officeAddins.configs.react]
   ),
+  {
+    rules: {
+      // 在 TypeScript 文件中禁用基础 ESLint 的 no-unused-vars 规则
+      // Disable base ESLint no-unused-vars rule in TypeScript files
+      // 因为 @typescript-eslint/no-unused-vars 提供了更好的 TypeScript 支持
+      // Because @typescript-eslint/no-unused-vars provides better TypeScript support
+      "no-unused-vars": "off",
+      // 允许下划线开头的未使用变量（包括接口中的参数占位符）
+      // Allow unused variables starting with underscore (including parameter placeholders in interfaces)
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ]
+    }
+  }
 );
