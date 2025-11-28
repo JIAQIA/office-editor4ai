@@ -23,8 +23,7 @@
       "node_modules/@types"
     ],
     "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "types": ["vitest/globals"]
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*",

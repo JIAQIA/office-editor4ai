@@ -31,6 +31,10 @@ module.exports = async (env, options) => {
     },
     resolve: {
       extensions: [".ts", ".tsx", ".html", ".js"],
+      symlinks: true,
+      fallback: {
+        "es6-promise": require.resolve("es6-promise"),
+      },
     },
     module: {
       rules: [

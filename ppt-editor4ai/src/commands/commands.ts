@@ -11,7 +11,7 @@ Office.onReady(() => {
 });
 
 /**
- * 执行加载项命令时显示通知
+ * 执行加载项命令时的处理函数
  * @param event Office 命令事件对象
  */
 function action(event: Office.AddinCommands.Event) {
