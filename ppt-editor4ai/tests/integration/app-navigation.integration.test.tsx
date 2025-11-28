@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { renderWithProviders, userEvent } from '../utils/test-utils';
 import App from '../../src/taskpane/components/App';
 
