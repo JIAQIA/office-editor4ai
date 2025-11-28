@@ -19,8 +19,12 @@ Office.onReady(() => {
   );
 });
 
+// Webpack 热模块替换 (HMR) 配置 / Webpack Hot Module Replacement (HMR) configuration
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 if ((module as any).hot) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (module as any).hot.accept("./components/App", () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const NextApp = require("./components/App").default;
     root?.render(NextApp);
   });

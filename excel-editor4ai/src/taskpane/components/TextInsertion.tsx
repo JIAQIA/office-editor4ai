@@ -5,6 +5,7 @@ import { Button, Field, Textarea, tokens, makeStyles } from "@fluentui/react-com
 /* global HTMLTextAreaElement */
 
 interface TextInsertionProps {
+  // 插入文本的回调函数 / Callback function to insert text
   insertText: (text: string) => void;
 }
 

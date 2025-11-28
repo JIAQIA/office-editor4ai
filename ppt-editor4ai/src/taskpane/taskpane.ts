@@ -11,7 +11,7 @@ export async function insertText(text: string, left?: number, top?: number) {
   try {
     await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      
+
       // 如果指定了位置参数，使用指定位置；否则使用默认位置
       // If position parameters are specified, use them; otherwise use default position
       let textBox;
@@ -22,16 +22,16 @@ export async function insertText(text: string, left?: number, top?: number) {
           left: left,
           top: top,
           width: 300,
-          height: 100
+          height: 100,
         });
       } else {
         textBox = slide.shapes.addTextBox(text);
       }
-      
+
       textBox.fill.setSolidColor("white");
       textBox.lineFormat.color = "black";
       textBox.lineFormat.weight = 1;
-      textBox.lineFormat.dashStyle = PowerPoint.ShapeLineDashStyle.solid;
+      textBox.lineFormat.dashStyle = "Solid";
       await context.sync();
     });
   } catch (error) {

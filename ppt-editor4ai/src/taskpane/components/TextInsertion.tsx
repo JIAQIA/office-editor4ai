@@ -5,6 +5,8 @@ import { Button, Field, Textarea, Input, tokens, makeStyles } from "@fluentui/re
 /* global HTMLTextAreaElement, HTMLInputElement */
 
 interface TextInsertionProps {
+  // 插入文本的回调函数 / Callback function to insert text
+  // 参数: 文本内容, X坐标(可选), Y坐标(可选) / Parameters: text content, X coordinate(optional), Y coordinate(optional)
   insertText: (text: string, left?: number, top?: number) => void;
 }
 
@@ -50,7 +52,9 @@ const useStyles = makeStyles({
 });
 
 const TextInsertion: React.FC<TextInsertionProps> = (props: TextInsertionProps) => {
+  // 文本内容状态 / Text content state
   const [text, setText] = useState<string>("Some text.");
+  // 位置坐标状态 / Position coordinates state
   const [left, setLeft] = useState<string>("");
   const [top, setTop] = useState<string>("");
 

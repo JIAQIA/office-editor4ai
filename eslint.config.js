@@ -27,7 +27,7 @@ const tsEsLint = require("typescript-eslint");
 // 其他最佳实践设置（可选） | Additional best practices (optional)
 const commonIgnores = ["dist/", "node_modules/", "**/*.d.ts"];
 
-export default [
+module.exports = [
   // 忽略目录 | Ignore patterns
   {
     ignores: commonIgnores,
@@ -54,6 +54,14 @@ export default [
   {
     files: ["src/**/*.{ts,tsx,js}", "*.ts", "*.js"],
     rules: {
+      // 允许下划线开头的未使用变量 / Allow unused variables starting with underscore
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ],
       // 可在此加入项目级规则 | Put project-level rules here
       // "no-console": "warn",
     },
