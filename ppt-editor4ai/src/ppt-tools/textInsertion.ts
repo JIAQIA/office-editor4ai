@@ -7,7 +7,7 @@
  * 描述: 文本插入工具核心逻辑，与 Office API 交互
  */
 
-/* global PowerPoint */
+/* global PowerPoint, console */
 
 export interface TextInsertionOptions {
   text: string;
@@ -59,7 +59,7 @@ export async function insertTextToSlide(options: TextInsertionOptions): Promise<
       textBox.lineFormat.color = lineColor;
       textBox.lineFormat.weight = lineWeight;
       textBox.lineFormat.dashStyle = "Solid";
-      
+
       await context.sync();
     });
   } catch (error) {

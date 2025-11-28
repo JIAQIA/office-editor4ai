@@ -7,7 +7,7 @@
  * 描述: 元素列表获取工具核心逻辑，与 Office API 交互
  */
 
-/* global PowerPoint */
+/* global PowerPoint, console */
 
 export interface SlideElement {
   id: string;
@@ -43,29 +43,29 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
       // 确定要获取的幻灯片
       let targetSlide: PowerPoint.Slide;
-      
+
       if (slideNumber !== undefined) {
         // 使用指定的页码（从1开始）
         const slideIndex = slideNumber - 1;
-        
+
         // 验证页码是否存在
         if (slideIndex < 0 || slideIndex >= slides.items.length) {
           console.warn(`页码 ${slideNumber} 不存在，总共有 ${slides.items.length} 页`);
           return; // 返回空数组
         }
-        
+
         targetSlide = slides.items[slideIndex];
       } else {
         // 使用当前选中的幻灯片
         const selectedSlides = context.presentation.getSelectedSlides();
         selectedSlides.load("items");
         await context.sync();
-        
+
         if (selectedSlides.items.length === 0) {
           console.warn("没有选中的幻灯片");
           return; // 返回空数组
         }
-        
+
         targetSlide = selectedSlides.items[0];
       }
 
@@ -75,28 +75,39 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
       await context.sync();
 
-      // 收集所有元素信息
-      for (let i = 0; i < shapes.items.length; i++) {
-        const shape = shapes.items[i];
-
-        // 加载形状的基本属性
+      // 批量加载所有形状的基本属性
+      for (const shape of shapes.items) {
         shape.load("id,type,left,top,width,height,name");
-        await context.sync();
+        if (includeText) {
+          try {
+            shape.textFrame.load("textRange");
+          } catch {
+            // 如果形状没有文本框，忽略错误
+          }
+        }
+      }
+      await context.sync();
 
+      // 批量加载文本内容
+      if (includeText) {
+        for (const shape of shapes.items) {
+          try {
+            shape.textFrame.textRange.load("text");
+          } catch {
+            // 如果形状没有文本框，忽略错误
+          }
+        }
+        await context.sync();
+      }
+
+      // 收集所有元素信息
+      for (const shape of shapes.items) {
         // 尝试获取文本内容
         let textContent: string | undefined;
         if (includeText) {
           try {
-            const textFrame = shape.textFrame;
-            textFrame.load("textRange");
-            await context.sync();
-
-            const textRange = textFrame.textRange;
-            textRange.load("text");
-            await context.sync();
-
-            textContent = textRange.text?.trim() || undefined;
-          } catch (e) {
+            textContent = shape.textFrame.textRange.text?.trim() || undefined;
+          } catch {
             // 如果形状没有文本框，忽略错误
             textContent = undefined;
           }

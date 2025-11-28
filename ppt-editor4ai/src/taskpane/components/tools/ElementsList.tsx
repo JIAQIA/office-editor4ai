@@ -8,6 +8,8 @@
  * 描述: 元素列表工具，用于获取并显示当前幻灯片中的所有元素
  */
 
+/* global console */
+
 import * as React from "react";
 import { useState } from "react";
 import { Button, makeStyles, tokens, Spinner, Input, Label } from "@fluentui/react-components";

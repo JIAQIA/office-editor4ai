@@ -5,6 +5,7 @@ import { insertText } from "../../../ppt-tools";
 
 /* global HTMLTextAreaElement, HTMLInputElement */
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface TextInsertionProps {
   // 不再需要传入 insertText 回调，直接使用工具函数
 }
