@@ -19,25 +19,27 @@ interface ToolsDebugPageProps {
 
 const useStyles = makeStyles({
   container: {
-    padding: "20px",
+    padding: "16px",
     minHeight: "100vh",
+    minWidth: "280px", // 确保内容区有最小宽度
     backgroundColor: tokens.colorNeutralBackground1,
   },
   title: {
     fontSize: tokens.fontSizeHero700,
     fontWeight: tokens.fontWeightSemibold,
     color: tokens.colorNeutralForeground1,
-    marginBottom: "10px",
+    marginBottom: "8px",
   },
   subtitle: {
     fontSize: tokens.fontSizeBase300,
     color: tokens.colorNeutralForeground3,
-    marginBottom: "30px",
+    marginBottom: "20px",
+    lineHeight: "1.4",
   },
   toolContainer: {
     backgroundColor: tokens.colorNeutralBackground1,
     borderRadius: tokens.borderRadiusMedium,
-    padding: "20px",
+    padding: "16px",
   },
 });
 

@@ -23,9 +23,11 @@ const useStyles = makeStyles({
     overflow: "hidden",
   },
   content: {
-    minWidth: "600px",
-    width: "600px",
-    overflow: "auto",
+    flex: 1,
+    minWidth: "320px", // 移动端最小宽度
+    maxWidth: "100%",
+    overflowX: "auto",
+    overflowY: "auto",
   },
 });
 
@@ -33,7 +35,7 @@ const App: React.FC = () => {
   const styles = useStyles();
   const [currentPage, setCurrentPage] = useState<string>("home");
   const [currentTool, setCurrentTool] = useState<string>("");
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
 
   // 处理导航 / Handle navigation
   const handleNavigate = (page: string, tool?: string) => {

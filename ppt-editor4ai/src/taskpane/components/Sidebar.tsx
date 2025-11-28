@@ -31,7 +31,7 @@ interface SidebarProps {
 
 const useStyles = makeStyles({
   sidebar: {
-    width: "200px",
+    width: "180px",
     height: "100vh",
     backgroundColor: tokens.colorNeutralBackground2,
     borderRight: `1px solid ${tokens.colorNeutralStroke1}`,
@@ -42,42 +42,43 @@ const useStyles = makeStyles({
     flexShrink: 0,
   },
   sidebarCollapsed: {
-    width: "50px",
-    padding: "8px 4px",
+    width: "48px",
+    padding: "8px 2px",
   },
   toggleButton: {
     width: "100%",
     justifyContent: "center",
-    padding: "6px 4px",
-    marginBottom: "4px",
+    padding: "8px 4px",
+    marginBottom: "8px",
     border: "none",
     backgroundColor: "transparent",
     cursor: "pointer",
-    minHeight: "32px",
+    minHeight: "36px",
     minWidth: "unset",
     ":hover": {
       backgroundColor: tokens.colorNeutralBackground3Hover,
     },
   },
   toggleButtonCollapsed: {
-    padding: "4px",
+    padding: "6px",
     margin: "0 auto",
-    marginBottom: "4px",
-    width: "42px",
-    minWidth: "42px",
-    maxWidth: "42px",
+    marginBottom: "8px",
+    width: "40px",
+    minWidth: "40px",
+    maxWidth: "40px",
   },
   menuItem: {
     width: "100%",
     justifyContent: "flex-start",
-    padding: "8px 12px",
+    padding: "10px 12px",
     border: "none",
     backgroundColor: "transparent",
     cursor: "pointer",
     transition: "background-color 0.2s",
+    minHeight: "40px",
   },
   menuItemCollapsed: {
-    padding: "8px 4px",
+    padding: "10px 4px",
     justifyContent: "center",
   },
   menuItemActive: {
@@ -94,11 +95,12 @@ const useStyles = makeStyles({
     width: "100%",
   },
   icon: {
-    marginRight: "8px",
-    fontSize: "18px",
+    marginRight: "10px",
+    fontSize: "20px",
   },
   iconCollapsed: {
     marginRight: "0",
+    fontSize: "22px",
   },
   label: {
     fontSize: tokens.fontSizeBase300,

@@ -71,15 +71,15 @@ describe('App 组件单元测试 | App Component Unit Tests', () => {
     
     renderWithProviders(<App />);
 
-    // 初始状态应该是未折叠 | Initial state should be not collapsed
-    expect(screen.getByText('Collapsed: false')).toBeInTheDocument();
+    // 初始状态应该是折叠的 | Initial state should be collapsed
+    expect(screen.getByText('Collapsed: true')).toBeInTheDocument();
 
     // 点击切换按钮 | Click toggle button
     const toggleButton = screen.getByText('Toggle');
     await user.click(toggleButton);
 
-    // 状态应该变为折叠 | State should change to collapsed
-    expect(screen.getByText('Collapsed: true')).toBeInTheDocument();
+    // 状态应该变为展开 | State should change to not collapsed
+    expect(screen.getByText('Collapsed: false')).toBeInTheDocument();
   });
 
   it('应该能够在页面间导航 | should be able to navigate between pages', async () => {
