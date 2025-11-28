@@ -1,0 +1,82 @@
+/**
+ * 文件名: ToolsDebugPage.tsx
+ * 作者: JQQ
+ * 创建日期: 2025/11/28
+ * 最后修改日期: 2025/11/28
+ * 版权: 2023 JQQ. All rights reserved.
+ * 依赖: @fluentui/react-components
+ * 描述: 工具调试页面，包含各种工具的调试界面
+ */
+
+import * as React from "react";
+import { makeStyles, tokens } from "@fluentui/react-components";
+import TextInsertion from "./TextInsertion";
+import { insertText } from "../taskpane";
+
+interface ToolsDebugPageProps {
+  selectedTool: string;
+}
+
+const useStyles = makeStyles({
+  container: {
+    padding: "20px",
+    minHeight: "100vh",
+    backgroundColor: tokens.colorNeutralBackground1,
+  },
+  title: {
+    fontSize: tokens.fontSizeHero700,
+    fontWeight: tokens.fontWeightSemibold,
+    color: tokens.colorNeutralForeground1,
+    marginBottom: "10px",
+  },
+  subtitle: {
+    fontSize: tokens.fontSizeBase300,
+    color: tokens.colorNeutralForeground3,
+    marginBottom: "30px",
+  },
+  toolContainer: {
+    backgroundColor: tokens.colorNeutralBackground1,
+    borderRadius: tokens.borderRadiusMedium,
+    padding: "20px",
+  },
+});
+
+const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
+  const styles = useStyles();
+
+  // 根据选中的工具渲染不同的组件
+  // Render different components based on selected tool
+  const renderTool = () => {
+    switch (selectedTool) {
+      case "text-insertion":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文本插入工具
+            </h1>
+            <p className={styles.subtitle}>
+              在幻灯片中插入文本框，支持自定义位置
+            </p>
+            <div className={styles.toolContainer}>
+              <TextInsertion insertText={insertText} />
+            </div>
+          </>
+        );
+      default:
+        return (
+          <>
+            <h1 className={styles.title}>
+              请选择工具
+            </h1>
+            <p className={styles.subtitle}>
+              从左侧菜单选择要调试的工具
+            </p>
+          </>
+        );
+    }
+  };
+
+  return <div className={styles.container}>{renderTool()}</div>;
+};
+
+export default ToolsDebugPage;
