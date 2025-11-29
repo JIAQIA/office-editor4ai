@@ -17,8 +17,8 @@ describe('HomePage 组件单元测试 | HomePage Component Unit Tests', () => {
   it('应该正确渲染组件 | should render component correctly', () => {
     renderWithProviders(<HomePage />);
 
-    // 验证欢迎标题 | Verify welcome title
-    expect(screen.getByRole('heading', { name: '欢迎' })).toBeInTheDocument();
+    // 验证标题 | Verify title
+    expect(screen.getByRole('heading', { name: 'TuringFocus' })).toBeInTheDocument();
   });
 
   it('应该显示 Logo 图片 | should display logo image', () => {

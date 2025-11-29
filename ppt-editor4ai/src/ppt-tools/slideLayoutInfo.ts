@@ -44,8 +44,8 @@ export interface TextInfo {
  * 图片信息
  */
 export interface ImageInfo {
-  format: string; // 图片格式
-  data?: string; // Base64 编码数据
+  format: string; // 图片格式类型，如 "picture"（图片形状）、"picture-placeholder"（图片占位符）、"picture-fill"（图片填充）。此字段始终存在以标识元素为图片
+  data?: string; // Base64 编码数据，仅在 includeImages=true 时包含
   url?: string; // 外部链接（如果有）
 }
 
@@ -132,7 +132,7 @@ export interface SlideLayoutInfo {
  */
 export interface GetLayoutInfoOptions {
   slideNumber?: number; // 幻灯片页码（从1开始），不填则使用当前页
-  includeImages?: boolean; // 是否包含图片的 Base64 数据，默认为 false
+  includeImages?: boolean; // 是否包含图片的 Base64 数据。注意：无论此参数为何值，图片元素都会被识别并在返回列表中标记（通过 image.format），此参数仅控制是否获取 Base64 数据（image.data）。默认为 false
   includeBackground?: boolean; // 是否包含背景信息，默认为 false
   includeTextDetails?: boolean; // 是否包含文本详细信息，默认为 false
 }
@@ -370,20 +370,18 @@ export async function getSlideLayoutInfo(
       await context.sync();
       console.log("[PowerPoint.run] 形状数量:", shapes.items.length);
 
-      // 尝试获取所有图片（如果 API 支持）
-      if (includeImages) {
-        try {
-          const slideAny = targetSlide as any;
-          if (slideAny.getPictures) {
-            console.log("[PowerPoint.run] 尝试使用 getPictures API");
-            const pictures = slideAny.getPictures();
-            pictures.load("items");
-            await context.sync();
-            console.log(`[PowerPoint.run] 通过 getPictures 找到 ${pictures.items.length} 张图片`);
-          }
-        } catch (error: any) {
-          console.log("[PowerPoint.run] getPictures API 不可用:", error.message);
+      // 尝试获取所有图片（探测 API 是否支持，用于日志记录）
+      try {
+        const slideAny = targetSlide as any;
+        if (slideAny.getPictures) {
+          console.log("[PowerPoint.run] 尝试使用 getPictures API");
+          const pictures = slideAny.getPictures();
+          pictures.load("items");
+          await context.sync();
+          console.log(`[PowerPoint.run] 通过 getPictures 找到 ${pictures.items.length} 张图片`);
         }
+      } catch (error: any) {
+        console.log("[PowerPoint.run] getPictures API 不可用:", error.message);
       }
 
       // 批量加载所有形状的基本属性
@@ -565,99 +563,97 @@ export async function getSlideLayoutInfo(
           );
         }
 
-        // 检查是否包含图片（无论形状类型）
-        if (includeImages) {
-          try {
-            let isImageShape = false;
+        // 检测图片元素（始终执行，与 includeImages 无关）
+        try {
+          let isImageShape = false;
 
-            // 1. 检查形状类型是否为图片
-            if (shapeType === "Picture" || shapeType === "picture" || shapeType === "Image") {
-              console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 是图片类型 (${shapeType})`);
+          // 1. 检查形状类型是否为图片
+          if (shapeType === "Picture" || shapeType === "picture" || shapeType === "Image") {
+            console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 是图片类型 (${shapeType})`);
+            isImageShape = true;
+            element.image = {
+              format: "picture",
+            };
+          }
+
+          // 2. 检查 Placeholder 的 containedType
+          if (shapeType === "Placeholder") {
+            console.log(`[PowerPoint.run] 形状 ${i + 1} 开始检查 Placeholder 内容类型`);
+            try {
+              const placeholderFormat = shape.placeholderFormat;
+              
+              // 检查 placeholderFormat 是否为 null
+              if (!placeholderFormat || placeholderFormat.isNullObject) {
+                console.log(`[PowerPoint.run] 形状 ${i + 1} placeholderFormat 为 null 或未加载`);
+              } else {
+                const containedType = placeholderFormat.containedType as string;
+                const placeholderType = placeholderFormat.type as string;
+
+                console.log(
+                  `[PowerPoint.run] 形状 ${i + 1} Placeholder 类型: ${placeholderType}, 包含内容: ${containedType}`
+                );
+
+                if (containedType === "Image" || containedType === "Picture") {
+                  console.log(`[PowerPoint.run] ✓✓ 形状 ${i + 1} Placeholder 包含图片`);
+                  isImageShape = true;
+                  element.image = {
+                    format: "picture-placeholder",
+                  };
+                }
+              }
+            } catch (error: any) {
+              console.log(
+                `[PowerPoint.run] 形状 ${i + 1} 读取 placeholderFormat 失败:`,
+                error.message
+              );
+            }
+          }
+
+          // 3. 检查填充是否为图片
+          if (element.fill && element.fill.type === "image") {
+            console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 的填充是图片类型`);
+            if (!element.image) {
               isImageShape = true;
               element.image = {
-                format: "picture",
+                format: "picture-fill",
               };
             }
+          }
 
-            // 2. 检查 Placeholder 的 containedType
-            if (shapeType === "Placeholder") {
-              console.log(`[PowerPoint.run] 形状 ${i + 1} 开始检查 Placeholder 内容类型`);
+          // 4. 如果检测到图片且 includeImages=true，则获取 base64 数据
+          if (isImageShape && element.image && includeImages) {
+            // 动态检测 getImageAsBase64 API 是否可用（Beta API）
+            if ("getImageAsBase64" in shape && typeof shape?.getImageAsBase64 === "function") {
               try {
-                const placeholderFormat = shape.placeholderFormat;
-                
-                // 检查 placeholderFormat 是否为 null
-                if (!placeholderFormat || placeholderFormat.isNullObject) {
-                  console.log(`[PowerPoint.run] 形状 ${i + 1} placeholderFormat 为 null 或未加载`);
-                } else {
-                  const containedType = placeholderFormat.containedType as string;
-                  const placeholderType = placeholderFormat.type as string;
+                console.log(`[PowerPoint.run] 尝试获取形状 ${i + 1} 的图片 base64 数据`);
+                const imageBase64Result = shape.getImageAsBase64();
+                await context.sync();
+                const imageData = imageBase64Result.value;
 
+                if (imageData) {
+                  element.image.data = imageData;
                   console.log(
-                    `[PowerPoint.run] 形状 ${i + 1} Placeholder 类型: ${placeholderType}, 包含内容: ${containedType}`
+                    `[PowerPoint.run] ✓✓✓ 形状 ${i + 1} 图片 base64 数据获取成功，长度: ${imageData.length}`
                   );
-
-                  if (containedType === "Image" || containedType === "Picture") {
-                    console.log(`[PowerPoint.run] ✓✓ 形状 ${i + 1} Placeholder 包含图片`);
-                    isImageShape = true;
-                    element.image = {
-                      format: "picture-placeholder",
-                    };
-                  }
                 }
               } catch (error: any) {
                 console.log(
-                  `[PowerPoint.run] 形状 ${i + 1} 读取 placeholderFormat 失败:`,
+                  `[PowerPoint.run] 形状 ${i + 1} 获取图片 base64 失败:`,
                   error.message
                 );
+                element.image.data = `图片获取失败: ${error.message}`;
               }
+            } else {
+              // API 不可用，提供中文描述
+              console.log(
+                `[PowerPoint.run] ⚠️ 形状 ${i + 1} getImageAsBase64 API 不可用（需要 Office 版本支持 Beta API）`
+              );
+              element.image.data =
+                "当前 Office 版本不支持图片数据获取（需要 PowerPointApi Beta 版本）";
             }
-
-            // 3. 检查填充是否为图片
-            if (element.fill && element.fill.type === "image") {
-              console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 的填充是图片类型`);
-              if (!element.image) {
-                isImageShape = true;
-                element.image = {
-                  format: "picture-fill",
-                };
-              }
-            }
-
-            // 4. 如果检测到图片，尝试获取 base64 数据
-            if (isImageShape && element.image) {
-              // 动态检测 getImageAsBase64 API 是否可用（Beta API）
-              if ("getImageAsBase64" in shape && typeof shape?.getImageAsBase64 === "function") {
-                try {
-                  console.log(`[PowerPoint.run] 尝试获取形状 ${i + 1} 的图片 base64 数据`);
-                  const imageBase64Result = shape.getImageAsBase64();
-                  await context.sync();
-                  const imageData = imageBase64Result.value;
-
-                  if (imageData) {
-                    element.image.data = imageData;
-                    console.log(
-                      `[PowerPoint.run] ✓✓✓ 形状 ${i + 1} 图片 base64 数据获取成功，长度: ${imageData.length}`
-                    );
-                  }
-                } catch (error: any) {
-                  console.log(
-                    `[PowerPoint.run] 形状 ${i + 1} 获取图片 base64 失败:`,
-                    error.message
-                  );
-                  element.image.data = `图片获取失败: ${error.message}`;
-                }
-              } else {
-                // API 不可用，提供中文描述
-                console.log(
-                  `[PowerPoint.run] ⚠️ 形状 ${i + 1} getImageAsBase64 API 不可用（需要 Office 版本支持 Beta API）`
-                );
-                element.image.data =
-                  "当前 Office 版本不支持图片数据获取（需要 PowerPointApi Beta 版本）";
-              }
-            }
-          } catch (error: any) {
-            console.log(`[PowerPoint.run] 形状 ${i + 1} 检查图片信息时出错: ${error.message}`);
           }
+        } catch (error: any) {
+          console.log(`[PowerPoint.run] 形状 ${i + 1} 检查图片信息时出错: ${error.message}`);
         }
 
         elements.push(element);
