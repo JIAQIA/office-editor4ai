@@ -3,7 +3,7 @@
  * See LICENSE in the project root for license information.
  */
 
-/* global Office */
+/* global Office, console */
 
 // 当 Office 加载项准备就绪时执行
 Office.onReady(() => {
@@ -18,13 +18,13 @@ function action(event: Office.AddinCommands.Event) {
   // 测试通知功能 - 在 PowerPoint 中显示对话框
   Office.context.ui.displayDialogAsync(
     // TODO 未来这里需要替换成线上聊天界面
-    'https://localhost:3003/taskpane.html',
+    "https://localhost:3003/taskpane.html",
     { height: 50, width: 30 },
     (result) => {
       if (result.status === Office.AsyncResultStatus.Failed) {
-        console.error('打开对话框失败:', result.error.message);
+        console.error("打开对话框失败:", result.error.message);
       } else {
-        console.log('对话框打开成功');
+        console.log("对话框打开成功");
         const dialog = result.value;
         dialog.addEventHandler(Office.EventType.DialogMessageReceived, () => {
           dialog.close();

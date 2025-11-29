@@ -8,7 +8,7 @@
  * 描述: 页面布局信息工具，用于获取并显示完整的页面布局、尺寸和元素详细信息
  */
 
-/* global console */
+/* global console, navigator, setTimeout */
 
 import * as React from "react";
 import { useState } from "react";
@@ -32,7 +32,7 @@ interface OfficeError extends Error {
     errorCode?: string;
     errorLocation?: string;
     message?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   code?: string;
 }
@@ -204,7 +204,7 @@ const useStyles = makeStyles({
   },
 });
 
-const SlideLayoutInfo: React.FC = () => {
+const SlideLayoutInfoComponent: React.FC = () => {
   const styles = useStyles();
   const [layoutInfo, setLayoutInfo] = useState<SlideLayoutInfo | null>(null);
   const [loading, setLoading] = useState(false);
@@ -533,4 +533,4 @@ const SlideLayoutInfo: React.FC = () => {
   );
 };
 
-export default SlideLayoutInfo;
+export default SlideLayoutInfoComponent;

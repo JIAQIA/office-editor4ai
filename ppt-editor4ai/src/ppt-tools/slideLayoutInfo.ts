@@ -44,7 +44,7 @@ export interface TextInfo {
  * 图片信息
  */
 export interface ImageInfo {
-  format: string; // 图片格式类型，如 "picture"（图片形状）、"picture-placeholder"（图片占位符）、"picture-fill"（图片填充）。此字段始终存在以标识元素为图片
+  format: "picture" | "picture-placeholder" | "picture-fill"; // 图片格式类型
   data?: string; // Base64 编码数据，仅在 includeImages=true 时包含
   url?: string; // 外部链接（如果有）
 }
@@ -191,7 +191,13 @@ export async function getPresentationDimensions(): Promise<SlideDimensions> {
     await PowerPoint.run(async (context) => {
       try {
         // 动态检测 pageSetup API 是否存在
-        const presentation = context.presentation as any;
+        const presentation = context.presentation as unknown as {
+          pageSetup?: {
+            slideWidth: number;
+            slideHeight: number;
+            load: (properties: string) => void;
+          };
+        };
         console.log("[DEBUG] 检测 pageSetup API...");
         if (presentation.pageSetup) {
           console.log("[DEBUG] pageSetup API 可用，正在获取尺寸...");
@@ -254,7 +260,7 @@ export async function getSlideLayoutInfo(
   console.log("[getSlideLayoutInfo] 开始获取布局信息，选项:", options);
 
   try {
-    let layoutInfo: SlideLayoutInfo = {
+    const layoutInfo: SlideLayoutInfo = {
       slideNumber: 0,
       slideId: "",
       dimensions: { width: 0, height: 0, aspectRatio: "", isFromAPI: false },
@@ -323,7 +329,13 @@ export async function getSlideLayoutInfo(
       let isFromAPI = false;
 
       try {
-        const presentation = context.presentation as any;
+        const presentation = context.presentation as unknown as {
+          pageSetup?: {
+            slideWidth: number;
+            slideHeight: number;
+            load: (properties: string) => void;
+          };
+        };
         if (presentation.pageSetup) {
           const pageSetup = presentation.pageSetup;
           pageSetup.load("slideWidth,slideHeight");
@@ -372,7 +384,9 @@ export async function getSlideLayoutInfo(
 
       // 尝试获取所有图片（探测 API 是否支持，用于日志记录）
       try {
-        const slideAny = targetSlide as any;
+        const slideAny = targetSlide as unknown as {
+          getPictures?: () => { load: (properties: string) => void; items: unknown[] };
+        };
         if (slideAny.getPictures) {
           console.log("[PowerPoint.run] 尝试使用 getPictures API");
           const pictures = slideAny.getPictures();
@@ -380,8 +394,8 @@ export async function getSlideLayoutInfo(
           await context.sync();
           console.log(`[PowerPoint.run] 通过 getPictures 找到 ${pictures.items.length} 张图片`);
         }
-      } catch (error: any) {
-        console.log("[PowerPoint.run] getPictures API 不可用:", error.message);
+      } catch (error: unknown) {
+        console.log("[PowerPoint.run] getPictures API 不可用:", (error as Error).message);
       }
 
       // 批量加载所有形状的基本属性
@@ -407,12 +421,12 @@ export async function getSlideLayoutInfo(
           shape.placeholderFormat.load("type,containedType");
         }
       }
-      
+
       try {
         await context.sync();
         console.log("[PowerPoint.run] Placeholder 格式信息加载完成");
-      } catch (error: any) {
-        console.log("[PowerPoint.run] Placeholder 格式信息加载失败:", error.message);
+      } catch (error: unknown) {
+        console.log("[PowerPoint.run] Placeholder 格式信息加载失败:", (error as Error).message);
         console.log("[PowerPoint.run] 将继续处理，但无法获取 Placeholder 的 containedType 信息");
       }
 
@@ -436,14 +450,15 @@ export async function getSlideLayoutInfo(
         try {
           const textFrame = shape.textFrame;
           textFrame.load("textRange");
+          // eslint-disable-next-line office-addins/no-context-sync-in-loop
           await context.sync();
 
           shapeTextSupport[i] = true;
           console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} textFrame 加载成功`);
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.log(
             `[PowerPoint.run] ✗ 形状 ${i + 1} 不支持 textFrame (${shapeType}):`,
-            error.message
+            (error as Error).message
           );
           // 不支持 textFrame 的形状，继续处理下一个
         }
@@ -460,10 +475,14 @@ export async function getSlideLayoutInfo(
             if (includeTextDetails) {
               textFrame.textRange.font.load("name,size,color");
             }
+            // eslint-disable-next-line office-addins/no-context-sync-in-loop
             await context.sync();
             console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 文本内容加载成功`);
-          } catch (error: any) {
-            console.log(`[PowerPoint.run] ✗ 形状 ${i + 1} 文本内容加载失败:`, error.message);
+          } catch (error: unknown) {
+            console.log(
+              `[PowerPoint.run] ✗ 形状 ${i + 1} 文本内容加载失败:`,
+              (error as Error).message
+            );
           }
         }
       }
@@ -534,6 +553,7 @@ export async function getSlideLayoutInfo(
         try {
           // 先加载 fill 对象
           shape.fill.load("type");
+          // eslint-disable-next-line office-addins/no-context-sync-in-loop
           await context.sync();
 
           // 检查 fill 是否为 null
@@ -556,10 +576,10 @@ export async function getSlideLayoutInfo(
               element.fill = { type: "unknown" };
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           // Placeholder 等某些类型的形状不支持 fill 属性
           console.log(
-            `[PowerPoint.run] 形状 ${i + 1} (${shapeType}) 不支持填充信息: ${error.message}`
+            `[PowerPoint.run] 形状 ${i + 1} (${shapeType}) 不支持填充信息: ${(error as Error).message}`
           );
         }
 
@@ -581,7 +601,7 @@ export async function getSlideLayoutInfo(
             console.log(`[PowerPoint.run] 形状 ${i + 1} 开始检查 Placeholder 内容类型`);
             try {
               const placeholderFormat = shape.placeholderFormat;
-              
+
               // 检查 placeholderFormat 是否为 null
               if (!placeholderFormat || placeholderFormat.isNullObject) {
                 console.log(`[PowerPoint.run] 形状 ${i + 1} placeholderFormat 为 null 或未加载`);
@@ -601,10 +621,10 @@ export async function getSlideLayoutInfo(
                   };
                 }
               }
-            } catch (error: any) {
+            } catch (error: unknown) {
               console.log(
                 `[PowerPoint.run] 形状 ${i + 1} 读取 placeholderFormat 失败:`,
-                error.message
+                (error as Error).message
               );
             }
           }
@@ -627,6 +647,7 @@ export async function getSlideLayoutInfo(
               try {
                 console.log(`[PowerPoint.run] 尝试获取形状 ${i + 1} 的图片 base64 数据`);
                 const imageBase64Result = shape.getImageAsBase64();
+                // eslint-disable-next-line office-addins/no-context-sync-in-loop
                 await context.sync();
                 const imageData = imageBase64Result.value;
 
@@ -636,12 +657,12 @@ export async function getSlideLayoutInfo(
                     `[PowerPoint.run] ✓✓✓ 形状 ${i + 1} 图片 base64 数据获取成功，长度: ${imageData.length}`
                   );
                 }
-              } catch (error: any) {
+              } catch (error: unknown) {
                 console.log(
                   `[PowerPoint.run] 形状 ${i + 1} 获取图片 base64 失败:`,
-                  error.message
+                  (error as Error).message
                 );
-                element.image.data = `图片获取失败: ${error.message}`;
+                element.image.data = `图片获取失败: ${(error as Error).message}`;
               }
             } else {
               // API 不可用，提供中文描述
@@ -652,8 +673,10 @@ export async function getSlideLayoutInfo(
                 "当前 Office 版本不支持图片数据获取（需要 PowerPointApi Beta 版本）";
             }
           }
-        } catch (error: any) {
-          console.log(`[PowerPoint.run] 形状 ${i + 1} 检查图片信息时出错: ${error.message}`);
+        } catch (error: unknown) {
+          console.log(
+            `[PowerPoint.run] 形状 ${i + 1} 检查图片信息时出错: ${(error as Error).message}`
+          );
         }
 
         elements.push(element);
