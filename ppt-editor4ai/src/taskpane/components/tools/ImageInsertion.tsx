@@ -219,17 +219,16 @@ const ImageInsertion: React.FC<ImageInsertionProps> = () => {
         }
       }
 
-      // 插入图片（统一使用 base64 方式）
+      // 插入图片（imageSource 已经是 Base64 格式）
       const result = await insertImageToSlide({
         imageSource,
-        sourceType: "base64", // 统一使用 base64，因为 URL 已经转换了
         left: leftValue,
         top: topValue,
         width: widthValue,
         height: heightValue,
       });
 
-      alert(`图片插入成功！\nID: ${result.shapeId}\n尺寸: ${result.width.toFixed(1)} × ${result.height.toFixed(1)} 磅`);
+      alert(`图片插入成功！\nID: ${result.imageId}\n尺寸: ${result.width.toFixed(1)} × ${result.height.toFixed(1)} 磅`);
 
       // 清空表单（可选）
       // resetForm();

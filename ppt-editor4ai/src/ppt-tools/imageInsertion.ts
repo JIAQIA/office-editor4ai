@@ -13,10 +13,8 @@
  * 图片插入选项
  */
 export interface ImageInsertionOptions {
-  /** 图片来源：Base64 编码的数据或 URL */
+  /** 图片来源：Base64 编码的数据（支持带或不带 data URL 前缀） */
   imageSource: string;
-  /** 图片来源类型：'base64' 或 'url' */
-  sourceType: "base64" | "url";
   /** X 坐标（可选，单位：磅） */
   left?: number;
   /** Y 坐标（可选，单位：磅） */
@@ -31,8 +29,8 @@ export interface ImageInsertionOptions {
  * 插入图片结果
  */
 export interface ImageInsertionResult {
-  /** 插入的图片形状 ID */
-  shapeId: string;
+  /** 插入的图片 ID（Common API 不提供，返回空字符串） */
+  imageId: string;
   /** 图片实际宽度 */
   width: number;
   /** 图片实际高度 */
@@ -50,21 +48,18 @@ export interface ImageInsertionResult {
  * 
  * @example
  * ```typescript
- * // 使用 Base64 插入图片
+ * // 使用 Base64 插入图片（支持带 data URL 前缀）
  * const result = await insertImageToSlide({
  *   imageSource: "data:image/png;base64,iVBORw0KGgoAAAANS...",
- *   sourceType: "base64",
  *   left: 100,
  *   top: 100,
  *   width: 200,
  *   height: 150
  * });
  * 
- * // 使用 URL 插入图片（建议先用 fetchImageAsBase64 转换）
- * const base64Data = await fetchImageAsBase64("https://example.com/image.png");
+ * // 或者不带前缀的纯 Base64
  * const result = await insertImageToSlide({
- *   imageSource: base64Data,
- *   sourceType: "base64",
+ *   imageSource: "iVBORw0KGgoAAAANS...",
  *   left: 100,
  *   top: 100
  * });
@@ -73,9 +68,9 @@ export interface ImageInsertionResult {
 export async function insertImageToSlide(
   options: ImageInsertionOptions
 ): Promise<ImageInsertionResult> {
-  const { imageSource, sourceType, left, top, width, height } = options;
+  const { imageSource, left, top, width, height } = options;
 
-  console.log("[insertImageToSlide] 开始插入图片，类型:", sourceType);
+  console.log("[insertImageToSlide] 开始插入图片");
 
   try {
     // 处理 Base64 数据
@@ -86,7 +81,7 @@ export async function insertImageToSlide(
       imageData = imageData.split(",")[1];
     }
     
-    console.log("[insertImageToSlide] 插入图片，来源类型:", sourceType);
+    console.log("[insertImageToSlide] 准备插入图片");
 
     // 使用 Office Common API 插入图片
     // 这会创建一个真正的 Picture 类型元素，而不是 Rectangle
@@ -119,10 +114,10 @@ export async function insertImageToSlide(
           } else {
             console.log("[insertImageToSlide] 图片插入成功");
             
-            // 注意：setSelectedDataAsync 不返回形状信息
+            // 注意：setSelectedDataAsync 不返回图片信息
             // 我们返回用户指定的尺寸，如果没有指定则返回默认值
             const result: ImageInsertionResult = {
-              shapeId: "", // Common API 不提供 ID
+              imageId: "", // Common API 不提供 ID
               width: width || 200,
               height: height || 150,
             };
@@ -213,17 +208,15 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 /**
  * 简化版本：插入图片（兼容旧接口）
  * 
- * @param imageSource 图片来源（Base64 或 URL）
- * @param sourceType 来源类型
+ * @param imageSource 图片来源（Base64 编码）
  * @param left X 坐标（可选）
  * @param top Y 坐标（可选）
  * @returns Promise<ImageInsertionResult> 插入结果
  */
 export async function insertImage(
   imageSource: string,
-  sourceType: "base64" | "url" = "base64",
   left?: number,
   top?: number
 ): Promise<ImageInsertionResult> {
-  return insertImageToSlide({ imageSource, sourceType, left, top });
+  return insertImageToSlide({ imageSource, left, top });
 }
