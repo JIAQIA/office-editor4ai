@@ -10,6 +10,7 @@
 import * as React from "react";
 import TextInsertion from "./TextInsertion";
 import ElementsList from "./ElementsList";
+import SlideLayoutInfo from "./SlideLayoutInfo";
 
 export interface ToolConfig {
   id: string;
@@ -34,6 +35,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "元素列表",
     subtitle: "获取当前幻灯片中所有元素的信息",
     component: <ElementsList />,
+  },
+  "slide-layout-info": {
+    id: "slide-layout-info",
+    title: "页面布局信息",
+    subtitle: "获取页面完整布局、尺寸和元素详细信息，支持导出 JSON 用于 AutoLayout 计算",
+    component: <SlideLayoutInfo />,
   },
 };
 

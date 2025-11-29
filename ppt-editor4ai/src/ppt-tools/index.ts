@@ -18,3 +18,23 @@ export {
   getSlideElementsByPageNumber,
 } from "./elementsList";
 export type { SlideElement, GetElementsOptions } from "./elementsList";
+
+// 页面布局信息工具
+export {
+  getSlideLayoutInfo,
+  getCurrentSlideLayoutInfo,
+  getSlideDimensions,
+  getPresentationDimensions,
+} from "./slideLayoutInfo";
+export type {
+  SlideLayoutInfo,
+  EnhancedElement,
+  SlideDimensions,
+  RelativePosition,
+  TextInfo,
+  ImageInfo,
+  FillInfo,
+  LayoutInfo,
+  BackgroundInfo,
+  GetLayoutInfoOptions,
+} from "./slideLayoutInfo";

@@ -87,7 +87,7 @@ const HomePage: React.FC = () => {
     <div className={styles.container}>
       <section className={styles.header}>
         <Image width="60" height="60" src="assets/logo-filled.png" alt="PPT Editor for AI" />
-        <h1 className={styles.message}>欢迎</h1>
+        <h1 className={styles.message}>TuringFocus</h1>
       </section>
 
       <div className={styles.mainContent}>
