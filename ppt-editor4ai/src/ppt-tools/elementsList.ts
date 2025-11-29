@@ -78,27 +78,8 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
       // 批量加载所有形状的基本属性
       for (const shape of shapes.items) {
         shape.load("id,type,left,top,width,height,name");
-        if (includeText) {
-          try {
-            shape.textFrame.load("textRange");
-          } catch {
-            // 如果形状没有文本框，忽略错误
-          }
-        }
       }
       await context.sync();
-
-      // 批量加载文本内容
-      if (includeText) {
-        for (const shape of shapes.items) {
-          try {
-            shape.textFrame.textRange.load("text");
-          } catch {
-            // 如果形状没有文本框，忽略错误
-          }
-        }
-        await context.sync();
-      }
 
       // 收集所有元素信息
       for (const shape of shapes.items) {
@@ -106,9 +87,18 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
         let textContent: string | undefined;
         if (includeText) {
           try {
-            textContent = shape.textFrame.textRange.text?.trim() || undefined;
+            // 先尝试加载 textFrame，如果形状支持文本框
+            const textFrame = shape.textFrame;
+            textFrame.load("hasText");
+            await context.sync();
+            
+            if (textFrame.hasText) {
+              textFrame.textRange.load("text");
+              await context.sync();
+              textContent = textFrame.textRange.text?.trim() || undefined;
+            }
           } catch {
-            // 如果形状没有文本框，忽略错误
+            // 如果形状不支持文本框，忽略错误
             textContent = undefined;
           }
         }
