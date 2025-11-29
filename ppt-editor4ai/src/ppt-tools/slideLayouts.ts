@@ -80,27 +80,49 @@ export async function getAvailableSlideLayouts(
         return;
       }
 
+      // 批量加载所有母版的基本信息和布局
+      for (const master of slideMasters.items) {
+        master.load("id,name,layouts");
+        master.layouts.load("items");
+      }
+      await context.sync();
+
+      // 批量加载所有布局的基本信息
+      for (const master of slideMasters.items) {
+        for (const layout of master.layouts.items) {
+          layout.load("id,name,type");
+          if (includePlaceholders) {
+            layout.load("shapes");
+            layout.shapes.load("items");
+          }
+        }
+      }
+      await context.sync();
+
+      // 如果需要占位符信息，批量加载所有形状的类型和占位符格式
+      if (includePlaceholders) {
+        for (const master of slideMasters.items) {
+          for (const layout of master.layouts.items) {
+            for (const shape of layout.shapes.items) {
+              shape.load("type,placeholderFormat");
+            }
+          }
+        }
+        await context.sync();
+      }
+
       // 遍历所有母版（通常只有一个）
       for (let masterIndex = 0; masterIndex < slideMasters.items.length; masterIndex++) {
         const master = slideMasters.items[masterIndex];
-        master.load("id,name");
-
-        // 获取该母版下的所有布局
         const masterLayouts = master.layouts;
-        masterLayouts.load("items");
-        await context.sync();
 
         console.log(
           `[PowerPoint.run] 母版 ${masterIndex + 1} (${master.name}) 包含 ${masterLayouts.items.length} 个布局`
         );
 
-        // 遍历所有布局
+        // 遍历所有布局，收集信息
         for (let i = 0; i < masterLayouts.items.length; i++) {
           const layout = masterLayouts.items[i];
-
-          // 加载布局基本信息
-          layout.load("id,name,type");
-          await context.sync();
 
           console.log(
             `[PowerPoint.run] 处理布局 ${i + 1}/${masterLayouts.items.length}: ${layout.name} (${layout.type})`
@@ -119,8 +141,6 @@ export async function getAvailableSlideLayouts(
           if (includePlaceholders) {
             try {
               const shapes = layout.shapes;
-              shapes.load("items");
-              await context.sync();
 
               console.log(
                 `[PowerPoint.run] 布局 "${layout.name}" 包含 ${shapes.items.length} 个形状`
@@ -131,17 +151,9 @@ export async function getAvailableSlideLayouts(
               // 遍历形状，查找占位符
               for (let j = 0; j < shapes.items.length; j++) {
                 const shape = shapes.items[j];
-                shape.load("type");
-                // eslint-disable-next-line office-addins/no-context-sync-in-loop
-                await context.sync();
 
                 if (shape.type === "Placeholder") {
                   try {
-                    shape.load("placeholderFormat");
-                    shape.placeholderFormat.load("type");
-                    // eslint-disable-next-line office-addins/no-context-sync-in-loop
-                    await context.sync();
-
                     const placeholderType = shape.placeholderFormat.type as string;
                     placeholderTypes.push(placeholderType);
                     console.log(
@@ -217,21 +229,25 @@ export async function createSlideWithLayout(layoutId: string, position?: number)
       slideMasters.load("items");
       await context.sync();
 
+      // 批量加载所有母版的布局
+      for (const master of slideMasters.items) {
+        master.layouts.load("items");
+      }
+      await context.sync();
+
+      // 批量加载所有布局的 ID
+      for (const master of slideMasters.items) {
+        for (const layout of master.layouts.items) {
+          layout.load("id");
+        }
+      }
+      await context.sync();
+
       // 查找包含指定布局的母版
       let targetLayout: PowerPoint.SlideLayout | null = null;
 
-      for (let i = 0; i < slideMasters.items.length; i++) {
-        const master = slideMasters.items[i];
-        const layouts = master.layouts;
-        layouts.load("items");
-        await context.sync();
-
-        for (let j = 0; j < layouts.items.length; j++) {
-          const layout = layouts.items[j];
-          layout.load("id");
-          // eslint-disable-next-line office-addins/no-context-sync-in-loop
-          await context.sync();
-
+      for (const master of slideMasters.items) {
+        for (const layout of master.layouts.items) {
           if (layout.id === layoutId) {
             targetLayout = layout;
             console.log("[PowerPoint.run] 找到目标布局:", layout.id);

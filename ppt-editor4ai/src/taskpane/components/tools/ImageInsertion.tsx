@@ -23,7 +23,7 @@ import {
 import { insertImageToSlide, readImageAsBase64, fetchImageAsBase64 } from "../../../ppt-tools";
 import { Image24Regular, ArrowUpload24Regular } from "@fluentui/react-icons";
 
-/* global HTMLInputElement */
+/* global HTMLInputElement, File, alert, console */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface ImageInsertionProps {}
@@ -231,7 +231,7 @@ const ImageInsertion: React.FC<ImageInsertionProps> = () => {
       alert(`图片插入成功！\nID: ${result.imageId}\n尺寸: ${result.width.toFixed(1)} × ${result.height.toFixed(1)} 磅`);
 
       // 清空表单（可选）
-      // resetForm();
+      // _resetForm();
     } catch (error) {
       console.error("插入图片失败:", error);
       alert(`插入图片失败: ${(error as Error).message}`);
@@ -241,7 +241,7 @@ const ImageInsertion: React.FC<ImageInsertionProps> = () => {
   };
 
   // 重置表单
-  const resetForm = () => {
+  const _resetForm = () => {
     setSelectedFile(null);
     setBase64Data("");
     setPreviewUrl("");

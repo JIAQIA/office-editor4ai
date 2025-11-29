@@ -7,7 +7,7 @@
  * 描述: 图片插入工具核心逻辑，与 Office API 交互
  */
 
-/* global PowerPoint, console */
+/* global Office, console, File, FileReader, fetch */
 
 /**
  * 图片插入选项

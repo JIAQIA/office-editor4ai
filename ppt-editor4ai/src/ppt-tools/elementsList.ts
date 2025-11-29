@@ -80,7 +80,26 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
       // 批量加载所有形状的基本属性
       for (const shape of shapes.items) {
         shape.load("id,type,left,top,width,height,name");
+
+        // 如果需要文本内容，预加载 textFrame
+        if (includeText) {
+          try {
+            shape.textFrame.load("hasText,textRange");
+          } catch {
+            // 如果形状不支持文本框，忽略错误
+          }
+        }
+
+        // 如果是占位符，预加载 placeholderFormat
+        // 注意：此时还不知道 type，所以尝试加载所有形状的 placeholderFormat
+        try {
+          shape.load("placeholderFormat");
+        } catch {
+          // 如果不是占位符，忽略错误
+        }
       }
+
+      // 一次性同步所有数据
       await context.sync();
 
       // 收集所有元素信息
@@ -89,14 +108,8 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
         let textContent: string | undefined;
         if (includeText) {
           try {
-            // 先尝试加载 textFrame，如果形状支持文本框
             const textFrame = shape.textFrame;
-            textFrame.load("hasText");
-            await context.sync();
-
-            if (textFrame.hasText) {
-              textFrame.textRange.load("text");
-              await context.sync();
+            if (textFrame.hasText && textFrame.textRange) {
               textContent = textFrame.textRange.text?.trim() || undefined;
             }
           } catch {
@@ -111,12 +124,8 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
         if (shape.type === "Placeholder") {
           try {
-            const placeholderFormat = shape.placeholderFormat;
-            placeholderFormat.load("type,containedType");
-            await context.sync();
-
-            placeholderType = placeholderFormat.type;
-            placeholderContainedType = placeholderFormat.containedType || undefined;
+            placeholderType = shape.placeholderFormat.type;
+            placeholderContainedType = shape.placeholderFormat.containedType || undefined;
           } catch {
             // 如果加载 placeholderFormat 失败，忽略错误
             placeholderType = undefined;
