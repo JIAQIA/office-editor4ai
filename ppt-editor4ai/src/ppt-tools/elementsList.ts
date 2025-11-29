@@ -93,7 +93,7 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
             const textFrame = shape.textFrame;
             textFrame.load("hasText");
             await context.sync();
-            
+
             if (textFrame.hasText) {
               textFrame.textRange.load("text");
               await context.sync();
@@ -108,13 +108,13 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
         // 获取 Placeholder 的详细类型信息
         let placeholderType: string | undefined;
         let placeholderContainedType: string | undefined;
-        
+
         if (shape.type === "Placeholder") {
           try {
             const placeholderFormat = shape.placeholderFormat;
             placeholderFormat.load("type,containedType");
             await context.sync();
-            
+
             placeholderType = placeholderFormat.type;
             placeholderContainedType = placeholderFormat.containedType || undefined;
           } catch {

@@ -39,13 +39,13 @@ export interface ImageInsertionResult {
 
 /**
  * 插入图片到幻灯片
- * 
+ *
  * 使用 Office.context.document.setSelectedDataAsync 和 Office.CoercionType.Image
  * 这是官方推荐的方式，插入的元素类型为 Picture 而不是 Rectangle
- * 
+ *
  * @param options 图片插入选项
  * @returns Promise<ImageInsertionResult> 插入结果
- * 
+ *
  * @example
  * ```typescript
  * // 使用 Base64 插入图片（支持带 data URL 前缀）
@@ -56,7 +56,7 @@ export interface ImageInsertionResult {
  *   width: 200,
  *   height: 150
  * });
- * 
+ *
  * // 或者不带前缀的纯 Base64
  * const result = await insertImageToSlide({
  *   imageSource: "iVBORw0KGgoAAAANS...",
@@ -75,12 +75,12 @@ export async function insertImageToSlide(
   try {
     // 处理 Base64 数据
     let imageData = imageSource;
-    
+
     // 如果包含 data URL 前缀，提取纯 Base64 部分
     if (imageData.includes(",")) {
       imageData = imageData.split(",")[1];
     }
-    
+
     console.log("[insertImageToSlide] 准备插入图片");
 
     // 使用 Office Common API 插入图片
@@ -113,7 +113,7 @@ export async function insertImageToSlide(
             reject(new Error(asyncResult.error?.message || "插入图片失败"));
           } else {
             console.log("[insertImageToSlide] 图片插入成功");
-            
+
             // 注意：setSelectedDataAsync 不返回图片信息
             // 我们返回用户指定的尺寸，如果没有指定则返回默认值
             const result: ImageInsertionResult = {
@@ -121,7 +121,7 @@ export async function insertImageToSlide(
               width: width || 200,
               height: height || 150,
             };
-            
+
             resolve(result);
           }
         }
@@ -139,7 +139,7 @@ export async function insertImageToSlide(
 
 /**
  * 从文件读取器读取图片并转换为 Base64
- * 
+ *
  * @param file 图片文件
  * @returns Promise<string> Base64 编码的图片数据（包含 data URL 前缀）
  */
@@ -165,7 +165,7 @@ export function readImageAsBase64(file: File): Promise<string> {
 
 /**
  * 从 URL 加载图片并转换为 Base64
- * 
+ *
  * @param url 图片 URL
  * @returns Promise<string> Base64 编码的图片数据（包含 data URL 前缀）
  */
@@ -173,7 +173,7 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
   try {
     // 使用 fetch 获取图片
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       throw new Error(`获取图片失败: ${response.status} ${response.statusText}`);
     }
@@ -207,7 +207,7 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 
 /**
  * 简化版本：插入图片（兼容旧接口）
- * 
+ *
  * @param imageSource 图片来源（Base64 编码）
  * @param left X 坐标（可选）
  * @param top Y 坐标（可选）
