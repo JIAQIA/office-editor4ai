@@ -22,15 +22,14 @@ import {
   Spinner,
 } from "@fluentui/react-components";
 import {
-  getSlideScreenshot,
   getCurrentSlideScreenshot,
   getSlideScreenshotByPageNumber,
   getAllSlidesScreenshots,
 } from "../../../ppt-tools";
-import type { SlideScreenshotResult } from "../../../ppt-tools/slideScreenshot";
+import type { SlideScreenshotResult } from "../../../ppt-tools";
 import { Camera24Regular, Image24Regular, Copy24Regular } from "@fluentui/react-icons";
 
-/* global alert, console, navigator */
+/* global alert, console, navigator, document */
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface SlideScreenshotProps {}
@@ -243,7 +242,11 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
         </div>
 
         <div className={styles.previewImageContainer}>
-          <img src={dataUrl} alt={`幻灯片 ${result.slideIndex + 1}`} className={styles.previewImage} />
+          <img
+            src={dataUrl}
+            alt={`幻灯片 ${result.slideIndex + 1}`}
+            className={styles.previewImage}
+          />
         </div>
 
         <div className={styles.buttonGroup}>
@@ -254,7 +257,10 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
           >
             复制 Base64
           </Button>
-          <Button appearance="secondary" onClick={() => handleDownload(result.imageBase64, result.slideIndex)}>
+          <Button
+            appearance="secondary"
+            onClick={() => handleDownload(result.imageBase64, result.slideIndex)}
+          >
             下载图片
           </Button>
         </div>
@@ -267,7 +273,11 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
       {/* 截图模式选择 */}
       <div className={styles.section}>
         <Label weight="semibold">选择截图模式</Label>
-        <RadioGroup value={mode} onChange={(_, data) => setMode(data.value as any)} className={styles.radioGroup}>
+        <RadioGroup
+          value={mode}
+          onChange={(_, data) => setMode(data.value as "current" | "specific" | "all")}
+          className={styles.radioGroup}
+        >
           <Radio value="current" label="当前幻灯片" />
           <Radio value="specific" label="指定页码" />
           <Radio value="all" label="所有幻灯片" />
@@ -294,10 +304,20 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
         <Label weight="semibold">图片尺寸（可选）</Label>
         <div className={styles.sizeContainer}>
           <Field className={styles.sizeField} label="宽度（像素）">
-            <Input type="number" value={width} onChange={(e) => setWidth(e.target.value)} placeholder="自动" />
+            <Input
+              type="number"
+              value={width}
+              onChange={(e) => setWidth(e.target.value)}
+              placeholder="自动"
+            />
           </Field>
           <Field className={styles.sizeField} label="高度（像素）">
-            <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="自动" />
+            <Input
+              type="number"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              placeholder="自动"
+            />
           </Field>
         </div>
       </div>
@@ -332,7 +352,9 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
       )}
 
       {/* 单个截图预览 */}
-      {!isCapturing && screenshot && <div className={styles.previewContainer}>{renderScreenshotPreview(screenshot)}</div>}
+      {!isCapturing && screenshot && (
+        <div className={styles.previewContainer}>{renderScreenshotPreview(screenshot)}</div>
+      )}
 
       {/* 所有截图预览 */}
       {!isCapturing && allScreenshots.length > 0 && (
@@ -352,7 +374,10 @@ const SlideScreenshot: React.FC<SlideScreenshotProps> = () => {
                 <Button size="small" onClick={() => handleCopyBase64(result.imageBase64)}>
                   复制
                 </Button>
-                <Button size="small" onClick={() => handleDownload(result.imageBase64, result.slideIndex)}>
+                <Button
+                  size="small"
+                  onClick={() => handleDownload(result.imageBase64, result.slideIndex)}
+                >
                   下载
                 </Button>
               </div>
