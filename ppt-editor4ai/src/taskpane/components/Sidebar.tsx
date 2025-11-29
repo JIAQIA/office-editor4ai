@@ -22,7 +22,8 @@ import {
   Navigation24Regular,
   Dismiss24Regular,
   List24Regular,
-  LayoutColumnTwoSplitLeft24Regular
+  LayoutColumnTwoSplitLeft24Regular,
+  LayoutRowTwo24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -396,6 +397,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <LayoutColumnTwoSplitLeft24Regular className={styles.icon} />
               <span className={styles.label}>页面布局信息</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "slide-layouts"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "slide-layouts")}
+          >
+            <div className={styles.menuItemContent}>
+              <LayoutRowTwo24Regular className={styles.icon} />
+              <span className={styles.label}>布局模板列表</span>
             </div>
           </Button>
         </div>

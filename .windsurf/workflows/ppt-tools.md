@@ -33,4 +33,4 @@ description: ppt-tools
 
 ---
 
-目前我们正在开发第2个能力，获取指定页面打开浏览器的Slide内容
+目前我们正在开发新能力：获取当前PPT可用的Office Theme Templates。即可用的模板。方便在创建的时候指定使用什么模板

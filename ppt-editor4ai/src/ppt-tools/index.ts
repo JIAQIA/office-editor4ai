@@ -38,3 +38,11 @@ export type {
   BackgroundInfo,
   GetLayoutInfoOptions,
 } from "./slideLayoutInfo";
+
+// 幻灯片布局模板工具
+export {
+  getAvailableSlideLayouts,
+  createSlideWithLayout,
+  getLayoutDescription,
+} from "./slideLayouts";
+export type { SlideLayoutTemplate, GetSlideLayoutsOptions } from "./slideLayouts";
