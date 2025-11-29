@@ -251,6 +251,8 @@ export async function getSlideLayoutInfo(
     includeTextDetails = false,
   } = options;
 
+  console.log("[getSlideLayoutInfo] 开始获取布局信息，选项:", options);
+
   try {
     let layoutInfo: SlideLayoutInfo = {
       slideNumber: 0,
@@ -261,9 +263,13 @@ export async function getSlideLayoutInfo(
     };
 
     await PowerPoint.run(async (context) => {
+      console.log("[PowerPoint.run] 进入上下文");
+      
       const slides = context.presentation.slides;
       slides.load("items");
+      console.log("[PowerPoint.run] 加载 slides.items");
       await context.sync();
+      console.log("[PowerPoint.run] 同步完成，幻灯片数量:", slides.items.length);
 
       // 确定要获取的幻灯片
       let targetSlide: PowerPoint.Slide;
@@ -271,18 +277,26 @@ export async function getSlideLayoutInfo(
 
       if (slideNumber !== undefined) {
         const slideIndex = slideNumber - 1;
+        console.log("[PowerPoint.run] 使用指定页码:", slideNumber, "索引:", slideIndex);
+        
         if (slideIndex < 0 || slideIndex >= slides.items.length) {
-          throw new Error(`页码 ${slideNumber} 不存在，总共有 ${slides.items.length} 页`);
+          const errorMsg = `页码 ${slideNumber} 不存在，总共有 ${slides.items.length} 页`;
+          console.error("[PowerPoint.run] 错误:", errorMsg);
+          throw new Error(errorMsg);
         }
         targetSlide = slides.items[slideIndex];
         actualSlideNumber = slideNumber;
       } else {
+        console.log("[PowerPoint.run] 使用当前选中的幻灯片");
         const selectedSlides = context.presentation.getSelectedSlides();
         selectedSlides.load("items");
         await context.sync();
+        console.log("[PowerPoint.run] 选中的幻灯片数量:", selectedSlides.items.length);
 
         if (selectedSlides.items.length === 0) {
-          throw new Error("没有选中的幻灯片");
+          const errorMsg = "没有选中的幻灯片";
+          console.error("[PowerPoint.run] 错误:", errorMsg);
+          throw new Error(errorMsg);
         }
 
         targetSlide = selectedSlides.items[0];
@@ -294,11 +308,13 @@ export async function getSlideLayoutInfo(
       }
 
       // 加载幻灯片基本信息
+      console.log("[PowerPoint.run] 加载幻灯片基本信息");
       targetSlide.load("id");
 
       // 获取布局信息
       const layout = targetSlide.layout;
       layout.load("name,type");
+      console.log("[PowerPoint.run] 加载布局信息");
 
       // 获取尺寸信息
       // 动态检测 pageSetup API 是否存在（未来可能进入正式版）
@@ -348,50 +364,92 @@ export async function getSlideLayoutInfo(
       }
 
       // 获取形状集合
+      console.log("[PowerPoint.run] 获取形状集合");
       const shapes = targetSlide.shapes;
       shapes.load("items");
       await context.sync();
+      console.log("[PowerPoint.run] 形状数量:", shapes.items.length);
 
       // 批量加载所有形状的基本属性
-      for (const shape of shapes.items) {
+      console.log("[PowerPoint.run] 开始加载形状属性");
+      
+      for (let i = 0; i < shapes.items.length; i++) {
+        const shape = shapes.items[i];
         shape.load("id,type,left,top,width,height,name");
+      }
+      
+      console.log("[PowerPoint.run] 同步形状基本属性");
+      await context.sync();
+      console.log("[PowerPoint.run] 形状基本属性同步完成");
 
-        // 加载文本框
+      // 逐个处理形状，避免批量操作时错误传播
+      // 存储每个形状是否成功加载了文本框
+      const shapeTextSupport: boolean[] = new Array(shapes.items.length).fill(false);
+      
+      console.log("[PowerPoint.run] 开始逐个加载文本框");
+      for (let i = 0; i < shapes.items.length; i++) {
+        const shape = shapes.items[i];
+        const shapeType = shape.type as string;
+        
+        console.log(`[PowerPoint.run] 形状 ${i + 1}/${shapes.items.length} 类型: ${shapeType}, ID: ${shape.id}`);
+        
+        // 尝试加载 textFrame，每个形状单独 sync
         try {
-          shape.textFrame.load("textRange");
-        } catch {
-          // 形状没有文本框
-        }
-
-        // 如果需要图片数据
-        if (includeImages && shape.type === PowerPoint.ShapeType.geometricShape) {
-          try {
-            shape.fill.load("type");
-          } catch {
-            // 无法加载填充信息
-          }
+          const textFrame = shape.textFrame;
+          textFrame.load("textRange");
+          await context.sync();
+          
+          shapeTextSupport[i] = true;
+          console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} textFrame 加载成功`);
+        } catch (error: any) {
+          console.log(`[PowerPoint.run] ✗ 形状 ${i + 1} 不支持 textFrame (${shapeType}):`, error.message);
+          // 不支持 textFrame 的形状，继续处理下一个
         }
       }
-      await context.sync();
 
       // 加载文本内容
-      for (const shape of shapes.items) {
-        try {
-          shape.textFrame.textRange.load("text");
-          if (includeTextDetails) {
-            shape.textFrame.textRange.font.load("name,size,color");
+      console.log("[PowerPoint.run] 开始加载文本内容");
+      for (let i = 0; i < shapes.items.length; i++) {
+        if (shapeTextSupport[i]) {
+          const shape = shapes.items[i];
+          try {
+            const textFrame = shape.textFrame;
+            textFrame.textRange.load("text");
+            if (includeTextDetails) {
+              textFrame.textRange.font.load("name,size,color");
+            }
+            await context.sync();
+            console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 文本内容加载成功`);
+          } catch (error: any) {
+            console.log(`[PowerPoint.run] ✗ 形状 ${i + 1} 文本内容加载失败:`, error.message);
           }
-        } catch {
-          // 形状没有文本框
         }
       }
-      await context.sync();
+
+      // 加载填充信息
+      if (includeImages) {
+        console.log("[PowerPoint.run] 开始加载填充信息");
+        for (let i = 0; i < shapes.items.length; i++) {
+          const shape = shapes.items[i];
+          try {
+            shape.fill.load("type");
+            await context.sync();
+            console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 填充信息加载成功`);
+          } catch (error: any) {
+            console.log(`[PowerPoint.run] ✗ 形状 ${i + 1} 填充信息加载失败:`, error.message);
+          }
+        }
+      }
+      
+      console.log("[PowerPoint.run] 所有形状属性加载完成");
 
       // 收集所有元素信息
+      console.log("[PowerPoint.run] 开始收集元素信息");
       const elements: EnhancedElement[] = [];
 
       for (let i = 0; i < shapes.items.length; i++) {
         const shape = shapes.items[i];
+        console.log(`[PowerPoint.run] 处理形状 ${i + 1}/${shapes.items.length}`);
 
         const element: EnhancedElement = {
           id: shape.id,
@@ -440,10 +498,12 @@ export async function getSlideLayoutInfo(
         // 注意：PowerPoint JavaScript API 对填充信息的支持有限
         // 目前只能获取填充类型，无法获取具体颜色值
         try {
-          shape.fill.load("type");
-          await context.sync();
+          // 检查 fill 是否已经加载
+          if (!shape.fill.isNullObject) {
+            shape.fill.load("type");
+            await context.sync();
 
-          const fillType = shape.fill.type as string;
+            const fillType = shape.fill.type as string;
           // PowerPoint.FillType 枚举值："solid", "gradient", "pattern", "pictureAndTexture", "noFill"
           if (fillType === "solid") {
             element.fill = { type: "solid" };
@@ -457,8 +517,9 @@ export async function getSlideLayoutInfo(
           } else {
             element.fill = { type: "unknown" };
           }
-        } catch {
-          // 无法获取填充信息
+          }
+        } catch (error) {
+          console.log(`[PowerPoint.run] 形状 ${i + 1} 无法获取填充信息:`, error.message);
         }
 
         // 如果是图片类型且需要包含图片数据
@@ -478,11 +539,26 @@ export async function getSlideLayoutInfo(
       }
 
       layoutInfo.elements = elements;
+      console.log("[PowerPoint.run] 元素信息收集完成，共", elements.length, "个元素");
     });
+    
+    console.log("[getSlideLayoutInfo] 布局信息获取成功");
 
     return layoutInfo;
   } catch (error) {
-    console.error("获取页面布局信息失败:", error);
+    console.error("[getSlideLayoutInfo] 获取页面布局信息失败");
+    console.error("[getSlideLayoutInfo] 错误名称:", error.name);
+    console.error("[getSlideLayoutInfo] 错误消息:", error.message);
+    console.error("[getSlideLayoutInfo] 错误堆栈:", error.stack);
+    
+    // 打印 Office.js 特定的调试信息
+    if (error.debugInfo) {
+      console.error("[getSlideLayoutInfo] Office.js 调试信息:", JSON.stringify(error.debugInfo, null, 2));
+    }
+    
+    // 打印完整的错误对象
+    console.error("[getSlideLayoutInfo] 完整错误对象:", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+    
     throw error;
   }
 }

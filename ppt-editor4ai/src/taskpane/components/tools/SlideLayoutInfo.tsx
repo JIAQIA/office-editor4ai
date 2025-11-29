@@ -26,6 +26,17 @@ import {
 import { getSlideLayoutInfo, type SlideLayoutInfo, type EnhancedElement } from "../../../ppt-tools";
 import { Copy24Regular, CheckmarkCircle24Regular } from "@fluentui/react-icons";
 
+// Office.js 错误类型定义
+interface OfficeError extends Error {
+  debugInfo?: {
+    errorCode?: string;
+    errorLocation?: string;
+    message?: string;
+    [key: string]: any;
+  };
+  code?: string;
+}
+
 const useStyles = makeStyles({
   container: {
     display: "flex",
@@ -175,7 +186,15 @@ const useStyles = makeStyles({
     color: tokens.colorPaletteRedForeground1,
     fontSize: tokens.fontSizeBase300,
     padding: "16px",
-    textAlign: "center",
+    textAlign: "left",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    backgroundColor: tokens.colorPaletteRedBackground1,
+    borderRadius: tokens.borderRadiusMedium,
+    border: `1px solid ${tokens.colorPaletteRedBorder1}`,
+    fontFamily: "monospace",
+    maxHeight: "300px",
+    overflow: "auto",
   },
   copyButton: {
     width: "100%",
@@ -219,8 +238,32 @@ const SlideLayoutInfo: React.FC = () => {
 
       setLayoutInfo(info);
     } catch (err) {
-      console.error("获取布局信息失败:", err);
-      setError(err instanceof Error ? err.message : "获取布局信息失败");
+      console.error("获取布局信息失败 - 完整错误:", err);
+      console.error("错误名称:", (err as Error)?.name);
+      console.error("错误消息:", (err as Error)?.message);
+      console.error("错误堆栈:", (err as Error)?.stack);
+      
+      // 打印 Office.js 特定的调试信息
+      const officeErr = err as OfficeError;
+      if (officeErr?.debugInfo) {
+        console.error("Office.js 调试信息:", JSON.stringify(officeErr.debugInfo, null, 2));
+      }
+      
+      // 打印完整的错误对象
+      console.error("完整错误对象:", JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
+      
+      // 构建更详细的错误消息
+      let errorMessage = "获取布局信息失败";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+        
+        // 如果有 Office.js 调试信息，添加到错误消息中
+        if (officeErr.debugInfo) {
+          errorMessage += `\n\n调试信息:\n${JSON.stringify(officeErr.debugInfo, null, 2)}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

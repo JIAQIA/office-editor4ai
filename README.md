@@ -114,6 +114,18 @@ pnpm start:word
 pnpm start:ppt
 ```
 
+### 启用开发者调试模式
+
+在 Mac 版 Office 中调试插件前，需先开启开发者调试功能：
+
+```bash
+defaults write com.microsoft.Word OfficeWebAddinDeveloperExtras -bool true
+defaults write com.microsoft.Excel OfficeWebAddinDeveloperExtras -bool true
+defaults write com.microsoft.Powerpoint OfficeWebAddinDeveloperExtras -bool true
+```
+
+执行后重启Office应用，在任务窗格右键选择"Inspect Element"即可打开Safari开发者工具。
+
 ### 停止调试 | Stop Debugging
 
 ```bash
