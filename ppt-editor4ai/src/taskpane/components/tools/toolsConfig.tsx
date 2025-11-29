@@ -13,6 +13,7 @@ import ElementsList from "./ElementsList";
 import SlideLayoutInfo from "./SlideLayoutInfo";
 import SlideLayouts from "./SlideLayouts";
 import ImageInsertion from "./ImageInsertion";
+import SlideScreenshot from "./SlideScreenshot";
 
 export interface ToolConfig {
   id: string;
@@ -55,6 +56,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "图片插入工具",
     subtitle: "在幻灯片中插入图片，支持本地上传或 URL",
     component: <ImageInsertion />,
+  },
+  "slide-screenshot": {
+    id: "slide-screenshot",
+    title: "幻灯片截图工具",
+    subtitle: "获取指定幻灯片的截图，支持导出 PNG 格式用于 AutoLayout 分析",
+    component: <SlideScreenshot />,
   },
 };
 

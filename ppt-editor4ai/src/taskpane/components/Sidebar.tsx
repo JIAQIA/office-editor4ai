@@ -24,7 +24,8 @@ import {
   List24Regular,
   LayoutColumnTwoSplitLeft24Regular,
   LayoutRowTwo24Regular,
-  Image24Regular
+  Image24Regular,
+  Camera24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -426,6 +427,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <LayoutRowTwo24Regular className={styles.icon} />
               <span className={styles.label}>布局模板列表</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "slide-screenshot"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "slide-screenshot")}
+          >
+            <div className={styles.menuItemContent}>
+              <Camera24Regular className={styles.icon} />
+              <span className={styles.label}>幻灯片截图</span>
             </div>
           </Button>
         </div>

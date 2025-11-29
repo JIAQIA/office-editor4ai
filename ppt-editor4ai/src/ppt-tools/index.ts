@@ -55,3 +55,12 @@ export {
   fetchImageAsBase64,
 } from "./imageInsertion";
 export type { ImageInsertionOptions, ImageInsertionResult } from "./imageInsertion";
+
+// 幻灯片截图工具
+export {
+  getSlideScreenshot,
+  getCurrentSlideScreenshot,
+  getSlideScreenshotByPageNumber,
+  getAllSlidesScreenshots,
+} from "./slideScreenshot";
+export type { SlideScreenshotOptions, SlideScreenshotResult } from "./slideScreenshot";
