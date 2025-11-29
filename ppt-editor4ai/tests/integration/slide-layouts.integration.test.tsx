@@ -10,10 +10,45 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { renderWithProviders, userEvent } from "../utils/test-utils";
-import { OfficeMockObject } from "office-addin-mock";
 import SlideLayouts from "../../src/taskpane/components/tools/SlideLayouts";
 
 describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
+  /**
+   * 为对象添加 load 方法的 mock
+   */
+  const addLoadMethod = (obj: any) => {
+    obj.load = vi.fn(() => obj);
+    return obj;
+  };
+
+  /**
+   * 创建 PowerPoint.run 的 mock 实现
+   */
+  const createPowerPointRunMock = (mockContext: any) => {
+    // 为 context 添加 sync 方法
+    mockContext.sync = vi.fn(async () => {});
+
+    // 递归为所有对象添加 load 方法
+    const addLoadToObjects = (obj: any) => {
+      if (!obj || typeof obj !== "object") return;
+
+      addLoadMethod(obj);
+
+      // 遍历对象的所有属性
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key) && typeof obj[key] === "object" && obj[key] !== null) {
+          addLoadToObjects(obj[key]);
+        }
+      }
+    };
+
+    addLoadToObjects(mockContext.presentation);
+
+    return async (callback: (context: any) => Promise<void>) => {
+      await callback(mockContext);
+    };
+  };
+
   beforeEach(() => {
     // 清理全局 PowerPoint 对象
     delete (global as any).PowerPoint;
@@ -68,16 +103,21 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
           ],
         },
         slides: {
-          items: [
-            { id: "slide-1" },
-            { id: "slide-2" },
-          ],
-          add: vi.fn(),
+          items: [{ id: "slide-1" }, { id: "slide-2" }],
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     renderWithProviders(<SlideLayouts />);
 
@@ -101,14 +141,18 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
     }
 
     await waitFor(() => {
-      expect(screen.getByText(/使用布局.*标题幻灯片.*创建新幻灯片/i)).toBeInTheDocument();
+      const elements = screen.getAllByText((_content, element) => {
+        return (
+          (element?.textContent?.includes("使用布局") &&
+            element?.textContent?.includes("标题幻灯片") &&
+            element?.textContent?.includes("创建新幻灯片")) ||
+          false
+        );
+      });
+      expect(elements.length).toBeGreaterThan(0);
     });
 
     // 步骤 3: 创建新幻灯片
-    // Mock 新幻灯片
-    const mockNewSlide = { id: "new-slide-1" };
-    mockContext.presentation.slides.items.push(mockNewSlide);
-
     const createButton = screen.getByRole("button", { name: /创建新幻灯片/i });
     await user.click(createButton);
 
@@ -152,12 +196,20 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
         },
         slides: {
           items: [],
-          add: vi.fn(),
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     renderWithProviders(<SlideLayouts />);
 
@@ -221,12 +273,20 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
         },
         slides: {
           items: [],
-          add: vi.fn(),
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     renderWithProviders(<SlideLayouts />);
 
@@ -239,7 +299,15 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
     });
 
     // 验证统计信息
-    expect(screen.getByText(/共找到.*3.*个布局模板/i)).toBeInTheDocument();
+    const statsElements = screen.getAllByText((_content, element) => {
+      return (
+        (element?.textContent?.includes("共找到") &&
+          element?.textContent?.includes("3") &&
+          element?.textContent?.includes("个布局模板")) ||
+        false
+      );
+    });
+    expect(statsElements.length).toBeGreaterThan(0);
   });
 
   it("应该支持复制布局数据到剪贴板 / should support copying layout data to clipboard", async () => {
@@ -267,19 +335,29 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
         },
         slides: {
           items: [],
-          add: vi.fn(),
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     // Mock clipboard API
     const mockWriteText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
         writeText: mockWriteText,
       },
+      writable: true,
+      configurable: true,
     });
 
     renderWithProviders(<SlideLayouts />);
@@ -333,17 +411,21 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
           ],
         },
         slides: {
-          items: [
-            { id: "slide-1" },
-            { id: "slide-2" },
-            { id: "slide-3" },
-          ],
-          add: vi.fn(),
+          items: [{ id: "slide-1" }, { id: "slide-2" }, { id: "slide-3" }],
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     renderWithProviders(<SlideLayouts />);
 
@@ -392,12 +474,20 @@ describe("SlideLayouts 集成测试 / SlideLayouts integration tests", () => {
         },
         slides: {
           items: [],
-          add: vi.fn(),
+          add: vi.fn(() => {
+            const newSlide = {
+              id: `new-slide-${mockContext.presentation.slides.items.length + 1}`,
+            };
+            addLoadMethod(newSlide);
+            mockContext.presentation.slides.items.push(newSlide);
+          }),
         },
       },
     };
 
-    (global as any).PowerPoint = new OfficeMockObject(mockContext);
+    (global as any).PowerPoint = {
+      run: createPowerPointRunMock(mockContext),
+    };
 
     renderWithProviders(<SlideLayouts />);
 

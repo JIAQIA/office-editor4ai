@@ -70,48 +70,7 @@ tests/
 
 ### 4. 测试编写模式
 
-**组件测试模式：**
-```typescript
-import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
-import { renderWithProviders, userEvent } from '../../utils/test-utils';
-
-describe('组件名称测试', () => {
-  it('应该正确渲染组件', () => {
-    renderWithProviders(<Component />);
-    expect(screen.getByText('文本')).toBeInTheDocument();
-  });
-  
-  it('应该处理用户交互', async () => {
-    const user = userEvent.setup();
-    renderWithProviders(<Component />);
-    await user.click(screen.getByRole('button'));
-    // 断言...
-  });
-});
-```
-
-**Office.js 工具函数测试模式：**
-```typescript
-import { describe, it, expect, beforeEach } from 'vitest';
-import { OfficeMockObject } from 'office-addin-mock';
-
-describe('工具函数测试', () => {
-  beforeEach(() => {
-    delete (global as any).PowerPoint;
-  });
-  
-  it('应该执行预期操作', async () => {
-    const mockData = createMockData();
-    (global as any).PowerPoint = new OfficeMockObject(mockData);
-    
-    await yourFunction(params);
-    
-    // 断言 Mock 对象状态
-    expect(mockData._getResult()).toBe(expected);
-  });
-});
-```
+关于用例中的Mock方法你需要阅读测试附近的兄弟用例的Mock方式然后进行撰写
 
 ### 5. 测试工具函数
 

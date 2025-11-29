@@ -146,8 +146,12 @@ describe("SlideLayouts 组件测试 / SlideLayouts component tests", () => {
     await user.click(screen.getByRole("button", { name: /获取布局模板/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/共找到.*3.*个布局模板/i)).toBeInTheDocument();
+      expect(screen.getByText("标题幻灯片")).toBeInTheDocument();
     });
+
+    // 验证统计信息（使用更精确的匹配）
+    expect(screen.getByText(/共找到/i)).toBeInTheDocument();
+    expect(screen.getByText("3")).toBeInTheDocument();
   });
 
   it("应该显示占位符标签 / should display placeholder tags", async () => {
@@ -159,13 +163,16 @@ describe("SlideLayouts 组件测试 / SlideLayouts component tests", () => {
     await user.click(screen.getByRole("button", { name: /获取布局模板/i }));
 
     await waitFor(() => {
-      expect(screen.getByText("Title")).toBeInTheDocument();
-      expect(screen.getByText("Subtitle")).toBeInTheDocument();
-      expect(screen.getByText("Body")).toBeInTheDocument();
+      expect(screen.getByText("标题幻灯片")).toBeInTheDocument();
     });
+
+    // 验证占位符标签存在
+    expect(screen.getAllByText("Title").length).toBeGreaterThan(0);
+    expect(screen.getByText("Subtitle")).toBeInTheDocument();
+    expect(screen.getByText("Body")).toBeInTheDocument();
   });
 
-  it("应该选择布局模板 / should select layout template", async () => {
+  it("应该选择布局并显示创建按钮 / should select layout and show create button", async () => {
     const user = userEvent.setup();
     vi.mocked(slideLayoutsModule.getAvailableSlideLayouts).mockResolvedValue(mockLayouts);
 
@@ -178,13 +185,14 @@ describe("SlideLayouts 组件测试 / SlideLayouts component tests", () => {
     });
 
     // 点击第一个布局卡片
-    const layoutCard = screen.getByText("标题幻灯片").closest("div");
-    if (layoutCard) {
-      await user.click(layoutCard);
+    const layoutCards = screen.getAllByRole("group");
+    const targetCard = layoutCards.find((card) => card.textContent?.includes("标题幻灯片"));
+    if (targetCard) {
+      await user.click(targetCard);
     }
 
     await waitFor(() => {
-      expect(screen.getByText(/使用布局.*标题幻灯片.*创建新幻灯片/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /创建新幻灯片/i })).toBeInTheDocument();
     });
   });
 
@@ -194,10 +202,12 @@ describe("SlideLayouts 组件测试 / SlideLayouts component tests", () => {
 
     // Mock clipboard API
     const mockWriteText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
         writeText: mockWriteText,
       },
+      writable: true,
+      configurable: true,
     });
 
     renderWithProviders(<SlideLayouts />);

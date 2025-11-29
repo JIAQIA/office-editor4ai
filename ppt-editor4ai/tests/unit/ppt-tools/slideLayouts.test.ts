@@ -8,7 +8,6 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { OfficeMockObject } from "office-addin-mock";
 import {
   getAvailableSlideLayouts,
   createSlideWithLayout,
@@ -21,6 +20,42 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
     // 清理全局 PowerPoint 对象
     delete (global as any).PowerPoint;
   });
+
+  /**
+   * 为对象添加 load 方法的 mock
+   */
+  const addLoadMethod = (obj: any) => {
+    obj.load = vi.fn(() => obj);
+    return obj;
+  };
+
+  /**
+   * 创建 PowerPoint.run 的 mock 实现
+   */
+  const createPowerPointRunMock = (mockContext: any) => {
+    // 为 context 添加 sync 方法
+    mockContext.sync = vi.fn(async () => {});
+
+    // 递归为所有对象添加 load 方法
+    const addLoadToObjects = (obj: any) => {
+      if (!obj || typeof obj !== "object") return;
+
+      addLoadMethod(obj);
+
+      // 遍历对象的所有属性
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key) && typeof obj[key] === "object" && obj[key] !== null) {
+          addLoadToObjects(obj[key]);
+        }
+      }
+    };
+
+    addLoadToObjects(mockContext.presentation);
+
+    return async (callback: (context: any) => Promise<void>) => {
+      await callback(mockContext);
+    };
+  };
 
   describe("getAvailableSlideLayouts", () => {
     it("应该成功获取布局模板列表 / should successfully get layout templates list", async () => {
@@ -92,7 +127,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const layouts = await getAvailableSlideLayouts({ includePlaceholders: true });
 
@@ -145,7 +182,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const layouts = await getAvailableSlideLayouts({ includePlaceholders: false });
 
@@ -168,7 +207,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const layouts = await getAvailableSlideLayouts();
 
@@ -213,7 +254,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const layouts = await getAvailableSlideLayouts({ includePlaceholders: false });
 
@@ -253,7 +296,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const layouts = await getAvailableSlideLayouts({ includePlaceholders: true });
 
@@ -265,6 +310,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
 
   describe("createSlideWithLayout", () => {
     it("应该成功创建新幻灯片 / should successfully create new slide", async () => {
+      const mockNewSlide = { id: "new-slide-1" };
+      addLoadMethod(mockNewSlide);
+
       const mockContext = {
         presentation: {
           slideMasters: {
@@ -284,16 +332,16 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
           },
           slides: {
             items: [{ id: "slide-1" }, { id: "slide-2" }],
-            add: vi.fn(),
+            add: vi.fn(() => {
+              mockContext.presentation.slides.items.push(mockNewSlide);
+            }),
           },
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
-
-      // Mock slides.add() 后的新幻灯片
-      const mockNewSlide = { id: "new-slide-1" };
-      mockContext.presentation.slides.items.push(mockNewSlide);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const newSlideId = await createSlideWithLayout("layout-1");
 
@@ -302,6 +350,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
     });
 
     it("应该在指定位置创建幻灯片 / should create slide at specified position", async () => {
+      const mockNewSlide = { id: "new-slide-1" };
+      addLoadMethod(mockNewSlide);
+
       const mockContext = {
         presentation: {
           slideMasters: {
@@ -321,15 +372,16 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
           },
           slides: {
             items: [{ id: "slide-1" }, { id: "slide-2" }],
-            add: vi.fn(),
+            add: vi.fn(() => {
+              mockContext.presentation.slides.items.push(mockNewSlide);
+            }),
           },
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
-
-      const mockNewSlide = { id: "new-slide-1" };
-      mockContext.presentation.slides.items.push(mockNewSlide);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       const newSlideId = await createSlideWithLayout("layout-1", 0);
 
@@ -362,7 +414,9 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
       await expect(createSlideWithLayout("non-existent-layout")).rejects.toThrow(
         "未找到布局ID: non-existent-layout"
@@ -389,14 +443,15 @@ describe("slideLayouts 工具函数测试 / slideLayouts utility functions tests
           },
           slides: {
             items: [],
-            add: vi.fn(),
+            add: vi.fn(), // 不添加新幻灯片，模拟创建失败
           },
         },
       };
 
-      (global as any).PowerPoint = new OfficeMockObject(mockContext);
+      (global as any).PowerPoint = {
+        run: createPowerPointRunMock(mockContext),
+      };
 
-      // 不添加新幻灯片，模拟创建失败
       await expect(createSlideWithLayout("layout-1")).rejects.toThrow(
         "创建幻灯片失败：无法获取新创建的幻灯片"
       );
