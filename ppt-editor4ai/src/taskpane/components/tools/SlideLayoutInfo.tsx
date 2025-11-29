@@ -38,7 +38,7 @@ interface OfficeError extends Error {
 }
 
 const useStyles = makeStyles({
-  container: {
+  root: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -242,27 +242,27 @@ const SlideLayoutInfo: React.FC = () => {
       console.error("错误名称:", (err as Error)?.name);
       console.error("错误消息:", (err as Error)?.message);
       console.error("错误堆栈:", (err as Error)?.stack);
-      
+
       // 打印 Office.js 特定的调试信息
       const officeErr = err as OfficeError;
       if (officeErr?.debugInfo) {
         console.error("Office.js 调试信息:", JSON.stringify(officeErr.debugInfo, null, 2));
       }
-      
+
       // 打印完整的错误对象
       console.error("完整错误对象:", JSON.stringify(err, Object.getOwnPropertyNames(err), 2));
-      
+
       // 构建更详细的错误消息
       let errorMessage = "获取布局信息失败";
       if (err instanceof Error) {
         errorMessage = err.message;
-        
+
         // 如果有 Office.js 调试信息，添加到错误消息中
         if (officeErr.debugInfo) {
           errorMessage += `\n\n调试信息:\n${JSON.stringify(officeErr.debugInfo, null, 2)}`;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -312,14 +312,15 @@ const SlideLayoutInfo: React.FC = () => {
           <div className={styles.detailItem}>
             <span className={styles.detailLabel}>相对位置 (%)</span>
             <span className={styles.detailValue}>
-              {element.relativePosition.leftPercent.toFixed(1)}%, {element.relativePosition.topPercent.toFixed(1)}%
+              {element.relativePosition.leftPercent.toFixed(1)}%,{" "}
+              {element.relativePosition.topPercent.toFixed(1)}%
             </span>
           </div>
           <div className={styles.detailItem}>
             <span className={styles.detailLabel}>相对尺寸 (%)</span>
             <span className={styles.detailValue}>
-              {element.relativePosition.widthPercent.toFixed(1)}% × {element.relativePosition.heightPercent.toFixed(1)}
-              %
+              {element.relativePosition.widthPercent.toFixed(1)}% ×{" "}
+              {element.relativePosition.heightPercent.toFixed(1)}%
             </span>
           </div>
         </div>
@@ -366,7 +367,13 @@ const SlideLayoutInfo: React.FC = () => {
             <div className={styles.detailLabel}>文本内容:</div>
             {element.text.content}
             {element.text.fontSize && (
-              <div style={{ marginTop: "4px", fontSize: "11px", color: tokens.colorNeutralForeground3 }}>
+              <div
+                style={{
+                  marginTop: "4px",
+                  fontSize: "11px",
+                  color: tokens.colorNeutralForeground3,
+                }}
+              >
                 字体: {element.text.fontFamily || "未知"} | 大小: {element.text.fontSize}
                 {element.text.color && ` | 颜色: ${element.text.color}`}
               </div>
@@ -386,7 +393,7 @@ const SlideLayoutInfo: React.FC = () => {
   );
 
   return (
-    <div className={styles.container}>
+    <div className={styles.root}>
       {/* 控制区域 */}
       <div className={styles.controlsSection}>
         <div className={styles.inputContainer}>
@@ -406,7 +413,11 @@ const SlideLayoutInfo: React.FC = () => {
         <div className={styles.switchContainer}>
           <div className={styles.switchItem}>
             <Label>包含图片数据</Label>
-            <Switch checked={includeImages} onChange={(_e, data) => setIncludeImages(data.checked)} disabled={loading} />
+            <Switch
+              checked={includeImages}
+              onChange={(_e, data) => setIncludeImages(data.checked)}
+              disabled={loading}
+            />
           </div>
           <div className={styles.switchItem}>
             <Label>包含背景信息</Label>
@@ -504,7 +515,13 @@ const SlideLayoutInfo: React.FC = () => {
           <Button
             appearance="secondary"
             size="large"
-            icon={copied ? <CheckmarkCircle24Regular className={styles.successIcon} /> : <Copy24Regular />}
+            icon={
+              copied ? (
+                <CheckmarkCircle24Regular className={styles.successIcon} />
+              ) : (
+                <Copy24Regular />
+              )
+            }
             onClick={copyToClipboard}
             className={styles.copyButton}
           >

@@ -426,20 +426,7 @@ export async function getSlideLayoutInfo(
         }
       }
 
-      // 加载填充信息
-      if (includeImages) {
-        console.log("[PowerPoint.run] 开始加载填充信息");
-        for (let i = 0; i < shapes.items.length; i++) {
-          const shape = shapes.items[i];
-          try {
-            shape.fill.load("type");
-            await context.sync();
-            console.log(`[PowerPoint.run] ✓ 形状 ${i + 1} 填充信息加载成功`);
-          } catch (error: any) {
-            console.log(`[PowerPoint.run] ✗ 形状 ${i + 1} 填充信息加载失败:`, error.message);
-          }
-        }
-      }
+      // 注意：填充信息将在后续逐个形状处理时加载，避免批量加载时的错误传播
       
       console.log("[PowerPoint.run] 所有形状属性加载完成");
 
@@ -498,25 +485,26 @@ export async function getSlideLayoutInfo(
         // 注意：PowerPoint JavaScript API 对填充信息的支持有限
         // 目前只能获取填充类型，无法获取具体颜色值
         try {
-          // 检查 fill 是否已经加载
-          if (!shape.fill.isNullObject) {
-            shape.fill.load("type");
-            await context.sync();
+          // 先加载 fill 对象
+          shape.fill.load("type");
+          await context.sync();
 
+          // 检查 fill 是否为 null
+          if (!shape.fill.isNullObject) {
             const fillType = shape.fill.type as string;
-          // PowerPoint.FillType 枚举值："solid", "gradient", "pattern", "pictureAndTexture", "noFill"
-          if (fillType === "solid") {
-            element.fill = { type: "solid" };
-            // 颜色信息在当前 API 版本中不可用
-          } else if (fillType === "gradient") {
-            element.fill = { type: "gradient" };
-          } else if (fillType === "pattern" || fillType === "pictureAndTexture") {
-            element.fill = { type: "image" };
-          } else if (fillType === "noFill") {
-            element.fill = { type: "none" };
-          } else {
-            element.fill = { type: "unknown" };
-          }
+            // PowerPoint.FillType 枚举值："solid", "gradient", "pattern", "pictureAndTexture", "noFill"
+            if (fillType === "solid") {
+              element.fill = { type: "solid" };
+              // 颜色信息在当前 API 版本中不可用
+            } else if (fillType === "gradient") {
+              element.fill = { type: "gradient" };
+            } else if (fillType === "pattern" || fillType === "pictureAndTexture") {
+              element.fill = { type: "image" };
+            } else if (fillType === "noFill") {
+              element.fill = { type: "none" };
+            } else {
+              element.fill = { type: "unknown" };
+            }
           }
         } catch (error) {
           console.log(`[PowerPoint.run] 形状 ${i + 1} 无法获取填充信息:`, error.message);
