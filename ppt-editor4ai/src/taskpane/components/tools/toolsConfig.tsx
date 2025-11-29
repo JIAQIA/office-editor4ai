@@ -12,6 +12,7 @@ import TextInsertion from "./TextInsertion";
 import ElementsList from "./ElementsList";
 import SlideLayoutInfo from "./SlideLayoutInfo";
 import SlideLayouts from "./SlideLayouts";
+import ImageInsertion from "./ImageInsertion";
 
 export interface ToolConfig {
   id: string;
@@ -48,6 +49,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "布局模板列表",
     subtitle: "获取可用的幻灯片布局模板，支持使用指定模板创建新幻灯片",
     component: <SlideLayouts />,
+  },
+  "image-insertion": {
+    id: "image-insertion",
+    title: "图片插入工具",
+    subtitle: "在幻灯片中插入图片，支持本地上传或 URL",
+    component: <ImageInsertion />,
   },
 };
 

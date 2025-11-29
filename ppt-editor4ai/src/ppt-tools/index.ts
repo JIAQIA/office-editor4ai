@@ -46,3 +46,7 @@ export {
   getLayoutDescription,
 } from "./slideLayouts";
 export type { SlideLayoutTemplate, GetSlideLayoutsOptions } from "./slideLayouts";
+
+// 图片插入工具
+export { insertImage, insertImageToSlide, readImageAsBase64, fetchImageAsBase64 } from "./imageInsertion";
+export type { ImageInsertionOptions, ImageInsertionResult } from "./imageInsertion";

@@ -23,7 +23,8 @@ import {
   Dismiss24Regular,
   List24Regular,
   LayoutColumnTwoSplitLeft24Regular,
-  LayoutRowTwo24Regular
+  LayoutRowTwo24Regular,
+  Image24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -256,6 +257,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <TextGrammarSettings24Regular className={styles.icon} />
               <span className={styles.label}>文本插入工具</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "create" && currentTool === "image-insertion"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("create", "image-insertion")}
+          >
+            <div className={styles.menuItemContent}>
+              <Image24Regular className={styles.icon} />
+              <span className={styles.label}>图片插入工具</span>
             </div>
           </Button>
         </div>
