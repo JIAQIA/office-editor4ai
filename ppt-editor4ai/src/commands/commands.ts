@@ -15,22 +15,25 @@ Office.onReady(() => {
  * @param event Office 命令事件对象
  */
 function action(event: Office.AddinCommands.Event) {
-  // 创建通知消息配置
-  const message: Office.NotificationMessageDetails = {
-    type: Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage, // 信息类型通知
-    message: "命令执行成功", // 通知内容
-    icon: "Icon.80x80", // 图标文件
-    persistent: true, // 持久化显示
-  };
-
-  // 替换现有通知（ID为"ActionPerformanceNotification"）
-  Office.context.mailbox.item?.notificationMessages.replaceAsync(
-    "ActionPerformanceNotification",
-    message
+  // 测试通知功能 - 在 PowerPoint 中显示对话框
+  Office.context.ui.displayDialogAsync(
+    // TODO 未来这里需要替换成线上聊天界面
+    'https://localhost:3003/taskpane.html',
+    { height: 50, width: 30 },
+    (result) => {
+      if (result.status === Office.AsyncResultStatus.Failed) {
+        console.error('打开对话框失败:', result.error.message);
+      } else {
+        console.log('对话框打开成功');
+        const dialog = result.value;
+        dialog.addEventHandler(Office.EventType.DialogMessageReceived, () => {
+          dialog.close();
+        });
+      }
+      // 必须调用 completed 来通知 Office 命令已完成
+      event.completed();
+    }
   );
-
-  // 必须调用 event.completed() 表示命令执行完成
-  event.completed();
 }
 
 // 将 action 函数注册为 Office 命令 "action" 的处理程序
