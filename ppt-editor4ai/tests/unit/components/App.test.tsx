@@ -18,7 +18,8 @@ vi.mock('../../../src/taskpane/components/Sidebar', () => ({
   default: ({ currentPage, onNavigate, isCollapsed, onToggleCollapse }: any) => (
     <div data-testid="sidebar">
       <button onClick={() => onNavigate('home')}>Home</button>
-      <button onClick={() => onNavigate('tools', 'text-insertion')}>Tools</button>
+      <button onClick={() => onNavigate('create', 'text-insertion')}>Create</button>
+      <button onClick={() => onNavigate('query', 'elements-list')}>Query</button>
       <button onClick={onToggleCollapse}>Toggle</button>
       <span>Current: {currentPage}</span>
       <span>Collapsed: {isCollapsed.toString()}</span>
@@ -32,7 +33,7 @@ vi.mock('../../../src/taskpane/components/HomePage', () => ({
 
 vi.mock('../../../src/taskpane/components/ToolsDebugPage', () => ({
   default: ({ selectedTool }: any) => (
-    <div data-testid="tools-page">Tools Page - {selectedTool}</div>
+    <div data-testid="tools-page">Tools Page - {selectedTool || 'none'}</div>
   ),
 }));
 
@@ -52,17 +53,18 @@ describe('App 组件单元测试 | App Component Unit Tests', () => {
     expect(screen.getByText('Current: home')).toBeInTheDocument();
   });
 
-  it('应该能够导航到工具页面 | should be able to navigate to tools page', async () => {
+  it('应该能够导航到创建元素类页面 | should be able to navigate to create page', async () => {
     const { userEvent } = await import('../../utils/test-utils');
     const user = userEvent.setup();
     
     renderWithProviders(<App />);
 
-    const toolsButton = screen.getByText('Tools');
-    await user.click(toolsButton);
+    const createButton = screen.getByText('Create');
+    await user.click(createButton);
 
     expect(screen.getByTestId('tools-page')).toBeInTheDocument();
     expect(screen.getByText('Tools Page - text-insertion')).toBeInTheDocument();
+    expect(screen.getByText('Current: create')).toBeInTheDocument();
   });
 
   it('应该能够切换侧边栏折叠状态 | should be able to toggle sidebar collapse state', async () => {
@@ -88,13 +90,15 @@ describe('App 组件单元测试 | App Component Unit Tests', () => {
     
     renderWithProviders(<App />);
 
-    // 导航到工具页 | Navigate to tools page
-    await user.click(screen.getByText('Tools'));
+    // 导航到创建元素类页面 | Navigate to create page
+    await user.click(screen.getByText('Create'));
     expect(screen.getByTestId('tools-page')).toBeInTheDocument();
+    expect(screen.getByText('Current: create')).toBeInTheDocument();
 
     // 导航回首页 | Navigate back to home page
     await user.click(screen.getByText('Home'));
     expect(screen.getByTestId('home-page')).toBeInTheDocument();
+    expect(screen.getByText('Current: home')).toBeInTheDocument();
   });
 
   it('应该正确传递 currentTool 属性 | should correctly pass currentTool prop', async () => {
@@ -103,8 +107,12 @@ describe('App 组件单元测试 | App Component Unit Tests', () => {
     
     renderWithProviders(<App />);
 
-    await user.click(screen.getByText('Tools'));
-
+    // 测试创建元素类页面的工具
+    await user.click(screen.getByText('Create'));
     expect(screen.getByText('Tools Page - text-insertion')).toBeInTheDocument();
+
+    // 测试查询元素类页面的工具
+    await user.click(screen.getByText('Query'));
+    expect(screen.getByText('Tools Page - elements-list')).toBeInTheDocument();
   });
 });

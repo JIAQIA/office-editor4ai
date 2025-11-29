@@ -55,7 +55,10 @@ const App: React.FC = () => {
     switch (currentPage) {
       case "home":
         return <HomePage />;
-      case "tools":
+      case "create":
+      case "delete":
+      case "update":
+      case "query":
         return <ToolsDebugPage selectedTool={currentTool} />;
       default:
         return <HomePage />;

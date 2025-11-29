@@ -13,7 +13,10 @@ import { useState } from "react";
 import { makeStyles, tokens, Button } from "@fluentui/react-components";
 import { 
   Home24Regular, 
-  Wrench24Regular, 
+  Add24Regular,
+  Delete24Regular,
+  Edit24Regular,
+  Search24Regular,
   TextGrammarSettings24Regular,
   ChevronDown24Regular,
   Navigation24Regular,
@@ -173,7 +176,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse 
 }) => {
   const styles = useStyles();
-  const [toolsExpanded, setToolsExpanded] = useState(true);
+  const [createExpanded, setCreateExpanded] = useState(true);
+  const [deleteExpanded, setDeleteExpanded] = useState(false);
+  const [updateExpanded, setUpdateExpanded] = useState(false);
+  const [queryExpanded, setQueryExpanded] = useState(false);
 
   return (
     <div className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ""}`}>
@@ -202,29 +208,29 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 工具调试页菜单项 */}
+      {/* 创建元素类菜单项 */}
       <Button
         appearance="subtle"
         className={`${styles.menuItem} ${isCollapsed ? styles.menuItemCollapsed : ""} ${
-          currentPage === "tools" ? styles.menuItemActive : styles.menuItemHover
+          currentPage === "create" ? styles.menuItemActive : styles.menuItemHover
         }`}
         onClick={() => {
           if (isCollapsed) {
-            onNavigate("tools", "text-insertion");
+            onNavigate("create", "text-insertion");
           } else {
-            setToolsExpanded(!toolsExpanded);
+            setCreateExpanded(!createExpanded);
           }
         }}
-        title={isCollapsed ? "工具调试页" : ""}
+        title={isCollapsed ? "创建元素类" : ""}
       >
         <div className={styles.menuItemContent}>
-          <Wrench24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          <Add24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
           {!isCollapsed && (
             <>
-              <span className={styles.label}>工具调试页</span>
+              <span className={styles.label}>创建元素类</span>
               <div 
                 className={styles.chevron}
-                style={{ transform: toolsExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                style={{ transform: createExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
               >
                 <ChevronDown24Regular />
               </div>
@@ -233,32 +239,144 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 工具调试页二级菜单 */}
+      {/* 创建元素类二级菜单 */}
       {!isCollapsed && (
-        <div className={`${styles.submenu} ${!toolsExpanded ? styles.submenuCollapsed : ""}`}>
+        <div className={`${styles.submenu} ${!createExpanded ? styles.submenuCollapsed : ""}`}>
           <Button
             appearance="subtle"
             className={`${styles.submenuItem} ${
-              currentPage === "tools" && currentTool === "text-insertion"
+              currentPage === "create" && currentTool === "text-insertion"
                 ? styles.submenuItemActive
                 : styles.submenuItemHover
             }`}
-            onClick={() => onNavigate("tools", "text-insertion")}
+            onClick={() => onNavigate("create", "text-insertion")}
           >
             <div className={styles.menuItemContent}>
               <TextGrammarSettings24Regular className={styles.icon} />
               <span className={styles.label}>文本插入工具</span>
             </div>
           </Button>
-          
+        </div>
+      )}
+
+      {/* 删除元素类菜单项 */}
+      <Button
+        appearance="subtle"
+        className={`${styles.menuItem} ${isCollapsed ? styles.menuItemCollapsed : ""} ${
+          currentPage === "delete" ? styles.menuItemActive : styles.menuItemHover
+        }`}
+        onClick={() => {
+          if (isCollapsed) {
+            // 暂时没有工具，不导航
+          } else {
+            setDeleteExpanded(!deleteExpanded);
+          }
+        }}
+        title={isCollapsed ? "删除元素类" : ""}
+      >
+        <div className={styles.menuItemContent}>
+          <Delete24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          {!isCollapsed && (
+            <>
+              <span className={styles.label}>删除元素类</span>
+              <div 
+                className={styles.chevron}
+                style={{ transform: deleteExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+              >
+                <ChevronDown24Regular />
+              </div>
+            </>
+          )}
+        </div>
+      </Button>
+
+      {/* 删除元素类二级菜单 - 暂时为空 */}
+      {!isCollapsed && (
+        <div className={`${styles.submenu} ${!deleteExpanded ? styles.submenuCollapsed : ""}`}>
+          {/* 后续添加删除类工具 */}
+        </div>
+      )}
+
+      {/* 修改元素类菜单项 */}
+      <Button
+        appearance="subtle"
+        className={`${styles.menuItem} ${isCollapsed ? styles.menuItemCollapsed : ""} ${
+          currentPage === "update" ? styles.menuItemActive : styles.menuItemHover
+        }`}
+        onClick={() => {
+          if (isCollapsed) {
+            // 暂时没有工具，不导航
+          } else {
+            setUpdateExpanded(!updateExpanded);
+          }
+        }}
+        title={isCollapsed ? "修改元素类" : ""}
+      >
+        <div className={styles.menuItemContent}>
+          <Edit24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          {!isCollapsed && (
+            <>
+              <span className={styles.label}>修改元素类</span>
+              <div 
+                className={styles.chevron}
+                style={{ transform: updateExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+              >
+                <ChevronDown24Regular />
+              </div>
+            </>
+          )}
+        </div>
+      </Button>
+
+      {/* 修改元素类二级菜单 - 暂时为空 */}
+      {!isCollapsed && (
+        <div className={`${styles.submenu} ${!updateExpanded ? styles.submenuCollapsed : ""}`}>
+          {/* 后续添加修改类工具 */}
+        </div>
+      )}
+
+      {/* 查询元素类菜单项 */}
+      <Button
+        appearance="subtle"
+        className={`${styles.menuItem} ${isCollapsed ? styles.menuItemCollapsed : ""} ${
+          currentPage === "query" ? styles.menuItemActive : styles.menuItemHover
+        }`}
+        onClick={() => {
+          if (isCollapsed) {
+            onNavigate("query", "elements-list");
+          } else {
+            setQueryExpanded(!queryExpanded);
+          }
+        }}
+        title={isCollapsed ? "查询元素类" : ""}
+      >
+        <div className={styles.menuItemContent}>
+          <Search24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          {!isCollapsed && (
+            <>
+              <span className={styles.label}>查询元素类</span>
+              <div 
+                className={styles.chevron}
+                style={{ transform: queryExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+              >
+                <ChevronDown24Regular />
+              </div>
+            </>
+          )}
+        </div>
+      </Button>
+
+      {/* 查询元素类二级菜单 */}
+      {!isCollapsed && (
+        <div className={`${styles.submenu} ${!queryExpanded ? styles.submenuCollapsed : ""}`}>
           <Button
             appearance="subtle"
             className={`${styles.submenuItem} ${
-              currentPage === "tools" && currentTool === "elements-list"
+              currentPage === "query" && currentTool === "elements-list"
                 ? styles.submenuItemActive
                 : styles.submenuItemHover
             }`}
-            onClick={() => onNavigate("tools", "elements-list")}
+            onClick={() => onNavigate("query", "elements-list")}
           >
             <div className={styles.menuItemContent}>
               <List24Regular className={styles.icon} />
