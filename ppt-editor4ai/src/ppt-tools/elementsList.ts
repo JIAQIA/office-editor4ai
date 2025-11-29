@@ -77,74 +77,85 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
       await context.sync();
 
-      // 批量加载所有形状的基本属性
+      // 批量加载所有 shape 的基本属性
       for (const shape of shapes.items) {
         shape.load("id,type,left,top,width,height,name");
+      }
 
-        // 如果需要文本内容，预加载 textFrame
-        if (includeText) {
+      try {
+        await context.sync();
+      } catch (error) {
+        // 如果批量加载失败，可能是因为某些 shape 不支持这些属性
+        console.warn("批量加载失败，尝试逐个加载:", error);
+
+        // 清空并重新逐个加载
+        for (const shape of shapes.items) {
           try {
-            shape.textFrame.load("hasText,textRange");
-          } catch {
-            // 如果形状不支持文本框，忽略错误
+            shape.load("id,type,left,top,width,height,name");
+            await context.sync();
+          } catch (e) {
+            console.warn("跳过无法加载基本属性的元素:", e);
+            continue;
           }
-        }
-
-        // 如果是占位符，预加载 placeholderFormat
-        // 注意：此时还不知道 type，所以尝试加载所有形状的 placeholderFormat
-        try {
-          shape.load("placeholderFormat");
-        } catch {
-          // 如果不是占位符，忽略错误
         }
       }
 
-      // 一次性同步所有数据
-      await context.sync();
-
       // 收集所有元素信息
       for (const shape of shapes.items) {
-        // 尝试获取文本内容
-        let textContent: string | undefined;
-        if (includeText) {
-          try {
-            const textFrame = shape.textFrame;
-            if (textFrame.hasText && textFrame.textRange) {
-              textContent = textFrame.textRange.text?.trim() || undefined;
+        try {
+          // 尝试获取文本内容
+          let textContent: string | undefined;
+          const supportsText = shape.type !== "Media" && shape.type !== "Line";
+
+          if (includeText && supportsText) {
+            try {
+              shape.textFrame.load("hasText,textRange");
+              await context.sync();
+
+              const textFrame = shape.textFrame;
+              if (textFrame.hasText && textFrame.textRange) {
+                textContent = textFrame.textRange.text?.trim() || undefined;
+              }
+            } catch {
+              // 如果形状不支持文本框，忽略错误
+              textContent = undefined;
             }
-          } catch {
-            // 如果形状不支持文本框，忽略错误
-            textContent = undefined;
           }
-        }
 
-        // 获取 Placeholder 的详细类型信息
-        let placeholderType: string | undefined;
-        let placeholderContainedType: string | undefined;
+          // 获取 Placeholder 的详细类型信息
+          let placeholderType: string | undefined;
+          let placeholderContainedType: string | undefined;
 
-        if (shape.type === "Placeholder") {
-          try {
-            placeholderType = shape.placeholderFormat.type;
-            placeholderContainedType = shape.placeholderFormat.containedType || undefined;
-          } catch {
-            // 如果加载 placeholderFormat 失败，忽略错误
-            placeholderType = undefined;
-            placeholderContainedType = undefined;
+          if (shape.type === "Placeholder") {
+            try {
+              shape.load("placeholderFormat");
+              await context.sync();
+
+              placeholderType = shape.placeholderFormat.type;
+              placeholderContainedType = shape.placeholderFormat.containedType || undefined;
+            } catch {
+              // 如果加载 placeholderFormat 失败，忽略错误
+              placeholderType = undefined;
+              placeholderContainedType = undefined;
+            }
           }
-        }
 
-        elementsList.push({
-          id: shape.id,
-          type: shape.type,
-          left: Math.round(shape.left * 100) / 100,
-          top: Math.round(shape.top * 100) / 100,
-          width: Math.round(shape.width * 100) / 100,
-          height: Math.round(shape.height * 100) / 100,
-          name: shape.name || undefined,
-          text: textContent,
-          placeholderType,
-          placeholderContainedType,
-        });
+          elementsList.push({
+            id: shape.id,
+            type: shape.type,
+            left: Math.round(shape.left * 100) / 100,
+            top: Math.round(shape.top * 100) / 100,
+            width: Math.round(shape.width * 100) / 100,
+            height: Math.round(shape.height * 100) / 100,
+            name: shape.name || undefined,
+            text: textContent,
+            placeholderType,
+            placeholderContainedType,
+          });
+        } catch (error) {
+          // 如果某个 shape 处理失败，记录错误但继续处理其他 shape
+          console.warn(`跳过无法处理的元素:`, error);
+        }
       }
     });
 

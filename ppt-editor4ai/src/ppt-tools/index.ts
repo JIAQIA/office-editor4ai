@@ -64,3 +64,12 @@ export {
   getAllSlidesScreenshots,
 } from "./slideScreenshot";
 export type { SlideScreenshotOptions, SlideScreenshotResult } from "./slideScreenshot";
+
+// 视频插入工具
+export {
+  insertVideo,
+  insertVideoToSlide,
+  readVideoAsBase64,
+  fetchVideoAsBase64,
+} from "./videoInsertion";
+export type { VideoInsertionOptions, VideoInsertionResult } from "./videoInsertion";

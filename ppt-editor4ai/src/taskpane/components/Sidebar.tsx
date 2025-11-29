@@ -25,6 +25,7 @@ import {
   LayoutColumnTwoSplitLeft24Regular,
   LayoutRowTwo24Regular,
   Image24Regular,
+  Video24Regular,
   Camera24Regular
 } from "@fluentui/react-icons";
 
@@ -272,6 +273,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <Image24Regular className={styles.icon} />
               <span className={styles.label}>图片插入工具</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "create" && currentTool === "video-insertion"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("create", "video-insertion")}
+          >
+            <div className={styles.menuItemContent}>
+              <Video24Regular className={styles.icon} />
+              <span className={styles.label}>视频插入工具</span>
             </div>
           </Button>
         </div>
