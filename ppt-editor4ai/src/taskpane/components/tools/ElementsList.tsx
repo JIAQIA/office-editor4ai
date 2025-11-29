@@ -15,6 +15,97 @@ import { useState } from "react";
 import { Button, makeStyles, tokens, Spinner, Input, Label } from "@fluentui/react-components";
 import { getSlideElements, type SlideElement } from "../../../ppt-tools";
 
+/**
+ * 获取元素类型的友好显示名称
+ */
+const getElementTypeDisplay = (element: SlideElement): string => {
+  if (element.type === "Placeholder" && element.placeholderType) {
+    return element.placeholderType;
+  }
+  return element.type;
+};
+
+/**
+ * 获取元素类型的详细描述
+ */
+const getElementTypeDescription = (element: SlideElement): string | null => {
+  if (element.type === "Placeholder") {
+    if (element.placeholderContainedType) {
+      return `占位符 (包含: ${element.placeholderContainedType})`;
+    }
+    return "占位符 (空)";
+  }
+  return null;
+};
+
+/**
+ * 获取元素类型的图标或标识
+ */
+const getElementTypeIcon = (element: SlideElement): string => {
+  const type = element.type;
+  const placeholderType = element.placeholderType;
+  
+  // 如果是占位符，根据占位符类型返回图标
+  if (type === "Placeholder") {
+    switch (placeholderType) {
+      case "Title":
+      case "CenterTitle":
+      case "VerticalTitle":
+        return "📋";
+      case "Body":
+      case "VerticalBody":
+        return "📝";
+      case "Picture":
+      case "OnlinePicture":
+        return "🖼️";
+      case "Chart":
+        return "📊";
+      case "Table":
+        return "📋";
+      case "SmartArt":
+        return "🎨";
+      case "Media":
+        return "🎬";
+      case "Content":
+      case "VerticalContent":
+        return "📄";
+      case "Date":
+        return "📅";
+      case "SlideNumber":
+        return "🔢";
+      case "Footer":
+      case "Header":
+        return "📌";
+      default:
+        return "⬜";
+    }
+  }
+  
+  // 根据主类型返回图标
+  switch (type) {
+    case "Image":
+      return "🖼️";
+    case "TextBox":
+      return "📝";
+    case "GeometricShape":
+      return "🔷";
+    case "Table":
+      return "📋";
+    case "Chart":
+      return "📊";
+    case "Line":
+      return "📏";
+    case "Group":
+      return "📦";
+    case "SmartArt":
+      return "🎨";
+    case "Media":
+      return "🎬";
+    default:
+      return "⬜";
+  }
+};
+
 const useStyles = makeStyles({
   container: {
     display: "flex",
@@ -67,6 +158,17 @@ const useStyles = makeStyles({
     fontWeight: tokens.fontWeightSemibold,
     fontSize: tokens.fontSizeBase300,
     color: tokens.colorBrandForeground1,
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+  },
+  typeIcon: {
+    fontSize: "16px",
+  },
+  typeDescription: {
+    fontSize: tokens.fontSizeBase100,
+    color: tokens.colorNeutralForeground3,
+    marginTop: "2px",
   },
   elementId: {
     fontSize: tokens.fontSizeBase200,
@@ -209,9 +311,17 @@ const ElementsList: React.FC = () => {
           {elements.map((element, index) => (
             <div key={element.id} className={styles.elementCard}>
               <div className={styles.elementHeader}>
-                <span className={styles.elementType}>
-                  {element.type}
-                </span>
+                <div>
+                  <div className={styles.elementType}>
+                    <span className={styles.typeIcon}>{getElementTypeIcon(element)}</span>
+                    <span>{getElementTypeDisplay(element)}</span>
+                  </div>
+                  {getElementTypeDescription(element) && (
+                    <div className={styles.typeDescription}>
+                      {getElementTypeDescription(element)}
+                    </div>
+                  )}
+                </div>
                 <span className={styles.elementId}>
                   #{index + 1}
                 </span>

@@ -11,13 +11,15 @@
 
 export interface SlideElement {
   id: string;
-  type: string;
+  type: string; // Shape 的主类型，如 "Image", "TextBox", "Placeholder", "GeometricShape" 等
   left: number;
   top: number;
   width: number;
   height: number;
   name?: string;
   text?: string;
+  placeholderType?: string; // 当 type === "Placeholder" 时，表示占位符的具体类型，如 "Title", "Body", "Picture" 等
+  placeholderContainedType?: string; // 当 type === "Placeholder" 时，表示占位符内包含的内容类型
 }
 
 export interface GetElementsOptions {
@@ -103,6 +105,25 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
           }
         }
 
+        // 获取 Placeholder 的详细类型信息
+        let placeholderType: string | undefined;
+        let placeholderContainedType: string | undefined;
+        
+        if (shape.type === "Placeholder") {
+          try {
+            const placeholderFormat = shape.placeholderFormat;
+            placeholderFormat.load("type,containedType");
+            await context.sync();
+            
+            placeholderType = placeholderFormat.type;
+            placeholderContainedType = placeholderFormat.containedType || undefined;
+          } catch {
+            // 如果加载 placeholderFormat 失败，忽略错误
+            placeholderType = undefined;
+            placeholderContainedType = undefined;
+          }
+        }
+
         elementsList.push({
           id: shape.id,
           type: shape.type,
@@ -112,6 +133,8 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
           height: Math.round(shape.height * 100) / 100,
           name: shape.name || undefined,
           text: textContent,
+          placeholderType,
+          placeholderContainedType,
         });
       }
     });
