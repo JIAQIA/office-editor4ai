@@ -30,7 +30,7 @@ import {
   Link,
 } from "@fluentui/react-components";
 import { insertVideoToSlide, readVideoAsBase64, fetchVideoAsBase64 } from "../../../ppt-tools";
-import { Video24Regular, ArrowUpload24Regular, DismissRegular, ErrorCircle24Regular } from "@fluentui/react-icons";
+import { Video24Regular, ArrowUpload24Regular, ErrorCircle24Regular } from "@fluentui/react-icons";
 
 /* global HTMLInputElement, File, console */
 

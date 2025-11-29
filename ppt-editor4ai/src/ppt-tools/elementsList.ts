@@ -90,28 +90,51 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
         // 清空并重新逐个加载
         for (const shape of shapes.items) {
+          shape.load("id,type,left,top,width,height,name");
+        }
+        // 批量同步所有加载请求
+        try {
+          await context.sync();
+        } catch (e) {
+          console.warn("部分元素无法加载基本属性:", e);
+        }
+      }
+
+      // 第一步：批量加载所有需要的额外属性
+      for (const shape of shapes.items) {
+        const supportsText = shape.type !== "Media" && shape.type !== "Line";
+        if (includeText && supportsText) {
           try {
-            shape.load("id,type,left,top,width,height,name");
-            await context.sync();
-          } catch (e) {
-            console.warn("跳过无法加载基本属性的元素:", e);
-            continue;
+            shape.textFrame.load("hasText,textRange");
+          } catch {
+            // 忽略不支持文本框的形状
+          }
+        }
+        if (shape.type === "Placeholder") {
+          try {
+            shape.load("placeholderFormat");
+          } catch {
+            // 忽略加载失败
           }
         }
       }
 
-      // 收集所有元素信息
+      // 统一同步所有额外属性
+      try {
+        await context.sync();
+      } catch {
+        // 忽略部分属性加载失败
+      }
+
+      // 第二步：收集所有元素信息（不再需要 sync）
       for (const shape of shapes.items) {
         try {
-          // 尝试获取文本内容
+          // 获取文本内容
           let textContent: string | undefined;
           const supportsText = shape.type !== "Media" && shape.type !== "Line";
 
           if (includeText && supportsText) {
             try {
-              shape.textFrame.load("hasText,textRange");
-              await context.sync();
-
               const textFrame = shape.textFrame;
               if (textFrame.hasText && textFrame.textRange) {
                 textContent = textFrame.textRange.text?.trim() || undefined;
@@ -128,9 +151,6 @@ export async function getSlideElements(options: GetElementsOptions = {}): Promis
 
           if (shape.type === "Placeholder") {
             try {
-              shape.load("placeholderFormat");
-              await context.sync();
-
               placeholderType = shape.placeholderFormat.type;
               placeholderContainedType = shape.placeholderFormat.containedType || undefined;
             } catch {

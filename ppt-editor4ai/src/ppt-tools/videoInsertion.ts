@@ -22,7 +22,7 @@
  * 3. 等待 Microsoft 官方 API 支持
  */
 
-/* global Office, console, File, FileReader, fetch */
+/* global console, File, FileReader, fetch */
 
 /**
  * 视频插入选项
@@ -192,66 +192,13 @@ export async function fetchVideoAsBase64(url: string): Promise<string> {
  *
  * 创建一个带有播放按钮图标的黑色背景图片，作为视频预览
  *
- * @param width 图片宽度（磅）
- * @param height 图片高度（磅）
+ * @param _width 图片宽度（磅）
+ * @param _height 图片高度（磅）
  * @returns Base64 编码的 PNG 图片（不含 data URL 前缀）
  */
-function generateVideoPlaceholder(width: number, height: number): string {
-  // 创建 Canvas
-  const canvas = document.createElement("canvas");
-  const dpr = window.devicePixelRatio || 1;
-
-  // 设置 canvas 尺寸（使用设备像素比以获得更清晰的图像）
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
-    throw new Error("无法创建 Canvas 上下文");
-  }
-
-  // 缩放以适应设备像素比
-  ctx.scale(dpr, dpr);
-
-  // 绘制黑色背景
-  ctx.fillStyle = "#000000";
-  ctx.fillRect(0, 0, width, height);
-
-  // 绘制播放按钮（白色三角形）
-  const centerX = width / 2;
-  const centerY = height / 2;
-  const buttonSize = Math.min(width, height) * 0.2; // 按钮大小为较小边的 20%
-
-  ctx.fillStyle = "#FFFFFF";
-  ctx.globalAlpha = 0.9;
-
-  // 绘制圆形背景
-  ctx.beginPath();
-  ctx.arc(centerX, centerY, buttonSize, 0, Math.PI * 2);
-  ctx.fill();
-
-  // 绘制三角形播放图标
-  ctx.fillStyle = "#000000";
-  ctx.beginPath();
-  const triangleSize = buttonSize * 0.5;
-  ctx.moveTo(centerX - triangleSize * 0.3, centerY - triangleSize * 0.6);
-  ctx.lineTo(centerX - triangleSize * 0.3, centerY + triangleSize * 0.6);
-  ctx.lineTo(centerX + triangleSize * 0.7, centerY);
-  ctx.closePath();
-  ctx.fill();
-
-  // 添加文字提示
-  ctx.globalAlpha = 0.7;
-  ctx.fillStyle = "#FFFFFF";
-  ctx.font = `${Math.max(12, height * 0.05)}px Arial`;
-  ctx.textAlign = "center";
-  ctx.fillText("视频占位符", centerX, height - 20);
-  ctx.font = `${Math.max(10, height * 0.035)}px Arial`;
-  ctx.fillText("PowerPoint API 暂不支持直接插入视频", centerX, height - 5);
-
-  // 转换为 Base64（移除 data URL 前缀）
-  const dataUrl = canvas.toDataURL("image/png");
-  return dataUrl.split(",")[1];
+function _generateVideoPlaceholder(_width: number, _height: number): string {
+  // 此函数暂时未使用，保留供将来可能的占位符功能使用
+  throw new Error("generateVideoPlaceholder is not implemented in Office Add-in context");
 }
 
 /**
