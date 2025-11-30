@@ -122,6 +122,7 @@ const createMockData = (shapes: MockShape[]): MockData => {
               items: shapes,
               load: function() {},
             },
+            load: function() {}, // 支持 slide.load("shapes")
           }),
         }),
       },
