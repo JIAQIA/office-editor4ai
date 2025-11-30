@@ -91,3 +91,7 @@ export {
   deleteElementsByIds,
 } from "./elementDeletion";
 export type { DeleteElementOptions, DeleteElementResult } from "./elementDeletion";
+
+// 幻灯片删除工具
+export { deleteSlides, deleteCurrentSlide, deleteSlidesByNumbers } from "./slideDeletion";
+export type { DeleteSlideOptions, DeleteSlideResult } from "./slideDeletion";

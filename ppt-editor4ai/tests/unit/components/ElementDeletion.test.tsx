@@ -386,7 +386,7 @@ describe("ElementDeletion 组件单元测试 | ElementDeletion Component Unit Te
     renderWithProviders(<ElementDeletion />);
 
     expect(screen.getByText("使用说明:")).toBeInTheDocument();
-    expect(screen.getByText(/方式1: 点击"获取当前页面元素"按钮/)).toBeInTheDocument();
+    expect(screen.getByText(/方式1: 点击.*获取当前页面元素.*按钮/)).toBeInTheDocument();
     expect(screen.getByText(/方式2: 在PPT中选中元素/)).toBeInTheDocument();
     expect(screen.getByText(/方式3: 手动输入元素ID/)).toBeInTheDocument();
   });

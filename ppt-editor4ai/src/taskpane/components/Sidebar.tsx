@@ -28,7 +28,8 @@ import {
   Video24Regular,
   Camera24Regular,
   Shapes24Regular,
-  Table24Regular
+  Table24Regular,
+  DocumentOnePage24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -368,6 +369,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <Delete24Regular className={styles.icon} />
               <span className={styles.label}>元素删除工具</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "delete" && currentTool === "slide-deletion"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("delete", "slide-deletion")}
+          >
+            <div className={styles.menuItemContent}>
+              <DocumentOnePage24Regular className={styles.icon} />
+              <span className={styles.label}>幻灯片删除工具</span>
             </div>
           </Button>
         </div>

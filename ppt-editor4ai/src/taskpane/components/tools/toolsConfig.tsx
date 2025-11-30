@@ -18,6 +18,7 @@ import SlideScreenshot from "./SlideScreenshot";
 import ShapeInsertion from "./ShapeInsertion";
 import TableInsertion from "./TableInsertion";
 import { ElementDeletion } from "./ElementDeletion";
+import { SlideDeletion } from "./SlideDeletion";
 
 export interface ToolConfig {
   id: string;
@@ -90,6 +91,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "元素删除工具",
     subtitle: "删除幻灯片中的元素，支持通过ID、名称或索引选择元素（调试工具）",
     component: <ElementDeletion />,
+  },
+  "slide-deletion": {
+    id: "slide-deletion",
+    title: "幻灯片删除工具",
+    subtitle: "删除指定页码的幻灯片，支持删除当前页或批量删除多页（调试工具）",
+    component: <SlideDeletion />,
   },
 };
 
