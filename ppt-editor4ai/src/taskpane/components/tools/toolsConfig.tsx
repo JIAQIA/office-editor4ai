@@ -15,6 +15,7 @@ import SlideLayouts from "./SlideLayouts";
 import ImageInsertion from "./ImageInsertion";
 import VideoInsertion from "./VideoInsertion";
 import SlideScreenshot from "./SlideScreenshot";
+import ShapeInsertion from "./ShapeInsertion";
 
 export interface ToolConfig {
   id: string;
@@ -69,6 +70,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "视频插入工具",
     subtitle: "在幻灯片中插入视频，支持本地上传或 URL（实验性功能）",
     component: <VideoInsertion />,
+  },
+  "shape-insertion": {
+    id: "shape-insertion",
+    title: "形状插入工具",
+    subtitle: "在幻灯片中插入各种几何形状，支持自定义样式和文本",
+    component: <ShapeInsertion />,
   },
 };
 

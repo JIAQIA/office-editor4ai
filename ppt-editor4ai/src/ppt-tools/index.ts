@@ -73,3 +73,7 @@ export {
   fetchVideoAsBase64,
 } from "./videoInsertion";
 export type { VideoInsertionOptions, VideoInsertionResult } from "./videoInsertion";
+
+// 形状插入工具
+export { insertShape, insertShapeToSlide, COMMON_SHAPES } from "./shapeInsertion";
+export type { ShapeInsertionOptions, ShapeInsertionResult, ShapeType } from "./shapeInsertion";

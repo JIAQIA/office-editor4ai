@@ -92,6 +92,13 @@ global.PowerPoint = {
   }),
 } as any;
 
+// Mock ResizeObserver for FluentUI components
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as any;
+
 // 扩展 expect 匹配器 | Extend expect matchers
 expect.extend({
   toBeInTheDocument(received) {
