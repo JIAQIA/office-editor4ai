@@ -95,3 +95,7 @@ export type { DeleteElementOptions, DeleteElementResult } from "./elementDeletio
 // 幻灯片删除工具
 export { deleteSlides, deleteCurrentSlide, deleteSlidesByNumbers } from "./slideDeletion";
 export type { DeleteSlideOptions, DeleteSlideResult } from "./slideDeletion";
+
+// 文本框更新工具
+export { updateTextBox, updateTextBoxes, getTextBoxStyle } from "./textUpdate";
+export type { TextUpdateOptions, TextUpdateResult } from "./textUpdate";

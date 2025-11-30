@@ -396,7 +396,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         }`}
         onClick={() => {
           if (isCollapsed) {
-            // 暂时没有工具，不导航
+            onNavigate("update", "text-update");
           } else {
             setUpdateExpanded(!updateExpanded);
           }
@@ -419,10 +419,23 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 修改元素类二级菜单 - 暂时为空 */}
+      {/* 修改元素类二级菜单 */}
       {!isCollapsed && (
         <div className={`${styles.submenu} ${!updateExpanded ? styles.submenuCollapsed : ""}`}>
-          {/* 后续添加修改类工具 */}
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "text-update"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "text-update")}
+          >
+            <div className={styles.menuItemContent}>
+              <TextGrammarSettings24Regular className={styles.icon} />
+              <span className={styles.label}>文本框更新工具</span>
+            </div>
+          </Button>
         </div>
       )}
 

@@ -19,6 +19,7 @@ import ShapeInsertion from "./ShapeInsertion";
 import TableInsertion from "./TableInsertion";
 import { ElementDeletion } from "./ElementDeletion";
 import { SlideDeletion } from "./SlideDeletion";
+import { TextUpdate } from "./TextUpdate";
 
 export interface ToolConfig {
   id: string;
@@ -97,6 +98,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "幻灯片删除工具",
     subtitle: "删除指定页码的幻灯片，支持删除当前页或批量删除多页（调试工具）",
     component: <SlideDeletion />,
+  },
+  "text-update": {
+    id: "text-update",
+    title: "文本框更新工具",
+    subtitle: "更新文本框的内容、字体、颜色、对齐方式、位置和尺寸等属性",
+    component: <TextUpdate />,
   },
 };
 
