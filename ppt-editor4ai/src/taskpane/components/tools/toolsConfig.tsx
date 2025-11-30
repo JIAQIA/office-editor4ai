@@ -16,6 +16,7 @@ import ImageInsertion from "./ImageInsertion";
 import VideoInsertion from "./VideoInsertion";
 import SlideScreenshot from "./SlideScreenshot";
 import ShapeInsertion from "./ShapeInsertion";
+import TableInsertion from "./TableInsertion";
 
 export interface ToolConfig {
   id: string;
@@ -76,6 +77,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "形状插入工具",
     subtitle: "在幻灯片中插入各种几何形状，支持自定义样式和文本",
     component: <ShapeInsertion />,
+  },
+  "table-insertion": {
+    id: "table-insertion",
+    title: "表格插入工具",
+    subtitle: "在幻灯片中插入表格，支持自定义行列数、样式和数据填充",
+    component: <TableInsertion />,
   },
 };
 

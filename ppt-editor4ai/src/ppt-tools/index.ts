@@ -77,3 +77,7 @@ export type { VideoInsertionOptions, VideoInsertionResult } from "./videoInserti
 // 形状插入工具
 export { insertShape, insertShapeToSlide, COMMON_SHAPES } from "./shapeInsertion";
 export type { ShapeInsertionOptions, ShapeInsertionResult, ShapeType } from "./shapeInsertion";
+
+// 表格插入工具
+export { insertTable, insertTableToSlide, TABLE_TEMPLATES } from "./tableInsertion";
+export type { TableInsertionOptions, TableInsertionResult } from "./tableInsertion";
