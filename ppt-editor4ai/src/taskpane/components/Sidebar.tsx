@@ -436,6 +436,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span className={styles.label}>文本框更新工具</span>
             </div>
           </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "slide-move"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "slide-move")}
+          >
+            <div className={styles.menuItemContent}>
+              <DocumentOnePage24Regular className={styles.icon} />
+              <span className={styles.label}>幻灯片移动工具</span>
+            </div>
+          </Button>
         </div>
       )}
 

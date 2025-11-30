@@ -99,3 +99,13 @@ export type { DeleteSlideOptions, DeleteSlideResult } from "./slideDeletion";
 // 文本框更新工具
 export { updateTextBox, updateTextBoxes, getTextBoxStyle } from "./textUpdate";
 export type { TextUpdateOptions, TextUpdateResult } from "./textUpdate";
+
+// 幻灯片移动工具
+export {
+  moveSlide,
+  moveCurrentSlide,
+  moveSlides,
+  swapSlides,
+  getAllSlidesInfo,
+} from "./slideMove";
+export type { SlideMoveOptions, SlideMoveResult, SlideInfo } from "./slideMove";

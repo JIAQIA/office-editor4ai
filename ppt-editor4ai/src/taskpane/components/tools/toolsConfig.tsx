@@ -20,6 +20,7 @@ import TableInsertion from "./TableInsertion";
 import { ElementDeletion } from "./ElementDeletion";
 import { SlideDeletion } from "./SlideDeletion";
 import { TextUpdate } from "./TextUpdate";
+import { SlideMove } from "./SlideMove";
 
 export interface ToolConfig {
   id: string;
@@ -104,6 +105,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "文本框更新工具",
     subtitle: "更新文本框的内容、字体、颜色、对齐方式、位置和尺寸等属性",
     component: <TextUpdate />,
+  },
+  "slide-move": {
+    id: "slide-move",
+    title: "幻灯片移动工具",
+    subtitle: "修改幻灯片页码，支持移动、交换幻灯片位置以调整排序",
+    component: <SlideMove />,
   },
 };
 
