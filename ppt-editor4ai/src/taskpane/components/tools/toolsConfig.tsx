@@ -21,6 +21,7 @@ import { ElementDeletion } from "./ElementDeletion";
 import { SlideDeletion } from "./SlideDeletion";
 import { TextUpdate } from "./TextUpdate";
 import { SlideMove } from "./SlideMove";
+import ImageReplace from "./ImageReplace";
 
 export interface ToolConfig {
   id: string;
@@ -111,6 +112,12 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "幻灯片移动工具",
     subtitle: "修改幻灯片页码，支持移动、交换幻灯片位置以调整排序",
     component: <SlideMove />,
+  },
+  "image-replace": {
+    id: "image-replace",
+    title: "图片替换工具",
+    subtitle: "替换选中的图片，支持普通图片和占位符图片（PlaceHolder-Picture）",
+    component: <ImageReplace />,
   },
 };
 

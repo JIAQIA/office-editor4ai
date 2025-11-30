@@ -450,6 +450,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span className={styles.label}>幻灯片移动工具</span>
             </div>
           </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "image-replace"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "image-replace")}
+          >
+            <div className={styles.menuItemContent}>
+              <Image24Regular className={styles.icon} />
+              <span className={styles.label}>图片替换工具</span>
+            </div>
+          </Button>
         </div>
       )}
 

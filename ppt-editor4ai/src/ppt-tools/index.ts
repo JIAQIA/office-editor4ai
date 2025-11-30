@@ -101,11 +101,9 @@ export { updateTextBox, updateTextBoxes, getTextBoxStyle } from "./textUpdate";
 export type { TextUpdateOptions, TextUpdateResult } from "./textUpdate";
 
 // 幻灯片移动工具
-export {
-  moveSlide,
-  moveCurrentSlide,
-  moveSlides,
-  swapSlides,
-  getAllSlidesInfo,
-} from "./slideMove";
+export { moveSlide, moveCurrentSlide, moveSlides, swapSlides, getAllSlidesInfo } from "./slideMove";
 export type { SlideMoveOptions, SlideMoveResult, SlideInfo } from "./slideMove";
+
+// 图片替换工具
+export { replaceImage, replaceSelectedImage, replaceImages, getImageInfo } from "./imageReplace";
+export type { ImageReplaceOptions, ImageReplaceResult, ImageElementInfo } from "./imageReplace";

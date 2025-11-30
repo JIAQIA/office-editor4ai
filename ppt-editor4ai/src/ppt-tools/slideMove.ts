@@ -262,7 +262,8 @@ export async function getAllSlidesInfo(): Promise<SlideInfo[]> {
                 title = textRange.text.trim();
                 break;
               }
-            } catch (e) {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (_e) {
               // 忽略无法读取文本的形状
               continue;
             }
