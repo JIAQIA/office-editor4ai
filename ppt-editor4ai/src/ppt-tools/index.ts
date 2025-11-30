@@ -81,3 +81,13 @@ export type { ShapeInsertionOptions, ShapeInsertionResult, ShapeType } from "./s
 // 表格插入工具
 export { insertTable, insertTableToSlide, TABLE_TEMPLATES } from "./tableInsertion";
 export type { TableInsertionOptions, TableInsertionResult } from "./tableInsertion";
+
+// 元素删除工具
+export {
+  deleteElement,
+  deleteElementById,
+  deleteElementByName,
+  deleteElementByIndex,
+  deleteElementsByIds,
+} from "./elementDeletion";
+export type { DeleteElementOptions, DeleteElementResult } from "./elementDeletion";

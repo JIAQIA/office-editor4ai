@@ -330,7 +330,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         }`}
         onClick={() => {
           if (isCollapsed) {
-            // 暂时没有工具，不导航
+            onNavigate("delete", "element-deletion");
           } else {
             setDeleteExpanded(!deleteExpanded);
           }
@@ -353,10 +353,23 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 删除元素类二级菜单 - 暂时为空 */}
+      {/* 删除元素类二级菜单 */}
       {!isCollapsed && (
         <div className={`${styles.submenu} ${!deleteExpanded ? styles.submenuCollapsed : ""}`}>
-          {/* 后续添加删除类工具 */}
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "delete" && currentTool === "element-deletion"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("delete", "element-deletion")}
+          >
+            <div className={styles.menuItemContent}>
+              <Delete24Regular className={styles.icon} />
+              <span className={styles.label}>元素删除工具</span>
+            </div>
+          </Button>
         </div>
       )}
 
