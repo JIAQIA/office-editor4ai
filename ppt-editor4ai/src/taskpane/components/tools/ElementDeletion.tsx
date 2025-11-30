@@ -30,7 +30,6 @@ export const ElementDeletion: React.FC = () => {
     } catch (error) {
       setMessage(`获取元素列表失败: ${error instanceof Error ? error.message : "未知错误"}`);
       setMessageType("error");
-      console.error("获取元素列表失败:", error);
     } finally {
       setLoading(false);
     }
@@ -82,7 +81,6 @@ export const ElementDeletion: React.FC = () => {
     } catch (error) {
       setMessage(`删除元素失败: ${error instanceof Error ? error.message : "未知错误"}`);
       setMessageType("error");
-      console.error("删除元素失败:", error);
     } finally {
       setLoading(false);
     }
@@ -164,7 +162,6 @@ export const ElementDeletion: React.FC = () => {
     } catch (error) {
       setMessage(`获取选中元素失败: ${error instanceof Error ? error.message : "未知错误"}`);
       setMessageType("error");
-      console.error("获取选中元素失败:", error);
     } finally {
       setLoading(false);
     }
@@ -405,10 +402,10 @@ export const ElementDeletion: React.FC = () => {
       >
         <strong>使用说明:</strong>
         <ol style={{ margin: "8px 0 0 0", paddingLeft: "20px" }}>
-          <li>方式1: 点击"获取当前页面元素"按钮，在列表中点击选择（按住Ctrl/Cmd多选）</li>
-          <li>方式2: 在PPT中选中元素（支持多选），然后点击"获取PPT中选中的元素"按钮</li>
+          <li>方式1: 点击&ldquo;获取当前页面元素&rdquo;按钮，在列表中点击选择（按住Ctrl/Cmd多选）</li>
+          <li>方式2: 在PPT中选中元素（支持多选），然后点击&ldquo;获取PPT中选中的元素&rdquo;按钮</li>
           <li>方式3: 手动输入元素ID（多个ID用逗号分隔）</li>
-          <li>最后点击"删除选中元素"按钮执行删除</li>
+          <li>最后点击&ldquo;删除选中元素&rdquo;按钮执行删除</li>
         </ol>
         <div style={{ marginTop: "8px", fontSize: "11px", color: "#999" }}>
           💡 提示: 支持批量删除多个元素，Office Add-in 无法实时监听PPT中的选中状态
