@@ -47,7 +47,7 @@ export interface ImageReplaceResult {
 /**
  * 替换图片
  * 支持普通图片（Picture/Image）和所有类型的占位符（Placeholder）
- * 
+ *
  * 处理方式：
  * - Picture/Image 类型：删除原图片，在相同位置插入新图片
  * - Placeholder-Picture 类型：使用 fill.setImage() 直接替换填充

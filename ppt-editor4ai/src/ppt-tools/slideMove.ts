@@ -231,33 +231,55 @@ export async function getAllSlidesInfo(): Promise<SlideInfo[]> {
       slides.load("items");
       await context.sync();
 
-      // 加载每张幻灯片的基本信息
+      // 批量加载所有幻灯片的基本信息
       for (let i = 0; i < slides.items.length; i++) {
         const slide = slides.items[i];
         slide.load("id,shapes");
-        await context.sync();
-
-        // 尝试获取幻灯片标题
-        let title: string | undefined;
         const shapes = slide.shapes;
         shapes.load("items");
-        await context.sync();
+      }
+      await context.sync();
 
+      // 批量加载所有 shape 的属性
+      for (let i = 0; i < slides.items.length; i++) {
+        const shapes = slides.items[i].shapes;
         for (const shape of shapes.items) {
-          shape.load("type,name");
-          await context.sync();
+          shape.load("type,name,textFrame");
+        }
+      }
+      await context.sync();
 
+      // 批量加载所有文本内容
+      for (let i = 0; i < slides.items.length; i++) {
+        const shapes = slides.items[i].shapes;
+        for (const shape of shapes.items) {
           // 查找标题占位符或第一个文本框
           if (shape.type === "Placeholder" || shape.type === "TextBox") {
             try {
               const textFrame = shape.textFrame;
               textFrame.load("textRange");
-              await context.sync();
-
               const textRange = textFrame.textRange;
               textRange.load("text");
-              await context.sync();
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (_e) {
+              // 忽略无法读取文本的形状
+              continue;
+            }
+          }
+        }
+      }
+      await context.sync();
 
+      // 处理数据，提取标题
+      for (let i = 0; i < slides.items.length; i++) {
+        const slide = slides.items[i];
+        let title: string | undefined;
+        const shapes = slide.shapes;
+
+        for (const shape of shapes.items) {
+          if (shape.type === "Placeholder" || shape.type === "TextBox") {
+            try {
+              const textRange = shape.textFrame.textRange;
               if (textRange.text && textRange.text.trim()) {
                 title = textRange.text.trim();
                 break;
