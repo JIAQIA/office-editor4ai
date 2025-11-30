@@ -95,8 +95,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
 
   describe("deleteSlidesByNumbers", () => {
     it("应该能够删除单个幻灯片 / Should delete a single slide", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([3]);
 
@@ -107,13 +106,12 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
       expect(result.details?.notFound).toEqual([]);
       expect(result.details?.errors).toEqual([]);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[2]._deleted).toBe(true);
     });
 
     it("应该能够删除多个幻灯片 / Should delete multiple slides", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([1, 3, 5]);
 
@@ -122,15 +120,14 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
       expect(result.failedCount).toBe(0);
       expect(result.details?.deleted).toEqual([5, 3, 1]); // 按从大到小排序
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[0]._deleted).toBe(true);
       expect(slides[2]._deleted).toBe(true);
       expect(slides[4]._deleted).toBe(true);
     });
 
     it("应该按从大到小的顺序删除幻灯片 / Should delete slides in descending order", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([2, 4, 1, 5, 3]);
 
@@ -141,8 +138,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该去除重复的页码 / Should remove duplicate slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([2, 2, 3, 3, 2]);
 
@@ -152,8 +148,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该处理不存在的页码 / Should handle non-existent slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([3, 10, 15]);
 
@@ -166,8 +161,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该处理负数页码 / Should handle negative slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([-1, 0, 3]);
 
@@ -189,8 +183,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该处理全部页码不存在的情况 / Should handle all non-existent slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([10, 20, 30]);
 
@@ -201,12 +194,11 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该在删除失败时返回错误信息 / Should return error info on deletion failure", async () => {
-      const mockData = createMockData(5);
+      (global as any).PowerPoint = createMockData(5);
       // 模拟删除时抛出错误
-      mockData._getSlides()[2].delete = function () {
+      (global as any).PowerPoint._getSlides()[2].delete = function () {
         throw new Error("删除失败");
       };
-      (global as any).PowerPoint = mockData;
 
       const result = await deleteSlidesByNumbers([3]);
 
@@ -219,12 +211,11 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该在 PowerPoint.run 失败时返回错误 / Should return error when PowerPoint.run fails", async () => {
-      const mockData = {
+      (global as any).PowerPoint = {
         run: async function () {
           throw new Error("PowerPoint API 错误");
         },
       };
-      (global as any).PowerPoint = mockData;
 
       const result = await deleteSlidesByNumbers([1, 2]);
 
@@ -237,8 +228,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
 
   describe("deleteCurrentSlide", () => {
     it("应该能够删除当前选中的幻灯片 / Should delete the currently selected slide", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteCurrentSlide();
 
@@ -248,7 +238,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
       expect(result.details?.deleted).toEqual([1]); // 默认选中第一页
       expect(result.message).toContain("成功删除第 1 页");
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[0]._deleted).toBe(true);
     });
 
@@ -290,17 +280,16 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
       expect(result.deletedCount).toBe(1);
       expect(result.details?.deleted).toEqual([3]);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[2]._deleted).toBe(true);
     });
 
     it("应该在 PowerPoint.run 失败时返回错误 / Should return error when PowerPoint.run fails", async () => {
-      const mockData = {
+      (global as any).PowerPoint = {
         run: async function () {
           throw new Error("API 调用失败");
         },
       };
-      (global as any).PowerPoint = mockData;
 
       const result = await deleteCurrentSlide();
 
@@ -313,8 +302,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
 
   describe("deleteSlides", () => {
     it("应该在指定页码时调用 deleteSlidesByNumbers / Should call deleteSlidesByNumbers when slide numbers are provided", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlides({ slideNumbers: [2, 4] });
 
@@ -324,8 +312,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该在未指定页码时删除当前幻灯片 / Should delete current slide when no slide numbers are provided", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlides({});
 
@@ -335,8 +322,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该在 deleteCurrentSlide 为 false 且无页码时返回错误 / Should return error when deleteCurrentSlide is false and no slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlides({ deleteCurrentSlide: false });
 
@@ -347,8 +333,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该优先使用指定的页码而非当前幻灯片 / Should prioritize slide numbers over current slide", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlides({
         slideNumbers: [3, 5],
@@ -360,15 +345,14 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
       expect(result.details?.deleted).toEqual([5, 3]);
 
       // 验证只删除了指定页码，而非当前页
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[0]._deleted).toBe(false); // 第一页（当前页）未删除
       expect(slides[2]._deleted).toBe(true); // 第三页已删除
       expect(slides[4]._deleted).toBe(true); // 第五页已删除
     });
 
     it("应该处理空页码数组 / Should handle empty slide numbers array", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlides({ slideNumbers: [] });
 
@@ -380,60 +364,55 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
 
   describe("边界情况测试 / Edge Cases", () => {
     it("应该能够删除只有一页的演示文稿的幻灯片 / Should delete slide from single-slide presentation", async () => {
-      const mockData = createMockData(1);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(1);
 
       const result = await deleteSlidesByNumbers([1]);
 
       expect(result.success).toBe(true);
       expect(result.deletedCount).toBe(1);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[0]._deleted).toBe(true);
     });
 
     it("应该能够删除最后一页 / Should delete the last slide", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([5]);
 
       expect(result.success).toBe(true);
       expect(result.deletedCount).toBe(1);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[4]._deleted).toBe(true);
     });
 
     it("应该能够删除第一页 / Should delete the first slide", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([1]);
 
       expect(result.success).toBe(true);
       expect(result.deletedCount).toBe(1);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides[0]._deleted).toBe(true);
     });
 
     it("应该能够删除所有幻灯片 / Should delete all slides", async () => {
-      const mockData = createMockData(3);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(3);
 
       const result = await deleteSlidesByNumbers([1, 2, 3]);
 
       expect(result.success).toBe(true);
       expect(result.deletedCount).toBe(3);
 
-      const slides = mockData._getSlides();
+      const slides = (global as any).PowerPoint._getSlides();
       expect(slides.every((slide) => slide._deleted)).toBe(true);
     });
 
     it("应该处理超大页码 / Should handle very large slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([999999]);
 
@@ -444,8 +423,7 @@ describe("slideDeletion 工具测试 / Slide Deletion Tool Tests", () => {
     });
 
     it("应该处理混合的有效和无效页码 / Should handle mixed valid and invalid slide numbers", async () => {
-      const mockData = createMockData(5);
-      (global as any).PowerPoint = mockData;
+      (global as any).PowerPoint = createMockData(5);
 
       const result = await deleteSlidesByNumbers([2, 10, 4, -5, 0, 3]);
 
