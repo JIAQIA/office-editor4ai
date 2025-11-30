@@ -20,7 +20,8 @@ import {
   TextGrammarSettings24Regular,
   ChevronDown24Regular,
   Navigation24Regular,
-  Dismiss24Regular
+  Dismiss24Regular,
+  Eye24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -342,7 +343,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         }`}
         onClick={() => {
           if (isCollapsed) {
-            // 暂时没有工具，不导航
+            onNavigate("query", "visible-content");
           } else {
             setQueryExpanded(!queryExpanded);
           }
@@ -365,10 +366,23 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 查询元素类二级菜单 - 暂时为空 */}
+      {/* 查询元素类二级菜单 */}
       {!isCollapsed && (
         <div className={`${styles.submenu} ${!queryExpanded ? styles.submenuCollapsed : ""}`}>
-          {/* 后续添加查询类工具 */}
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "visible-content"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "visible-content")}
+          >
+            <div className={styles.menuItemContent}>
+              <Eye24Regular className={styles.icon} />
+              <span className={styles.label}>可见内容获取</span>
+            </div>
+          </Button>
         </div>
       )}
     </div>

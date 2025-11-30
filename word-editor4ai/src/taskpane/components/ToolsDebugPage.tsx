@@ -11,6 +11,7 @@
 import * as React from "react";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import TextInsertion from "./TextInsertion";
+import VisibleContent from "./tools/VisibleContent";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -61,6 +62,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <TextInsertion insertText={insertText} />
+            </div>
+          </>
+        );
+      case "visible-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              可见内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取用户当前可见范围的文档内容，包括段落、表格、图片等元素
+            </p>
+            <div className={styles.toolContainer}>
+              <VisibleContent />
             </div>
           </>
         );
