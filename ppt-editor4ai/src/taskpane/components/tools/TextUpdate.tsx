@@ -160,8 +160,13 @@ export const TextUpdate: React.FC = () => {
       options.bold = bold;
       options.italic = italic;
       options.underline = underline;
-      options.horizontalAlignment = horizontalAlignment as any;
-      options.verticalAlignment = verticalAlignment as any;
+      options.horizontalAlignment = horizontalAlignment as
+        | "Left"
+        | "Center"
+        | "Right"
+        | "Justify"
+        | "Distributed";
+      options.verticalAlignment = verticalAlignment as "Top" | "Middle" | "Bottom";
       if (backgroundColor !== "") options.backgroundColor = backgroundColor;
       if (left !== "") options.left = parseFloat(left);
       if (top !== "") options.top = parseFloat(top);
@@ -297,7 +302,7 @@ export const TextUpdate: React.FC = () => {
             border: "1px solid #a80000",
           }}
         >
-          ⚠️ 选中的元素类型 "{selectedShapeType}" 不支持文本编辑，请选择文本框、占位符或几何形状
+          ⚠️ 选中的元素类型 &quot;{selectedShapeType}&quot; 不支持文本编辑，请选择文本框、占位符或几何形状
         </div>
       )}
 
@@ -710,10 +715,10 @@ export const TextUpdate: React.FC = () => {
       >
         <strong>使用说明:</strong>
         <ol style={{ margin: "8px 0 0 0", paddingLeft: "20px" }}>
-          <li>在PPT中选中一个文本框元素，点击"获取PPT中选中的元素"</li>
-          <li>点击"加载当前样式"查看元素的当前属性</li>
+          <li>在PPT中选中一个文本框元素，点击&quot;获取PPT中选中的元素&quot;</li>
+          <li>点击&quot;加载当前样式&quot;查看元素的当前属性</li>
           <li>修改需要更新的属性（留空的字段不会被修改）</li>
-          <li>点击"更新文本框"应用更改</li>
+          <li>点击&quot;更新文本框&quot;应用更改</li>
         </ol>
         <div style={{ marginTop: "8px", fontSize: "11px", color: "#999" }}>
           💡 提示: 支持的元素类型包括文本框、占位符和几何形状

@@ -51,11 +51,16 @@ export async function updateTextBox(options: TextUpdateOptions): Promise<TextUpd
   try {
     await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
+      // 直接通过 shapes 添加/操作，不读取 items
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
 
-      // 查找目标元素
+      // 查找目标元素 - 合并为一次循环
       let targetShape: PowerPoint.Shape | null = null;
       for (const shape of shapes.items) {
         shape.load("id,type");
@@ -197,6 +202,10 @@ export async function getTextBoxStyle(elementId: string): Promise<TextUpdateOpti
 
     await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -236,7 +245,12 @@ export async function getTextBoxStyle(elementId: string): Promise<TextUpdateOpti
       paragraphFormat.load("horizontalAlignment");
       await context.sync();
 
-      const horizontalAlignment = paragraphFormat.horizontalAlignment as any;
+      const horizontalAlignment = paragraphFormat.horizontalAlignment as
+        | "Left"
+        | "Center"
+        | "Right"
+        | "Justify"
+        | "Distributed";
 
       // 加载背景颜色
       targetShape.fill.load("type,foregroundColor");
@@ -257,7 +271,7 @@ export async function getTextBoxStyle(elementId: string): Promise<TextUpdateOpti
         italic: font.italic,
         underline: font.underline !== "None",
         horizontalAlignment,
-        verticalAlignment: textFrame.verticalAlignment as any,
+        verticalAlignment: textFrame.verticalAlignment as "Top" | "Middle" | "Bottom",
         backgroundColor,
         left: targetShape.left,
         top: targetShape.top,
