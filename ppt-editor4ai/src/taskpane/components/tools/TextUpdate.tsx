@@ -7,7 +7,7 @@
  * 描述: 文本框更新调试组件
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { updateTextBox, getTextBoxStyle, type TextUpdateOptions } from "../../../ppt-tools";
 
 export const TextUpdate: React.FC = () => {
@@ -152,7 +152,8 @@ export const TextUpdate: React.FC = () => {
       };
 
       // 只添加用户修改过的属性
-      if (text !== "") options.text = text;
+      // 注意：text 可以是空字符串（用于清空文本框）
+      options.text = text;
       if (fontSize !== "") options.fontSize = parseFloat(fontSize);
       if (fontName !== "") options.fontName = fontName;
       if (fontColor !== "") options.fontColor = fontColor;
@@ -237,6 +238,7 @@ export const TextUpdate: React.FC = () => {
         </button>
 
         <label
+          htmlFor="elementId"
           style={{
             display: "block",
             marginBottom: "8px",
@@ -247,6 +249,7 @@ export const TextUpdate: React.FC = () => {
           元素ID:
         </label>
         <input
+          id="elementId"
           type="text"
           value={elementId}
           onChange={(e) => setElementId(e.target.value)}
@@ -301,6 +304,7 @@ export const TextUpdate: React.FC = () => {
       {/* 文本内容 */}
       <div style={{ marginBottom: "16px" }}>
         <label
+          htmlFor="text"
           style={{
             display: "block",
             marginBottom: "8px",
@@ -311,6 +315,7 @@ export const TextUpdate: React.FC = () => {
           文本内容:
         </label>
         <textarea
+          id="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="输入新的文本内容（留空则不修改）"
@@ -334,8 +339,14 @@ export const TextUpdate: React.FC = () => {
         </h4>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>字号:</label>
+            <label
+              htmlFor="fontSize"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              字号:
+            </label>
             <input
+              id="fontSize"
               type="number"
               value={fontSize}
               onChange={(e) => setFontSize(e.target.value)}
@@ -351,8 +362,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>字体:</label>
+            <label
+              htmlFor="fontName"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              字体:
+            </label>
             <input
+              id="fontName"
               type="text"
               value={fontName}
               onChange={(e) => setFontName(e.target.value)}
@@ -368,10 +385,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>
+            <label
+              htmlFor="fontColor"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
               字体颜色:
             </label>
             <input
+              id="fontColor"
               type="color"
               value={fontColor}
               onChange={(e) => setFontColor(e.target.value)}
@@ -385,10 +406,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>
+            <label
+              htmlFor="backgroundColor"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
               背景颜色:
             </label>
             <input
+              id="backgroundColor"
               type="color"
               value={backgroundColor}
               onChange={(e) => setBackgroundColor(e.target.value)}
@@ -405,7 +430,9 @@ export const TextUpdate: React.FC = () => {
 
         {/* 字体样式 */}
         <div style={{ marginTop: "12px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-          <label style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}>
+          <label
+            style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}
+          >
             <input
               type="checkbox"
               checked={bold}
@@ -414,7 +441,9 @@ export const TextUpdate: React.FC = () => {
             />
             <strong>加粗</strong>
           </label>
-          <label style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}>
+          <label
+            style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}
+          >
             <input
               type="checkbox"
               checked={italic}
@@ -423,7 +452,9 @@ export const TextUpdate: React.FC = () => {
             />
             <em>斜体</em>
           </label>
-          <label style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}>
+          <label
+            style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}
+          >
             <input
               type="checkbox"
               checked={underline}
@@ -442,10 +473,14 @@ export const TextUpdate: React.FC = () => {
         </h4>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>
+            <label
+              htmlFor="horizontalAlignment"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
               水平对齐:
             </label>
             <select
+              id="horizontalAlignment"
               value={horizontalAlignment}
               onChange={(e) => setHorizontalAlignment(e.target.value)}
               style={{
@@ -465,10 +500,14 @@ export const TextUpdate: React.FC = () => {
             </select>
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>
+            <label
+              htmlFor="verticalAlignment"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
               垂直对齐:
             </label>
             <select
+              id="verticalAlignment"
               value={verticalAlignment}
               onChange={(e) => setVerticalAlignment(e.target.value)}
               style={{
@@ -495,8 +534,14 @@ export const TextUpdate: React.FC = () => {
         </h4>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>X坐标:</label>
+            <label
+              htmlFor="left"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              X坐标:
+            </label>
             <input
+              id="left"
               type="number"
               value={left}
               onChange={(e) => setLeft(e.target.value)}
@@ -512,8 +557,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>Y坐标:</label>
+            <label
+              htmlFor="top"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              Y坐标:
+            </label>
             <input
+              id="top"
               type="number"
               value={top}
               onChange={(e) => setTop(e.target.value)}
@@ -529,8 +580,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>宽度:</label>
+            <label
+              htmlFor="width"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              宽度:
+            </label>
             <input
+              id="width"
               type="number"
               value={width}
               onChange={(e) => setWidth(e.target.value)}
@@ -546,8 +603,14 @@ export const TextUpdate: React.FC = () => {
             />
           </div>
           <div>
-            <label style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}>高度:</label>
+            <label
+              htmlFor="height"
+              style={{ display: "block", marginBottom: "4px", fontSize: "12px" }}
+            >
+              高度:
+            </label>
             <input
+              id="height"
               type="number"
               value={height}
               onChange={(e) => setHeight(e.target.value)}
