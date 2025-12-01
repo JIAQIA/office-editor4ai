@@ -13,6 +13,7 @@ import { makeStyles, tokens } from "@fluentui/react-components";
 import TextInsertion from "./TextInsertion";
 import VisibleContent from "./tools/VisibleContent";
 import DocumentStructure from "./tools/DocumentStructure";
+import DocumentSections from "./tools/DocumentSections";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -91,6 +92,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <DocumentStructure />
+            </div>
+          </>
+        );
+      case "document-sections":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文档节信息获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档的分节符、页眉页脚配置、页面设置等信息
+            </p>
+            <div className={styles.toolContainer}>
+              <DocumentSections />
             </div>
           </>
         );

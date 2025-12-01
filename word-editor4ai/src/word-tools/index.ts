@@ -9,3 +9,4 @@
 
 export * from "./visibleContent";
 export * from "./documentStructure";
+export * from "./documentSections";
