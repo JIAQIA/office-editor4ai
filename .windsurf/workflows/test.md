@@ -75,10 +75,10 @@ tests/
 ### 5. 测试工具函数
 
 **核心工具函数（tests/utils/test-utils.tsx）：**
-- [renderWithProviders()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/utils/test-utils.tsx:24:0-35:1) - 包装 FluentUI Provider 的自定义渲染函数
-- [createMockOfficeContext()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/utils/test-utils.tsx:37:0-66:1) - 创建 Office 上下文 Mock
-- [mockPowerPointRun()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/utils/test-utils.tsx:74:0-81:1) - Mock PowerPoint.run 调用
-- [waitForAsync()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/utils/test-utils.tsx:68:0-72:83) - 等待异步操作
+- [renderWithProviders()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/utils/test-utils.tsx:24:0-35:1) - 包装 FluentUI Provider 的自定义渲染函数
+- [createMockOfficeContext()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/utils/test-utils.tsx:37:0-66:1) - 创建 Office 上下文 Mock
+- [mockPowerPointRun()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/utils/test-utils.tsx:74:0-81:1) - Mock PowerPoint.run 调用
+- [waitForAsync()](cci:1://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/utils/test-utils.tsx:68:0-72:83) - 等待异步操作
 
 ### 6. 运行测试的命令
 
@@ -96,8 +96,8 @@ pnpm test:integration  # 仅运行集成测试
 
 1. **测试分层明确**：单元测试（unit）和集成测试（integration）分开
 2. **Mock 策略**：使用 `office-addin-mock` 模拟 Office.js API，使用 `vi.mock()` 模拟组件依赖
-3. **全局设置**：在 [setup.ts](cci:7://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/setup.ts:0:0-0:0) 中配置 Office.js 和 PowerPoint 全局对象
-4. **自定义工具**：封装常用的测试工具函数到 [test-utils.tsx](cci:7://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt-editor4ai/tests/utils/test-utils.tsx:0:0-0:0)
+3. **全局设置**：在 [setup.ts](cci:7://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/setup.ts:0:0-0:0) 中配置 Office.js 和 PowerPoint 全局对象
+4. **自定义工具**：封装常用的测试工具函数到 [test-utils.tsx](cci:7://file:///Users/JQQ/WebstormProjects/office-editor4ai/ppt|word|excel-editor4ai/tests/utils/test-utils.tsx:0:0-0:0)
 5. **中英双语注释**：所有测试用例使用中英文双语描述
 6. **覆盖率要求**：设置 60% 的覆盖率阈值
 7. **边界测试**：包含边界情况测试（空值、特殊字符、负数等）
