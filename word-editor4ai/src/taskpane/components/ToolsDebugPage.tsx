@@ -14,6 +14,7 @@ import TextInsertion from "./TextInsertion";
 import VisibleContent from "./tools/VisibleContent";
 import DocumentStructure from "./tools/DocumentStructure";
 import DocumentSections from "./tools/DocumentSections";
+import { DocumentStats } from "./tools/DocumentStats";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -106,6 +107,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <DocumentSections />
+            </div>
+          </>
+        );
+      case "document-stats":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文档统计信息工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档的字数、段落数、页数等统计信息，支持自定义统计选项
+            </p>
+            <div className={styles.toolContainer}>
+              <DocumentStats />
             </div>
           </>
         );
