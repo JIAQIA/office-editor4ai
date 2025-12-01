@@ -151,8 +151,8 @@ export const TableFormatUpdate: React.FC = () => {
   const [fontUnderline, setFontUnderline] = useState<boolean>(false);
   const [borderWidth, setBorderWidth] = useState<string>("");
   const [borderColor, setBorderColor] = useState<string>("");
-  const [horizontalAlignment, setHorizontalAlignment] = useState<string>("");
-  const [verticalAlignment, setVerticalAlignment] = useState<string>("");
+  const [horizontalAlignment, setHorizontalAlignment] = useState<"" | "Left" | "Center" | "Right" | "Justify">("");
+  const [verticalAlignment, setVerticalAlignment] = useState<"" | "Top" | "Middle" | "Bottom">("");
   const [rowHeight, setRowHeight] = useState<string>("");
   const [columnWidth, setColumnWidth] = useState<string>("");
 
@@ -232,8 +232,8 @@ export const TableFormatUpdate: React.FC = () => {
     if (fontUnderline) options.fontUnderline = true;
     if (borderWidth.trim()) options.borderWidth = parseFloat(borderWidth);
     if (borderColor.trim()) options.borderColor = borderColor.trim();
-    if (horizontalAlignment) options.horizontalAlignment = horizontalAlignment as any;
-    if (verticalAlignment) options.verticalAlignment = verticalAlignment as any;
+    if (horizontalAlignment) options.horizontalAlignment = horizontalAlignment;
+    if (verticalAlignment) options.verticalAlignment = verticalAlignment;
 
     return options;
   };
@@ -553,7 +553,7 @@ export const TableFormatUpdate: React.FC = () => {
               placeholder="选择对齐方式"
               value={horizontalAlignment}
               selectedOptions={horizontalAlignment ? [horizontalAlignment] : []}
-              onOptionSelect={(_, data) => setHorizontalAlignment(data.optionValue || "")}
+              onOptionSelect={(_, data) => setHorizontalAlignment((data.optionValue || "") as "" | "Left" | "Center" | "Right" | "Justify")}
               disabled={loading}
             >
               <Option value="">不设置</Option>
@@ -568,7 +568,7 @@ export const TableFormatUpdate: React.FC = () => {
               placeholder="选择对齐方式"
               value={verticalAlignment}
               selectedOptions={verticalAlignment ? [verticalAlignment] : []}
-              onOptionSelect={(_, data) => setVerticalAlignment(data.optionValue || "")}
+              onOptionSelect={(_, data) => setVerticalAlignment((data.optionValue || "") as "" | "Top" | "Middle" | "Bottom")}
               disabled={loading}
             >
               <Option value="">不设置</Option>

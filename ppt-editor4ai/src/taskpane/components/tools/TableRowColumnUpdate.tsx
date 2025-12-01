@@ -559,10 +559,10 @@ export const TableRowColumnUpdate: React.FC = () => {
         <div className={styles.sectionTitle}>使用说明:</div>
         <ul className={styles.tipsList}>
           <li>行列编号从 1 开始计数（第1行第1列）</li>
-          <li>可以通过"获取选中的表格"按钮自动填充表格 ID</li>
+          <li>可以通过&quot;获取选中的表格&quot;按钮自动填充表格 ID</li>
           <li>单行/列更新时，数据用逗号分隔，例如: 值1,值2,值3</li>
           <li>批量更新时，每行一个行/列，格式: 编号:值1,值2,值3</li>
-          <li>启用"跳过空值"后，空字符串不会更新到单元格</li>
+          <li>启用&quot;跳过空值&quot;后，空字符串不会更新到单元格</li>
           <li>如果数据长度超过表格大小，多余数据会被截断</li>
         </ul>
       </div>

@@ -93,6 +93,9 @@ export async function updateTableRow(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -223,6 +226,9 @@ export async function updateTableColumn(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -350,6 +356,9 @@ export async function updateTableRowsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -465,6 +474,9 @@ export async function updateTableColumnsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -568,6 +580,9 @@ export async function getTableRowContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -607,21 +622,18 @@ export async function getTableRowContent(
 
       // 获取行数据
       // Get row data
-      const rowData: string[] = [];
+      const cells: PowerPoint.TableCell[] = [];
       for (let colIndex = 0; colIndex < table.columnCount; colIndex++) {
         const cell = table.getCellOrNullObject(rowIndex, colIndex);
         cell.load("text");
-        rowData.push("");
+        cells.push(cell);
       }
 
       await context.sync();
 
       // 填充实际数据
       // Fill actual data
-      for (let colIndex = 0; colIndex < table.columnCount; colIndex++) {
-        const cell = table.getCellOrNullObject(rowIndex, colIndex);
-        rowData[colIndex] = cell.text;
-      }
+      const rowData: string[] = cells.map((cell) => cell.text);
 
       return rowData;
     });
@@ -650,6 +662,9 @@ export async function getTableColumnContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -691,21 +706,18 @@ export async function getTableColumnContent(
 
       // 获取列数据
       // Get column data
-      const columnData: string[] = [];
+      const cells: PowerPoint.TableCell[] = [];
       for (let rowIndex = 0; rowIndex < table.rowCount; rowIndex++) {
         const cell = table.getCellOrNullObject(rowIndex, columnIndex);
         cell.load("text");
-        columnData.push("");
+        cells.push(cell);
       }
 
       await context.sync();
 
       // 填充实际数据
       // Fill actual data
-      for (let rowIndex = 0; rowIndex < table.rowCount; rowIndex++) {
-        const cell = table.getCellOrNullObject(rowIndex, columnIndex);
-        columnData[rowIndex] = cell.text;
-      }
+      const columnData: string[] = cells.map((cell) => cell.text);
 
       return columnData;
     });

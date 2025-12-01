@@ -16,7 +16,6 @@ import {
   Input,
   tokens,
   makeStyles,
-  Checkbox,
 } from "@fluentui/react-components";
 import {
   updateTableCell,
@@ -464,7 +463,7 @@ export const TableCellUpdate: React.FC = () => {
         <div className={styles.sectionTitle}>使用说明:</div>
         <ul className={styles.tipsList}>
           <li>行列编号从 1 开始计数（第1行第1列）</li>
-          <li>可以通过"获取选中的表格"按钮自动填充表格 ID</li>
+          <li>可以通过&quot;获取选中的表格&quot;按钮自动填充表格 ID</li>
           <li>也可以手动输入表格形状 ID 或使用表格索引</li>
           <li>批量更新时，每行一个单元格，格式: 行编号,列编号,文本内容</li>
           <li>文本内容中如果包含逗号，会被正确处理</li>
