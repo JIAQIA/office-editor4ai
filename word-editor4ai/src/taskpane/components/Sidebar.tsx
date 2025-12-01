@@ -21,7 +21,8 @@ import {
   ChevronDown24Regular,
   Navigation24Regular,
   Dismiss24Regular,
-  Eye24Regular
+  Eye24Regular,
+  DocumentBulletList24Regular
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -381,6 +382,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <Eye24Regular className={styles.icon} />
               <span className={styles.label}>可见内容获取</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "document-structure"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "document-structure")}
+          >
+            <div className={styles.menuItemContent}>
+              <DocumentBulletList24Regular className={styles.icon} />
+              <span className={styles.label}>文档结构获取</span>
             </div>
           </Button>
         </div>

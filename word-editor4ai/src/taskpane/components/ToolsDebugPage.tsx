@@ -12,6 +12,7 @@ import * as React from "react";
 import { makeStyles, tokens } from "@fluentui/react-components";
 import TextInsertion from "./TextInsertion";
 import VisibleContent from "./tools/VisibleContent";
+import DocumentStructure from "./tools/DocumentStructure";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -76,6 +77,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <VisibleContent />
+            </div>
+          </>
+        );
+      case "document-structure":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文档结构获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档的大纲结构（标题层级），支持树形展示和导出功能
+            </p>
+            <div className={styles.toolContainer}>
+              <DocumentStructure />
             </div>
           </>
         );
