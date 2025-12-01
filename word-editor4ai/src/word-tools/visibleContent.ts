@@ -16,7 +16,7 @@ export interface ContentElement {
   id: string;
   type: ContentElementType;
   text?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -170,16 +170,111 @@ export async function getVisibleContent(
 
       console.log(`检测到 ${pages.items.length} 个可见页面`);
 
-      // 遍历每个可见页面
+      // 批量加载所有页面的基本信息 / Batch load basic info for all pages
+      const pageRanges: Word.Range[] = [];
       for (let i = 0; i < pages.items.length; i++) {
         const page = pages.items[i];
         page.load("index");
-
-        // 获取页面的 Range
         const pageRange = page.getRange();
-        pageRange.load("text");
+        // eslint-disable-next-line office-addins/no-navigational-load -- 必须预加载导航属性以优化后续批量操作性能 / Must preload navigation properties to optimize subsequent batch operations
+        pageRange.load("text,paragraphs,tables,contentControls");
+        pageRanges.push(pageRange);
+      }
+
+      await context.sync();
+
+      // 批量加载所有页面的段落、表格和内容控件 / Batch load paragraphs, tables and content controls for all pages
+      for (const pageRange of pageRanges) {
+        const paragraphs = pageRange.paragraphs;
+        paragraphs.load("items");
+
+        if (includeTables) {
+          const tables = pageRange.tables;
+          tables.load("items");
+        }
+
+        if (includeContentControls) {
+          const contentControls = pageRange.contentControls;
+          contentControls.load("items");
+        }
+      }
+
+      await context.sync();
+
+      // 批量加载段落和图片的详细信息 / Batch load detailed paragraph and image information
+      for (const pageRange of pageRanges) {
+        for (const paragraph of pageRange.paragraphs.items) {
+          paragraph.load(
+            "text,style,alignment,firstLineIndent,leftIndent,rightIndent,lineSpacing,spaceAfter,spaceBefore,isListItem"
+          );
+          if (includeImages) {
+            paragraph.inlinePictures.load("items");
+          }
+        }
+
+        // 批量加载表格属性 / Batch load table properties
+        if (includeTables) {
+          for (const table of pageRange.tables.items) {
+            table.load("rowCount");
+            table.columns.load("items");
+            if (includeText && detailedMetadata) {
+              table.rows.load("items");
+            }
+          }
+        }
+
+        // 批量加载内容控件属性 / Batch load content control properties
+        if (includeContentControls) {
+          for (const control of pageRange.contentControls.items) {
+            control.load("text,title,tag,type,cannotDelete,cannotEdit,placeholderText");
+          }
+        }
+      }
+
+      await context.sync();
+
+      // 批量加载图片和表格单元格的详细信息 / Batch load detailed image and table cell information
+      for (const pageRange of pageRanges) {
+        // 加载图片属性 / Load image properties
+        if (includeImages) {
+          for (const paragraph of pageRange.paragraphs.items) {
+            for (const picture of paragraph.inlinePictures.items) {
+              picture.load("width,height,altTextTitle,altTextDescription,hyperlink");
+            }
+          }
+        }
+
+        // 加载表格单元格 / Load table cells
+        if (includeTables && includeText && detailedMetadata) {
+          for (const table of pageRange.tables.items) {
+            for (const row of table.rows.items) {
+              row.cells.load("items");
+            }
+          }
+        }
+      }
+
+      await context.sync();
+
+      // 批量加载单元格属性 / Batch load cell properties
+      if (includeTables && includeText && detailedMetadata) {
+        for (const pageRange of pageRanges) {
+          for (const table of pageRange.tables.items) {
+            for (const row of table.rows.items) {
+              for (const cell of row.cells.items) {
+                cell.load("value,width");
+              }
+            }
+          }
+        }
 
         await context.sync();
+      }
+
+      // 遍历每个可见页面并构建数据结构 / Iterate through each visible page and build data structure
+      for (let i = 0; i < pages.items.length; i++) {
+        const page = pages.items[i];
+        const pageRange = pageRanges[i];
 
         const pageInfo: PageInfo = {
           index: page.index,
@@ -187,22 +282,8 @@ export async function getVisibleContent(
           text: includeText ? pageRange.text : undefined,
         };
 
-        // 获取页面中的段落
-        const paragraphs = pageRange.paragraphs;
-        paragraphs.load("items");
-        await context.sync();
-
-        // 加载段落的详细信息
-        for (const paragraph of paragraphs.items) {
-          paragraph.load(
-            "text,style,alignment,firstLineIndent,leftIndent,rightIndent,lineSpacing,spaceAfter,spaceBefore,isListItem"
-          );
-        }
-
-        await context.sync();
-
-        // 处理段落
-        for (const paragraph of paragraphs.items) {
+        // 处理段落 / Process paragraphs
+        for (const paragraph of pageRange.paragraphs.items) {
           try {
             let paragraphText = paragraph.text;
             if (maxTextLength && paragraphText.length > maxTextLength) {
@@ -226,17 +307,12 @@ export async function getVisibleContent(
 
             pageInfo.elements.push(paragraphElement);
 
-            // 检查段落中的内联图片
+            // 检查段落中的内联图片 / Check inline pictures in paragraph
             if (includeImages) {
               try {
                 const inlinePictures = paragraph.inlinePictures;
-                inlinePictures.load("items");
-                await context.sync();
 
                 for (const picture of inlinePictures.items) {
-                  picture.load("width,height,altTextTitle,altTextDescription,hyperlink");
-                  await context.sync();
-
                   const imageElement: InlinePictureElement = {
                     id: `img-${page.index}-${pageInfo.elements.length}`,
                     type: "InlinePicture",
@@ -257,18 +333,11 @@ export async function getVisibleContent(
           }
         }
 
-        // 获取页面中的表格
+        // 获取页面中的表格 / Get tables in the page
         if (includeTables) {
           try {
-            const tables = pageRange.tables;
-            tables.load("items");
-            await context.sync();
-
-            for (const table of tables.items) {
-              table.load("rowCount");
+            for (const table of pageRange.tables.items) {
               const columns = table.columns;
-              columns.load("items");
-              await context.sync();
 
               const tableElement: TableElement = {
                 id: `table-${page.index}-${pageInfo.elements.length}`,
@@ -278,25 +347,18 @@ export async function getVisibleContent(
                 cells: [],
               };
 
-              // 获取表格单元格内容
+              // 获取表格单元格内容 / Get table cell content
               if (includeText && detailedMetadata) {
                 try {
                   const rows = table.rows;
-                  rows.load("items");
-                  await context.sync();
-
+                  // 处理单元格数据 / Process cell data
                   for (let rowIndex = 0; rowIndex < rows.items.length; rowIndex++) {
                     const row = rows.items[rowIndex];
                     const cells = row.cells;
-                    cells.load("items");
-                    await context.sync();
-
                     const cellRow: TableCellInfo[] = [];
 
                     for (let colIndex = 0; colIndex < cells.items.length; colIndex++) {
                       const cell = cells.items[colIndex];
-                      cell.load("value,width");
-                      await context.sync();
 
                       let cellText = cell.value;
                       if (maxTextLength && cellText.length > maxTextLength) {
@@ -325,17 +387,10 @@ export async function getVisibleContent(
           }
         }
 
-        // 获取页面中的内容控件
+        // 获取页面中的内容控件 / Get content controls in the page
         if (includeContentControls) {
           try {
-            const contentControls = pageRange.contentControls;
-            contentControls.load("items");
-            await context.sync();
-
-            for (const control of contentControls.items) {
-              control.load("text,title,tag,type,cannotDelete,cannotEdit,placeholderText");
-              await context.sync();
-
+            for (const control of pageRange.contentControls.items) {
               let controlText = control.text;
               if (maxTextLength && controlText.length > maxTextLength) {
                 controlText = controlText.substring(0, maxTextLength) + "...";
