@@ -35,10 +35,7 @@ import {
 } from "@fluentui/react-components";
 import {
   DocumentBulletList24Regular,
-  Navigation24Regular,
   ArrowDownload24Regular,
-  ChevronRight20Regular,
-  ChevronDown20Regular,
   Info24Regular,
 } from "@fluentui/react-icons";
 import {
@@ -164,7 +161,9 @@ const useStyles = makeStyles({
 /**
  * 获取标题级别的颜色
  */
-const getLevelColor = (level: number): "brand" | "success" | "warning" | "danger" | "important" | "informative" => {
+const getLevelColor = (
+  level: number
+): "brand" | "success" | "warning" | "danger" | "important" | "informative" => {
   const colors: Array<"brand" | "success" | "warning" | "danger" | "important" | "informative"> = [
     "brand",
     "success",
@@ -185,9 +184,10 @@ const OutlineTreeNode: React.FC<{
   onNavigate: (nodeId: string) => void;
 }> = ({ node, includeFormat, onNavigate }) => {
   const styles = useStyles();
-  const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleClick = () => {
+  const handleNavigateClick = (e: React.MouseEvent) => {
+    // 阻止事件冒泡，避免触发 TreeItem 的展开/折叠
+    e.stopPropagation();
     onNavigate(node.id);
   };
 
@@ -197,31 +197,18 @@ const OutlineTreeNode: React.FC<{
       }`
     : "";
 
+  const hasChildren = node.children && node.children.length > 0;
+
   return (
     <TreeItem
-      itemType={node.children.length > 0 ? "branch" : "leaf"}
+      itemType={hasChildren ? "branch" : "leaf"}
       value={node.id}
       className={styles.treeItem}
     >
-      <TreeItemLayout
-        iconBefore={
-          node.children.length > 0 ? (
-            isExpanded ? (
-              <ChevronDown20Regular />
-            ) : (
-              <ChevronRight20Regular />
-            )
-          ) : null
-        }
-        onClick={() => {
-          if (node.children.length > 0) {
-            setIsExpanded(!isExpanded);
-          }
-        }}
-      >
+      <TreeItemLayout>
         <div className={styles.nodeContent}>
           <Tooltip content={`点击跳转到此标题 (索引: ${node.index})`} relationship="label">
-            <span className={styles.nodeText} onClick={handleClick}>
+            <span className={styles.nodeText} onClick={handleNavigateClick}>
               {node.text || "(空标题)"}
             </span>
           </Tooltip>
@@ -229,11 +216,9 @@ const OutlineTreeNode: React.FC<{
             H{node.level}
           </Badge>
         </div>
-        {includeFormat && node.format && (
-          <div className={styles.formatInfo}>{formatText}</div>
-        )}
+        {includeFormat && node.format && <div className={styles.formatInfo}>{formatText}</div>}
       </TreeItemLayout>
-      {node.children.length > 0 && isExpanded && (
+      {hasChildren && (
         <Tree>
           {node.children.map((child) => (
             <OutlineTreeNode
@@ -385,7 +370,10 @@ export const DocumentStructure: React.FC = () => {
 
         <div className={styles.optionRow}>
           <Label>树形结构</Label>
-          <Switch checked={useTreeStructure} onChange={(_, data) => setUseTreeStructure(data.checked)} />
+          <Switch
+            checked={useTreeStructure}
+            onChange={(_, data) => setUseTreeStructure(data.checked)}
+          />
         </div>
 
         <div className={styles.optionRow}>
