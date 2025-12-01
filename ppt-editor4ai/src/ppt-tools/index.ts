@@ -107,3 +107,47 @@ export type { SlideMoveOptions, SlideMoveResult, SlideInfo } from "./slideMove";
 // 图片替换工具
 export { replaceImage, replaceSelectedImage, replaceImages, getImageInfo } from "./imageReplace";
 export type { ImageReplaceOptions, ImageReplaceResult, ImageElementInfo } from "./imageReplace";
+
+// 表格单元格更新工具
+export {
+  updateTableCell,
+  updateTableCellsBatch,
+  getTableCellContent,
+} from "./tableCellUpdate";
+export type {
+  CellUpdateOptions,
+  BatchCellUpdateOptions,
+  TableLocationOptions,
+  CellUpdateResult,
+} from "./tableCellUpdate";
+
+// 表格行/列更新工具
+export {
+  updateTableRow,
+  updateTableColumn,
+  updateTableRowsBatch,
+  updateTableColumnsBatch,
+  getTableRowContent,
+  getTableColumnContent,
+} from "./tableRowColumnUpdate";
+export type {
+  RowUpdateOptions,
+  ColumnUpdateOptions,
+  BatchRowUpdateOptions,
+  BatchColumnUpdateOptions,
+} from "./tableRowColumnUpdate";
+
+// 表格格式更新工具
+export {
+  updateCellFormat,
+  updateCellFormatsBatch,
+  updateRowFormat,
+  updateColumnFormat,
+} from "./tableFormatUpdate";
+export type {
+  CellFormatOptions,
+  BatchCellFormatOptions,
+  RowFormatOptions,
+  ColumnFormatOptions,
+  FormatUpdateResult,
+} from "./tableFormatUpdate";

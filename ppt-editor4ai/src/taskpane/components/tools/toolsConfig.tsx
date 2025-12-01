@@ -22,6 +22,9 @@ import { SlideDeletion } from "./SlideDeletion";
 import { TextUpdate } from "./TextUpdate";
 import { SlideMove } from "./SlideMove";
 import ImageReplace from "./ImageReplace";
+import { TableCellUpdate } from "./TableCellUpdate";
+import { TableRowColumnUpdate } from "./TableRowColumnUpdate";
+import { TableFormatUpdate } from "./TableFormatUpdate";
 
 export interface ToolConfig {
   id: string;
@@ -118,6 +121,24 @@ export const toolsConfig: Record<string, ToolConfig> = {
     title: "图片替换工具",
     subtitle: "替换选中的图片，支持普通图片和占位符图片（PlaceHolder-Picture）",
     component: <ImageReplace />,
+  },
+  "table-cell-update": {
+    id: "table-cell-update",
+    title: "表格单元格更新工具",
+    subtitle: "通过行列坐标修改表格单元格内容，支持单个或批量更新",
+    component: <TableCellUpdate />,
+  },
+  "table-row-column-update": {
+    id: "table-row-column-update",
+    title: "表格行/列批量更新工具",
+    subtitle: "批量修改表格的整行或整列内容，提高表格编辑效率",
+    component: <TableRowColumnUpdate />,
+  },
+  "table-format-update": {
+    id: "table-format-update",
+    title: "表格格式更新工具",
+    subtitle: "修改表格单元格、行或列的格式属性（背景色、字体、边框、对齐等）",
+    component: <TableFormatUpdate />,
   },
 };
 

@@ -464,6 +464,48 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span className={styles.label}>图片替换工具</span>
             </div>
           </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "table-cell-update"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "table-cell-update")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>表格单元格更新</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "table-row-column-update"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "table-row-column-update")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>表格行/列更新</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "table-format-update"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "table-format-update")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>表格格式更新</span>
+            </div>
+          </Button>
         </div>
       )}
 
