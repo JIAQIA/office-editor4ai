@@ -103,6 +103,7 @@ const createMockData = (shapes: MockShape[]): any => {
               items: shapes,
               load: function () {},
             },
+            load: function () {}, // 添加 slide.load 方法 | Add slide.load method
           }),
         }),
       },

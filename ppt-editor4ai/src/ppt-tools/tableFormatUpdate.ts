@@ -175,13 +175,17 @@ export async function updateCellFormat(
         // 通过形状 ID 查找 Find by shape ID
         const shape = shapes.items.find((s) => s.id === tableLocation.shapeId);
         if (!shape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
         shape.load("type");
         await context.sync();
 
         if (shape.type !== "Table") {
-          throw new Error(`形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`);
+          throw new Error(
+            `形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`
+          );
         }
         table = shape.getTable();
       } else {
@@ -203,7 +207,9 @@ export async function updateCellFormat(
         }
 
         if (!table) {
-          throw new Error(`未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`);
+          throw new Error(
+            `未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`
+          );
         }
       }
 
@@ -213,10 +219,14 @@ export async function updateCellFormat(
 
       // 验证行列索引 Validate row and column indices
       if (rowIndex >= table.rowCount) {
-        throw new Error(`行索引 ${rowIndex} 超出范围（表格有 ${table.rowCount} 行）/ Row index ${rowIndex} out of range (table has ${table.rowCount} rows)`);
+        throw new Error(
+          `行索引 ${rowIndex} 超出范围（表格有 ${table.rowCount} 行）/ Row index ${rowIndex} out of range (table has ${table.rowCount} rows)`
+        );
       }
       if (columnIndex >= table.columnCount) {
-        throw new Error(`列索引 ${columnIndex} 超出范围（表格有 ${table.columnCount} 列）/ Column index ${columnIndex} out of range (table has ${table.columnCount} columns)`);
+        throw new Error(
+          `列索引 ${columnIndex} 超出范围（表格有 ${table.columnCount} 列）/ Column index ${columnIndex} out of range (table has ${table.columnCount} columns)`
+        );
       }
 
       // 获取单元格 Get cell
@@ -224,7 +234,9 @@ export async function updateCellFormat(
       await context.sync();
 
       if (cell.isNullObject) {
-        throw new Error(`单元格 (${rowIndex}, ${columnIndex}) 不存在或是合并单元格的一部分 / Cell (${rowIndex}, ${columnIndex}) does not exist or is part of a merged cell`);
+        throw new Error(
+          `单元格 (${rowIndex}, ${columnIndex}) 不存在或是合并单元格的一部分 / Cell (${rowIndex}, ${columnIndex}) does not exist or is part of a merged cell`
+        );
       }
 
       // 应用格式 Apply formats
@@ -250,12 +262,15 @@ export async function updateCellFormat(
         cell.font.italic = formatOptions.fontItalic;
       }
       if (formatOptions.fontUnderline !== undefined) {
-        cell.font.underline = formatOptions.fontUnderline ? PowerPoint.ShapeFontUnderlineStyle.single : PowerPoint.ShapeFontUnderlineStyle.none;
+        cell.font.underline = formatOptions.fontUnderline
+          ? PowerPoint.ShapeFontUnderlineStyle.single
+          : PowerPoint.ShapeFontUnderlineStyle.none;
       }
 
       // 对齐方式 Alignment
       if (formatOptions.horizontalAlignment !== undefined) {
-        cell.horizontalAlignment = PowerPoint.ParagraphHorizontalAlignment[formatOptions.horizontalAlignment];
+        cell.horizontalAlignment =
+          PowerPoint.ParagraphHorizontalAlignment[formatOptions.horizontalAlignment];
       }
       if (formatOptions.verticalAlignment !== undefined) {
         cell.verticalAlignment = PowerPoint.TextVerticalAlignment[formatOptions.verticalAlignment];
@@ -329,13 +344,17 @@ export async function updateCellFormatsBatch(
       if (tableLocation?.shapeId) {
         const shape = shapes.items.find((s) => s.id === tableLocation.shapeId);
         if (!shape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
         shape.load("type");
         await context.sync();
 
         if (shape.type !== "Table") {
-          throw new Error(`形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`);
+          throw new Error(
+            `形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`
+          );
         }
         table = shape.getTable();
       } else {
@@ -356,7 +375,9 @@ export async function updateCellFormatsBatch(
         }
 
         if (!table) {
-          throw new Error(`未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`);
+          throw new Error(
+            `未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`
+          );
         }
       }
 
@@ -370,8 +391,15 @@ export async function updateCellFormatsBatch(
         const { rowIndex, columnIndex } = cellFormat;
 
         // 验证索引 Validate indices
-        if (rowIndex < 0 || rowIndex >= table.rowCount || columnIndex < 0 || columnIndex >= table.columnCount) {
-          console.warn(`跳过无效单元格 (${rowIndex}, ${columnIndex}) / Skipping invalid cell (${rowIndex}, ${columnIndex})`);
+        if (
+          rowIndex < 0 ||
+          rowIndex >= table.rowCount ||
+          columnIndex < 0 ||
+          columnIndex >= table.columnCount
+        ) {
+          console.warn(
+            `跳过无效单元格 (${rowIndex}, ${columnIndex}) / Skipping invalid cell (${rowIndex}, ${columnIndex})`
+          );
           continue;
         }
 
@@ -379,7 +407,9 @@ export async function updateCellFormatsBatch(
         await context.sync();
 
         if (cell.isNullObject) {
-          console.warn(`跳过合并单元格 (${rowIndex}, ${columnIndex}) / Skipping merged cell (${rowIndex}, ${columnIndex})`);
+          console.warn(
+            `跳过合并单元格 (${rowIndex}, ${columnIndex}) / Skipping merged cell (${rowIndex}, ${columnIndex})`
+          );
           continue;
         }
 
@@ -404,11 +434,14 @@ export async function updateCellFormatsBatch(
           cell.font.italic = cellFormat.fontItalic;
         }
         if (cellFormat.fontUnderline !== undefined) {
-          cell.font.underline = cellFormat.fontUnderline ? PowerPoint.ShapeFontUnderlineStyle.single : PowerPoint.ShapeFontUnderlineStyle.none;
+          cell.font.underline = cellFormat.fontUnderline
+            ? PowerPoint.ShapeFontUnderlineStyle.single
+            : PowerPoint.ShapeFontUnderlineStyle.none;
         }
 
         if (cellFormat.horizontalAlignment !== undefined) {
-          cell.horizontalAlignment = PowerPoint.ParagraphHorizontalAlignment[cellFormat.horizontalAlignment];
+          cell.horizontalAlignment =
+            PowerPoint.ParagraphHorizontalAlignment[cellFormat.horizontalAlignment];
         }
         if (cellFormat.verticalAlignment !== undefined) {
           cell.verticalAlignment = PowerPoint.TextVerticalAlignment[cellFormat.verticalAlignment];
@@ -484,13 +517,17 @@ export async function updateRowFormat(
       if (tableLocation?.shapeId) {
         const shape = shapes.items.find((s) => s.id === tableLocation.shapeId);
         if (!shape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
         shape.load("type");
         await context.sync();
 
         if (shape.type !== "Table") {
-          throw new Error(`形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`);
+          throw new Error(
+            `形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`
+          );
         }
         table = shape.getTable();
       } else {
@@ -511,7 +548,9 @@ export async function updateRowFormat(
         }
 
         if (!table) {
-          throw new Error(`未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`);
+          throw new Error(
+            `未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`
+          );
         }
       }
 
@@ -519,7 +558,9 @@ export async function updateRowFormat(
       await context.sync();
 
       if (rowIndex >= table.rowCount) {
-        throw new Error(`行索引 ${rowIndex} 超出范围（表格有 ${table.rowCount} 行）/ Row index ${rowIndex} out of range (table has ${table.rowCount} rows)`);
+        throw new Error(
+          `行索引 ${rowIndex} 超出范围（表格有 ${table.rowCount} 行）/ Row index ${rowIndex} out of range (table has ${table.rowCount} rows)`
+        );
       }
 
       const row = table.rows.getItemAt(rowIndex);
@@ -626,13 +667,17 @@ export async function updateColumnFormat(
       if (tableLocation?.shapeId) {
         const shape = shapes.items.find((s) => s.id === tableLocation.shapeId);
         if (!shape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
         shape.load("type");
         await context.sync();
 
         if (shape.type !== "Table") {
-          throw new Error(`形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`);
+          throw new Error(
+            `形状 ${tableLocation.shapeId} 不是表格类型 / Shape ${tableLocation.shapeId} is not a table`
+          );
         }
         table = shape.getTable();
       } else {
@@ -653,7 +698,9 @@ export async function updateColumnFormat(
         }
 
         if (!table) {
-          throw new Error(`未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`);
+          throw new Error(
+            `未找到索引为 ${tableIndex} 的表格 / Table with index ${tableIndex} not found`
+          );
         }
       }
 
@@ -661,7 +708,9 @@ export async function updateColumnFormat(
       await context.sync();
 
       if (columnIndex >= table.columnCount) {
-        throw new Error(`列索引 ${columnIndex} 超出范围（表格有 ${table.columnCount} 列）/ Column index ${columnIndex} out of range (table has ${table.columnCount} columns)`);
+        throw new Error(
+          `列索引 ${columnIndex} 超出范围（表格有 ${table.columnCount} 列）/ Column index ${columnIndex} out of range (table has ${table.columnCount} columns)`
+        );
       }
 
       const column = table.columns.getItemAt(columnIndex);

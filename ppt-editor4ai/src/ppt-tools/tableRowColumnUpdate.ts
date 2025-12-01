@@ -104,7 +104,9 @@ export async function updateTableRow(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -232,7 +234,9 @@ export async function updateTableColumn(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -357,7 +361,9 @@ export async function updateTableRowsBatch(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -385,9 +391,7 @@ export async function updateTableRowsBatch(
         // 验证行索引
         // Validate row index
         if (rowIndex < 0 || rowIndex >= table.rowCount) {
-          console.warn(
-            `跳过无效行索引 ${rowIndex} / Skipping invalid row index ${rowIndex}`
-          );
+          console.warn(`跳过无效行索引 ${rowIndex} / Skipping invalid row index ${rowIndex}`);
           continue;
         }
 
@@ -472,7 +476,9 @@ export async function updateTableColumnsBatch(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -573,7 +579,9 @@ export async function getTableRowContent(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -594,9 +602,7 @@ export async function getTableRowContent(
       // 验证行索引
       // Validate row index
       if (rowIndex >= table.rowCount) {
-        throw new Error(
-          `行索引 ${rowIndex} 超出范围 / Row index ${rowIndex} out of range`
-        );
+        throw new Error(`行索引 ${rowIndex} 超出范围 / Row index ${rowIndex} out of range`);
       }
 
       // 获取行数据
@@ -655,7 +661,9 @@ export async function getTableColumnContent(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);

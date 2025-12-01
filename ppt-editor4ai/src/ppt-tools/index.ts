@@ -109,11 +109,7 @@ export { replaceImage, replaceSelectedImage, replaceImages, getImageInfo } from 
 export type { ImageReplaceOptions, ImageReplaceResult, ImageElementInfo } from "./imageReplace";
 
 // 表格单元格更新工具
-export {
-  updateTableCell,
-  updateTableCellsBatch,
-  getTableCellContent,
-} from "./tableCellUpdate";
+export { updateTableCell, updateTableCellsBatch, getTableCellContent } from "./tableCellUpdate";
 export type {
   CellUpdateOptions,
   BatchCellUpdateOptions,

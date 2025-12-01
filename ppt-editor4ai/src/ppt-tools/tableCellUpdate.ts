@@ -93,6 +93,9 @@ export async function updateTableCell(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -106,7 +109,9 @@ export async function updateTableCell(
         // Find by ID
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         // 查找所有表格
@@ -215,6 +220,9 @@ export async function updateTableCellsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -226,7 +234,9 @@ export async function updateTableCellsBatch(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
@@ -314,6 +324,9 @@ export async function getTableCellContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -325,7 +338,9 @@ export async function getTableCellContent(
       if (tableLocation?.shapeId) {
         tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
-          throw new Error(`未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`);
+          throw new Error(
+            `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
+          );
         }
       } else {
         const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
