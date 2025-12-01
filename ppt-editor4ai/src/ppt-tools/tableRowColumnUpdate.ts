@@ -93,11 +93,8 @@ export async function updateTableRow(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -105,14 +102,16 @@ export async function updateTableRow(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }
@@ -226,11 +225,8 @@ export async function updateTableColumn(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -238,14 +234,16 @@ export async function updateTableColumn(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }
@@ -356,11 +354,8 @@ export async function updateTableRowsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -368,14 +363,16 @@ export async function updateTableRowsBatch(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }
@@ -474,11 +471,8 @@ export async function updateTableColumnsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -486,14 +480,16 @@ export async function updateTableColumnsBatch(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }
@@ -580,11 +576,8 @@ export async function getTableRowContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -592,14 +585,16 @@ export async function getTableRowContent(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }
@@ -662,11 +657,8 @@ export async function getTableColumnContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
-      slide.load("shapes");
-      await context.sync();
-
-      const shapes = slide.shapes;
-      shapes.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.shapes.load("items");
       await context.sync();
 
       // 查找表格
@@ -674,14 +666,16 @@ export async function getTableColumnContent(
       let tableShape: PowerPoint.Shape | undefined;
 
       if (tableLocation?.shapeId) {
-        tableShape = shapes.items.find((shape) => shape.id === tableLocation.shapeId);
+        tableShape = slide.shapes.items.find((shape) => shape.id === tableLocation.shapeId);
         if (!tableShape) {
           throw new Error(
             `未找到 ID 为 ${tableLocation.shapeId} 的形状 / Shape with ID ${tableLocation.shapeId} not found`
           );
         }
       } else {
-        const tables = shapes.items.filter((shape) => shape.type === PowerPoint.ShapeType.table);
+        const tables = slide.shapes.items.filter(
+          (shape) => shape.type === PowerPoint.ShapeType.table
+        );
         if (tables.length === 0) {
           throw new Error("当前幻灯片没有表格 / No tables found in current slide");
         }

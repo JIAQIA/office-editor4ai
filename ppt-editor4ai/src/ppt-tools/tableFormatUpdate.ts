@@ -164,6 +164,10 @@ export async function updateCellFormat(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -193,10 +197,13 @@ export async function updateCellFormat(
         const tableIndex = tableLocation?.tableIndex ?? 0;
         let currentTableIndex = 0;
 
+        // 批量加载所有 shape 的 type 属性 Batch load type property for all shapes
         for (const shape of shapes.items) {
           shape.load("type");
-          await context.sync();
+        }
+        await context.sync();
 
+        for (const shape of shapes.items) {
           if (shape.type === "Table") {
             if (currentTableIndex === tableIndex) {
               table = shape.getTable();
@@ -334,6 +341,10 @@ export async function updateCellFormatsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -361,10 +372,13 @@ export async function updateCellFormatsBatch(
         const tableIndex = tableLocation?.tableIndex ?? 0;
         let currentTableIndex = 0;
 
+        // 批量加载所有 shape 的 type 属性 Batch load type property for all shapes
         for (const shape of shapes.items) {
           shape.load("type");
-          await context.sync();
+        }
+        await context.sync();
 
+        for (const shape of shapes.items) {
           if (shape.type === "Table") {
             if (currentTableIndex === tableIndex) {
               table = shape.getTable();
@@ -387,6 +401,12 @@ export async function updateCellFormatsBatch(
       let updatedCount = 0;
 
       // 批量更新单元格格式 Batch update cell formats
+      // 首先批量获取所有需要的单元格 First batch get all needed cells
+      const cellsToUpdate: Array<{
+        cell: PowerPoint.TableCell;
+        format: CellFormatOptions;
+      }> = [];
+
       for (const cellFormat of cells) {
         const { rowIndex, columnIndex } = cellFormat;
 
@@ -404,11 +424,17 @@ export async function updateCellFormatsBatch(
         }
 
         const cell = table.getCellOrNullObject(rowIndex, columnIndex);
-        await context.sync();
+        cellsToUpdate.push({ cell, format: cellFormat });
+      }
 
+      // 一次性 sync 所有单元格 Sync all cells at once
+      await context.sync();
+
+      // 应用格式 Apply formats
+      for (const { cell, format: cellFormat } of cellsToUpdate) {
         if (cell.isNullObject) {
           console.warn(
-            `跳过合并单元格 (${rowIndex}, ${columnIndex}) / Skipping merged cell (${rowIndex}, ${columnIndex})`
+            `跳过合并单元格 (${cellFormat.rowIndex}, ${cellFormat.columnIndex}) / Skipping merged cell (${cellFormat.rowIndex}, ${cellFormat.columnIndex})`
           );
           continue;
         }
@@ -507,6 +533,10 @@ export async function updateRowFormat(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -534,10 +564,13 @@ export async function updateRowFormat(
         const tableIndex = tableLocation?.tableIndex ?? 0;
         let currentTableIndex = 0;
 
+        // 批量加载所有 shape 的 type 属性 Batch load type property for all shapes
         for (const shape of shapes.items) {
           shape.load("type");
-          await context.sync();
+        }
+        await context.sync();
 
+        for (const shape of shapes.items) {
           if (shape.type === "Table") {
             if (currentTableIndex === tableIndex) {
               table = shape.getTable();
@@ -571,10 +604,18 @@ export async function updateRowFormat(
       }
 
       // 更新行中所有单元格的格式 Update format of all cells in the row
+      // 批量获取所有单元格 Batch get all cells
+      const cells: PowerPoint.TableCell[] = [];
       for (let colIndex = 0; colIndex < table.columnCount; colIndex++) {
         const cell = table.getCellOrNullObject(rowIndex, colIndex);
-        await context.sync();
+        cells.push(cell);
+      }
 
+      // 一次性 sync 所有单元格 Sync all cells at once
+      await context.sync();
+
+      // 应用格式 Apply formats
+      for (const cell of cells) {
         if (cell.isNullObject) {
           continue; // 跳过合并单元格 Skip merged cells
         }
@@ -657,6 +698,10 @@ export async function updateColumnFormat(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
+      slide.load("shapes");
+      await context.sync();
+
       const shapes = slide.shapes;
       shapes.load("items");
       await context.sync();
@@ -684,10 +729,13 @@ export async function updateColumnFormat(
         const tableIndex = tableLocation?.tableIndex ?? 0;
         let currentTableIndex = 0;
 
+        // 批量加载所有 shape 的 type 属性 Batch load type property for all shapes
         for (const shape of shapes.items) {
           shape.load("type");
-          await context.sync();
+        }
+        await context.sync();
 
+        for (const shape of shapes.items) {
           if (shape.type === "Table") {
             if (currentTableIndex === tableIndex) {
               table = shape.getTable();
@@ -721,10 +769,18 @@ export async function updateColumnFormat(
       }
 
       // 更新列中所有单元格的格式 Update format of all cells in the column
+      // 批量获取所有单元格 Batch get all cells
+      const cells: PowerPoint.TableCell[] = [];
       for (let rowIdx = 0; rowIdx < table.rowCount; rowIdx++) {
         const cell = table.getCellOrNullObject(rowIdx, columnIndex);
-        await context.sync();
+        cells.push(cell);
+      }
 
+      // 一次性 sync 所有单元格 Sync all cells at once
+      await context.sync();
+
+      // 应用格式 Apply formats
+      for (const cell of cells) {
         if (cell.isNullObject) {
           continue; // 跳过合并单元格 Skip merged cells
         }

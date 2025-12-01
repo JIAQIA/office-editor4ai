@@ -93,6 +93,7 @@ export async function updateTableCell(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
       slide.load("shapes");
       await context.sync();
 
@@ -220,6 +221,7 @@ export async function updateTableCellsBatch(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
       slide.load("shapes");
       await context.sync();
 
@@ -324,6 +326,7 @@ export async function getTableCellContent(
   try {
     return await PowerPoint.run(async (context) => {
       const slide = context.presentation.getSelectedSlides().getItemAt(0);
+      // eslint-disable-next-line office-addins/no-navigational-load
       slide.load("shapes");
       await context.sync();
 
