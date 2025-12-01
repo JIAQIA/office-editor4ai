@@ -5,7 +5,7 @@
  * 描述: imageReplace 工具的单元测试 | imageReplace tool unit tests
  */
 
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { replaceImage, replaceSelectedImage, getImageInfo } from "../../../src/ppt-tools";
 
 type MockShape = {
@@ -110,7 +110,7 @@ const createMockData = (): MockData => {
     createMockShape("shape-4", "Picture", "Image 2"),
   ];
 
-  let selectedShapeIds: string[] = ["shape-1"];
+  const selectedShapeIds: string[] = ["shape-1"];
   const deletedShapeIds: string[] = [];
   const addedImages: Array<{ base64: string; shape: MockShape }> = [];
 
@@ -118,26 +118,37 @@ const createMockData = (): MockData => {
     context: {
       presentation: {
         getSelectedSlides: function () {
-          return {
-            items: [
-              {
-                shapes: {
-                  items: shapes.filter((s) => !deletedShapeIds.includes(s.id)),
-                  addImage: function (base64: string) {
-                    const newShape = createMockShape(
-                      `new-shape-${addedImages.length + 1}`,
-                      "Picture",
-                      "New Image"
-                    );
-                    addedImages.push({ base64, shape: newShape });
-                    shapes.push(newShape);
-                    return newShape;
-                  },
-                  load: function () {},
+          const slideItems = [
+            {
+              shapes: {
+                get items() {
+                  return shapes.filter((s) => !deletedShapeIds.includes(s.id));
+                },
+                addImage: function (base64: string) {
+                  const newShape = createMockShape(
+                    `new-shape-${addedImages.length + 1}`,
+                    "Picture",
+                    "New Image"
+                  );
+                  addedImages.push({ base64, shape: newShape });
+                  shapes.push(newShape);
+                  return newShape;
                 },
                 load: function () {},
               },
-            ],
+              setSelectedShapes: function (shapeIds: string[]) {
+                // Mock implementation - update selected shapes
+                selectedShapeIds.length = 0;
+                selectedShapeIds.push(...shapeIds);
+              },
+              load: function () {},
+            },
+          ];
+          return {
+            items: slideItems,
+            getItemAt: function (index: number) {
+              return slideItems[index];
+            },
             load: function () {},
           };
         },
@@ -174,6 +185,57 @@ const createMockData = (): MockData => {
   return mockData;
 };
 
+// 创建 Office Mock
+const createMockOfficeContext = (mockData: MockData) => {
+  const mockAsyncResult: Office.AsyncResult<void> = {
+    status: Office.AsyncResultStatus.Succeeded,
+    value: undefined,
+    error: undefined,
+    asyncContext: undefined,
+    diagnostics: undefined,
+  };
+
+  return {
+    setSelectedDataAsync: vi.fn(
+      (
+        data: string,
+        _options: Office.SetSelectedDataOptions,
+        callback: (result: Office.AsyncResult<void>) => void
+      ) => {
+        // 模拟图片插入：在当前选中位置插入新图片
+        // 获取当前选中的形状（如果有）
+        const selectedShapes = mockData.context.presentation.getSelectedShapes();
+        let originalShape: MockShape | undefined;
+        
+        if (selectedShapes.items.length > 0) {
+          originalShape = selectedShapes.items[0];
+        }
+
+        // 创建新图片
+        const newShape = createMockShape(
+          `new-shape-${mockData._addedImages.length + 1}`,
+          "Picture",
+          originalShape?.name || "New Image"
+        );
+
+        // 如果有原始形状，复制其位置和尺寸
+        if (originalShape) {
+          newShape.left = originalShape.left;
+          newShape.top = originalShape.top;
+          newShape.width = originalShape.width;
+          newShape.height = originalShape.height;
+        }
+
+        // 添加到 shapes 和 addedImages
+        mockData._shapes.push(newShape);
+        mockData._addedImages.push({ base64: data, shape: newShape });
+
+        callback(mockAsyncResult);
+      }
+    ),
+  };
+};
+
 describe("imageReplace", () => {
   let mockData: MockData;
 
@@ -181,6 +243,30 @@ describe("imageReplace", () => {
     mockData = createMockData();
     // @ts-expect-error - Mock PowerPoint global
     global.PowerPoint = mockData;
+
+    // Mock Office.AsyncResultStatus
+    if (!global.Office) {
+      global.Office = {} as typeof Office;
+    }
+    if (!global.Office.AsyncResultStatus) {
+      global.Office.AsyncResultStatus = {
+        Succeeded: 0,
+        Failed: 1,
+      } as typeof Office.AsyncResultStatus;
+    }
+
+    // Mock Office.context.document
+    if (!global.Office.context) {
+      global.Office.context = {} as Office.Context;
+    }
+    global.Office.context.document = createMockOfficeContext(mockData) as unknown as Office.Document;
+
+    // Mock Office.CoercionType
+    if (!global.Office.CoercionType) {
+      global.Office.CoercionType = {
+        Image: "image",
+      } as unknown as typeof Office.CoercionType;
+    }
   });
 
   describe("replaceImage", () => {
@@ -258,7 +344,8 @@ describe("imageReplace", () => {
     });
 
     it("应该拒绝非图片元素", async () => {
-      mockData._selectedShapeIds = ["shape-3"]; // TextBox
+      mockData._selectedShapeIds.length = 0;
+      mockData._selectedShapeIds.push("shape-3"); // TextBox
 
       const result = await replaceImage({
         imageSource: "iVBORw0KGgoAAAANS...",
@@ -269,7 +356,7 @@ describe("imageReplace", () => {
     });
 
     it("应该拒绝未选中任何元素", async () => {
-      mockData._selectedShapeIds = [];
+      mockData._selectedShapeIds.length = 0;
 
       const result = await replaceImage({
         imageSource: "iVBORw0KGgoAAAANS...",
@@ -280,7 +367,8 @@ describe("imageReplace", () => {
     });
 
     it("应该拒绝选中多个元素", async () => {
-      mockData._selectedShapeIds = ["shape-1", "shape-4"];
+      mockData._selectedShapeIds.length = 0;
+      mockData._selectedShapeIds.push("shape-1", "shape-4");
 
       const result = await replaceImage({
         imageSource: "iVBORw0KGgoAAAANS...",
@@ -359,7 +447,8 @@ describe("imageReplace", () => {
     });
 
     it("应该返回占位符图片的信息", async () => {
-      mockData._selectedShapeIds = ["shape-2"];
+      mockData._selectedShapeIds.length = 0;
+      mockData._selectedShapeIds.push("shape-2");
 
       const info = await getImageInfo();
 
@@ -371,7 +460,7 @@ describe("imageReplace", () => {
     });
 
     it("应该处理未选中任何元素的情况", async () => {
-      mockData._selectedShapeIds = [];
+      mockData._selectedShapeIds.length = 0;
 
       const info = await getImageInfo();
 

@@ -69,9 +69,6 @@ describe("ImageReplace Component", () => {
     vi.spyOn(imageInsertionModule, "fetchImageAsBase64").mockResolvedValue(
       "data:image/png;base64,iVBORw0KGgoAAAANS..."
     );
-
-    // Mock alert
-    vi.spyOn(window, "alert").mockImplementation(() => {});
   });
 
   it("应该渲染组件", () => {
@@ -96,7 +93,8 @@ describe("ImageReplace Component", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Test Placeholder")).toBeInTheDocument();
-      expect(screen.getByText(/Placeholder.*Picture/)).toBeInTheDocument();
+      expect(screen.getByText("已选中图片元素")).toBeInTheDocument();
+      expect(screen.getByText(/类型:.*Placeholder.*\(Picture\)/)).toBeInTheDocument();
     });
   });
 
@@ -120,7 +118,7 @@ describe("ImageReplace Component", () => {
     render(<ImageReplace />);
 
     await waitFor(() => {
-      expect(screen.getByText("选中的元素不是图片")).toBeInTheDocument();
+      expect(screen.getByText("选中的元素不支持图片替换")).toBeInTheDocument();
     });
   });
 
@@ -181,7 +179,7 @@ describe("ImageReplace Component", () => {
     render(<ImageReplace />);
 
     await waitFor(() => {
-      expect(screen.getByText("选中的元素不是图片")).toBeInTheDocument();
+      expect(screen.getByText("选中的元素不支持图片替换")).toBeInTheDocument();
     });
 
     const replaceButton = screen.getByRole("button", { name: /确认替换/ });
@@ -324,10 +322,10 @@ describe("ImageReplace Component", () => {
         expect(imageReplaceModule.replaceImage).toHaveBeenCalledWith({
           imageSource: "data:image/png;base64,iVBORw0KGgoAAAANS...",
           keepDimensions: true,
-          width: undefined,
-          height: undefined,
+          width: 200,
+          height: 150,
         });
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("图片替换成功"));
+        expect(screen.getByText(/图片替换成功/)).toBeInTheDocument();
       });
     });
 
@@ -395,7 +393,7 @@ describe("ImageReplace Component", () => {
       await user.click(replaceButton);
 
       await waitFor(() => {
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("替换失败"));
+        expect(screen.getByText(/替换失败/)).toBeInTheDocument();
       });
     });
   });
