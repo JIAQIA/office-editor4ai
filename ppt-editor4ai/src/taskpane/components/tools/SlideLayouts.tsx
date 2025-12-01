@@ -11,7 +11,7 @@
 /* global console, navigator, setTimeout */
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Button,
   makeStyles,
@@ -184,6 +184,17 @@ const SlideLayoutsComponent: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [creating, setCreating] = useState(false);
   const [insertPosition, setInsertPosition] = useState<string>("");
+  
+  // 用于存储定时器 ID，以便在组件卸载时清理 / Store timer IDs for cleanup on unmount
+  const timersRef = useRef<NodeJS.Timeout[]>([]);
+
+  // 组件卸载时清理所有定时器 / Cleanup all timers on component unmount
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((timer) => clearTimeout(timer));
+      timersRef.current = [];
+    };
+  }, []);
 
   const fetchLayouts = async () => {
     setLoading(true);
@@ -198,7 +209,8 @@ const SlideLayoutsComponent: React.FC = () => {
 
       setLayouts(layoutsList);
       setSuccessMessage(`成功获取 ${layoutsList.length} 个布局模板`);
-      setTimeout(() => setSuccessMessage(null), 3000);
+      const timer1 = setTimeout(() => setSuccessMessage(null), 3000);
+      timersRef.current.push(timer1);
     } catch (err) {
       console.error("获取布局模板失败:", err);
       setError(err instanceof Error ? err.message : "获取布局模板失败");
@@ -214,7 +226,8 @@ const SlideLayoutsComponent: React.FC = () => {
       const jsonString = JSON.stringify(layouts, null, 2);
       await navigator.clipboard.writeText(jsonString);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const timer2 = setTimeout(() => setCopied(false), 2000);
+      timersRef.current.push(timer2);
     } catch (err) {
       console.error("复制失败:", err);
       setError("复制到剪贴板失败");
@@ -242,7 +255,8 @@ const SlideLayoutsComponent: React.FC = () => {
 
       const newSlideId = await createSlideWithLayout(selectedLayoutId, position);
       setSuccessMessage(`成功创建新幻灯片！ID: ${newSlideId}`);
-      setTimeout(() => setSuccessMessage(null), 5000);
+      const timer3 = setTimeout(() => setSuccessMessage(null), 5000);
+      timersRef.current.push(timer3);
     } catch (err) {
       console.error("创建幻灯片失败:", err);
       setError(err instanceof Error ? err.message : "创建幻灯片失败");

@@ -1,15 +1,19 @@
-# Word Editor4AI 测试指南
+# Word Editor4AI 测试文档
 
-## 测试目录结构
+## 测试结构
 
 ```
 tests/
-├── setup.ts              # 测试环境设置文件
-├── unit/                 # 单元测试
-│   └── word-tools/       # Word 工具测试
-│       └── visibleContent.test.ts
-├── integration/          # 集成测试
-└── utils/                # 测试工具函数
+├── setup.ts                          # 全局测试设置
+├── utils/                            # 测试工具函数
+│   └── test-utils.tsx               # 自定义渲染函数、Mock 工具
+├── unit/                            # 单元测试
+│   ├── components/                  # 组件单元测试
+│   │   └── DocumentStructure.test.tsx
+│   └── word-tools/                  # Word 工具函数测试
+│       ├── visibleContent.test.ts
+│       └── documentStructure.test.ts
+└── README.md                        # 本文档
 ```
 
 ## 运行测试
