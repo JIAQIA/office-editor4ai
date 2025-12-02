@@ -11,8 +11,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { makeStyles, tokens, Button } from "@fluentui/react-components";
-import { 
-  Home24Regular, 
+import {
+  Home24Regular,
   Add24Regular,
   Delete24Regular,
   Edit24Regular,
@@ -24,7 +24,8 @@ import {
   Eye24Regular,
   DocumentBulletList24Regular,
   DocumentPageBreak24Regular,
-  DocumentData24Regular
+  DocumentData24Regular,
+  DocumentOnePage24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -171,12 +172,12 @@ const useStyles = makeStyles({
   },
 });
 
-const Sidebar: React.FC<SidebarProps> = ({ 
-  currentPage, 
-  currentTool, 
-  isCollapsed, 
-  onNavigate, 
-  onToggleCollapse 
+const Sidebar: React.FC<SidebarProps> = ({
+  currentPage,
+  currentTool,
+  isCollapsed,
+  onNavigate,
+  onToggleCollapse,
 }) => {
   const styles = useStyles();
   const [createExpanded, setCreateExpanded] = useState(true);
@@ -231,9 +232,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <>
               <span className={styles.label}>创建元素类</span>
-              <div 
+              <div
                 className={styles.chevron}
-                style={{ transform: createExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                style={{ transform: createExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
               >
                 <ChevronDown24Regular />
               </div>
@@ -278,13 +279,15 @@ const Sidebar: React.FC<SidebarProps> = ({
         title={isCollapsed ? "删除元素类" : ""}
       >
         <div className={styles.menuItemContent}>
-          <Delete24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          <Delete24Regular
+            className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`}
+          />
           {!isCollapsed && (
             <>
               <span className={styles.label}>删除元素类</span>
-              <div 
+              <div
                 className={styles.chevron}
-                style={{ transform: deleteExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                style={{ transform: deleteExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
               >
                 <ChevronDown24Regular />
               </div>
@@ -320,9 +323,9 @@ const Sidebar: React.FC<SidebarProps> = ({
           {!isCollapsed && (
             <>
               <span className={styles.label}>修改元素类</span>
-              <div 
+              <div
                 className={styles.chevron}
-                style={{ transform: updateExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                style={{ transform: updateExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
               >
                 <ChevronDown24Regular />
               </div>
@@ -354,13 +357,15 @@ const Sidebar: React.FC<SidebarProps> = ({
         title={isCollapsed ? "查询元素类" : ""}
       >
         <div className={styles.menuItemContent}>
-          <Search24Regular className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`} />
+          <Search24Regular
+            className={`${styles.icon} ${isCollapsed ? styles.iconCollapsed : ""}`}
+          />
           {!isCollapsed && (
             <>
               <span className={styles.label}>查询元素类</span>
-              <div 
+              <div
                 className={styles.chevron}
-                style={{ transform: queryExpanded ? 'rotate(0deg)' : 'rotate(-90deg)' }}
+                style={{ transform: queryExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
               >
                 <ChevronDown24Regular />
               </div>
@@ -426,6 +431,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <DocumentData24Regular className={styles.icon} />
               <span className={styles.label}>文档统计信息</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "page-content"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "page-content")}
+          >
+            <div className={styles.menuItemContent}>
+              <DocumentOnePage24Regular className={styles.icon} />
+              <span className={styles.label}>页面内容获取</span>
             </div>
           </Button>
         </div>

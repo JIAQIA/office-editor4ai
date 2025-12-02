@@ -15,6 +15,7 @@ import VisibleContent from "./tools/VisibleContent";
 import DocumentStructure from "./tools/DocumentStructure";
 import DocumentSections from "./tools/DocumentSections";
 import { DocumentStats } from "./tools/DocumentStats";
+import PageContent from "./tools/PageContent";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -121,6 +122,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <DocumentStats />
+            </div>
+          </>
+        );
+      case "page-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              页面内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取指定页面的内容和统计信息，支持自定义获取选项
+            </p>
+            <div className={styles.toolContainer}>
+              <PageContent />
             </div>
           </>
         );

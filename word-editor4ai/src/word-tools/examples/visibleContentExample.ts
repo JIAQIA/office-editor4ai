@@ -11,9 +11,8 @@ import {
   getVisibleContent,
   getVisibleText,
   getVisibleContentStats,
-  type PageInfo,
-  type AnyContentElement,
 } from "../visibleContent";
+import type { PageInfo, AnyContentElement } from "../types";
 
 /**
  * 示例 1: 获取可见内容的基本用法

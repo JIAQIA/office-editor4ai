@@ -2,126 +2,22 @@
  * 文件名: visibleContent.ts
  * 作者: JQQ
  * 创建日期: 2025/11/30
- * 最后修改日期: 2025/11/30
+ * 最后修改日期: 2025/12/02
  * 版权: 2023 JQQ. All rights reserved.
  * 描述: 获取用户可见范围内容的工具核心逻辑，与 Word API 交互
  */
 
 /* global Word, console */
 
-/**
- * 内容元素基础信息
- */
-export interface ContentElement {
-  id: string;
-  type: ContentElementType;
-  text?: string;
-  metadata?: Record<string, unknown>;
-}
-
-/**
- * 段落元素
- */
-export interface ParagraphElement extends ContentElement {
-  type: "Paragraph";
-  style?: string;
-  alignment?: string;
-  firstLineIndent?: number;
-  leftIndent?: number;
-  rightIndent?: number;
-  lineSpacing?: number;
-  spaceAfter?: number;
-  spaceBefore?: number;
-  isListItem?: boolean;
-  listLevel?: number;
-}
-
-/**
- * 表格元素
- */
-export interface TableElement extends ContentElement {
-  type: "Table";
-  rowCount?: number;
-  columnCount?: number;
-  cells?: TableCellInfo[][];
-}
-
-/**
- * 表格单元格信息
- */
-export interface TableCellInfo {
-  text: string;
-  rowIndex: number;
-  columnIndex: number;
-  width?: number;
-}
-
-/**
- * 图片元素
- */
-export interface ImageElement extends ContentElement {
-  type: "Image";
-  width?: number;
-  height?: number;
-  altText?: string;
-  hyperlink?: string;
-  base64?: string; // 可选：图片的 base64 编码
-}
-
-/**
- * 内容控件元素
- */
-export interface ContentControlElement extends ContentElement {
-  type: "ContentControl";
-  title?: string;
-  tag?: string;
-  controlType?: string;
-  cannotDelete?: boolean;
-  cannotEdit?: boolean;
-  placeholderText?: string;
-}
-
-/**
- * 内联图片元素
- */
-export interface InlinePictureElement extends ContentElement {
-  type: "InlinePicture";
-  width?: number;
-  height?: number;
-  altText?: string;
-  hyperlink?: string;
-}
-
-/**
- * 内容元素类型
- */
-export type ContentElementType =
-  | "Paragraph"
-  | "Table"
-  | "Image"
-  | "ContentControl"
-  | "InlinePicture"
-  | "Unknown";
-
-/**
- * 所有内容元素的联合类型
- */
-export type AnyContentElement =
-  | ParagraphElement
-  | TableElement
-  | ImageElement
-  | ContentControlElement
-  | InlinePictureElement
-  | ContentElement;
-
-/**
- * 页面信息
- */
-export interface PageInfo {
-  index: number;
-  elements: AnyContentElement[];
-  text?: string; // 页面的完整文本
-}
+import type {
+  PageInfo,
+  AnyContentElement,
+  ParagraphElement,
+  TableElement,
+  InlinePictureElement,
+  ContentControlElement,
+  TableCellInfo,
+} from "./types";
 
 /**
  * 获取可见内容的选项
