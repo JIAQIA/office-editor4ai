@@ -16,3 +16,4 @@ export * from "./documentStructure";
 export * from "./documentSections";
 export * from "./documentStats";
 export * from "./pageContent";
+export * from "./selectedContent";

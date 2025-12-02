@@ -26,6 +26,7 @@ import {
   DocumentPageBreak24Regular,
   DocumentData24Regular,
   DocumentOnePage24Regular,
+  TextEffects24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -445,6 +446,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <DocumentOnePage24Regular className={styles.icon} />
               <span className={styles.label}>页面内容获取</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "selected-content"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "selected-content")}
+          >
+            <div className={styles.menuItemContent}>
+              <TextEffects24Regular className={styles.icon} />
+              <span className={styles.label}>选中内容获取</span>
             </div>
           </Button>
         </div>

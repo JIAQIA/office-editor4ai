@@ -16,6 +16,7 @@ import DocumentStructure from "./tools/DocumentStructure";
 import DocumentSections from "./tools/DocumentSections";
 import { DocumentStats } from "./tools/DocumentStats";
 import PageContent from "./tools/PageContent";
+import SelectedContent from "./tools/SelectedContent";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -136,6 +137,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <PageContent />
+            </div>
+          </>
+        );
+      case "selected-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              选中内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取用户当前选中的内容，包括文本、段落、表格、图片等元素
+            </p>
+            <div className={styles.toolContainer}>
+              <SelectedContent />
             </div>
           </>
         );
