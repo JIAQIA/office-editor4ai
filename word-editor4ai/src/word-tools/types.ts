@@ -127,6 +127,31 @@ export interface ContentControlElement extends ContentElement {
 }
 
 /**
+ * 文本框元素 / Text Box Element
+ */
+export interface TextBoxElement extends ContentElement {
+  type: "TextBox";
+  /** 名称 / Name */
+  name?: string;
+  /** 宽度（磅）/ Width in points */
+  width?: number;
+  /** 高度（磅）/ Height in points */
+  height?: number;
+  /** 左边距（磅）/ Left position in points */
+  left?: number;
+  /** 上边距（磅）/ Top position in points */
+  top?: number;
+  /** 旋转角度 / Rotation in degrees */
+  rotation?: number;
+  /** 是否可见 / Visible */
+  visible?: boolean;
+  /** 是否锁定纵横比 / Lock aspect ratio */
+  lockAspectRatio?: boolean;
+  /** 文本框内的段落列表 / Paragraphs in text box */
+  paragraphs?: ParagraphElement[];
+}
+
+/**
  * 内容元素类型 / Content Element Type
  */
 export type ContentElementType =
@@ -135,6 +160,7 @@ export type ContentElementType =
   | "Image"
   | "ContentControl"
   | "InlinePicture"
+  | "TextBox"
   | "Unknown";
 
 /**
@@ -146,6 +172,7 @@ export type AnyContentElement =
   | ImageElement
   | ContentControlElement
   | InlinePictureElement
+  | TextBoxElement
   | ContentElement;
 
 /**
@@ -348,4 +375,46 @@ export interface GetHeaderFooterContentOptions {
   includeElements?: boolean;
   /** 是否包含元数据统计，默认为 true / Include metadata statistics, default true */
   includeMetadata?: boolean;
+}
+
+/**
+ * 文本框信息 / Text Box Info
+ */
+export interface TextBoxInfo {
+  /** 文本框唯一标识 / Text box unique ID */
+  id: string;
+  /** 名称 / Name */
+  name?: string;
+  /** 文本内容 / Text content */
+  text?: string;
+  /** 宽度（磅）/ Width in points */
+  width?: number;
+  /** 高度（磅）/ Height in points */
+  height?: number;
+  /** 左边距（磅）/ Left position in points */
+  left?: number;
+  /** 上边距（磅）/ Top position in points */
+  top?: number;
+  /** 旋转角度 / Rotation in degrees */
+  rotation?: number;
+  /** 是否可见 / Visible */
+  visible?: boolean;
+  /** 是否锁定纵横比 / Lock aspect ratio */
+  lockAspectRatio?: boolean;
+  /** 文本框内的段落列表 / Paragraphs in text box */
+  paragraphs?: ParagraphElement[];
+}
+
+/**
+ * 获取文本框内容的选项 / Get Text Box Content Options
+ */
+export interface GetTextBoxOptions {
+  /** 是否包含文本内容，默认为 true / Include text content, default true */
+  includeText?: boolean;
+  /** 是否包含段落详情，默认为 false / Include paragraph details, default false */
+  includeParagraphs?: boolean;
+  /** 是否包含详细的元数据，默认为 false / Include detailed metadata, default false */
+  detailedMetadata?: boolean;
+  /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
+  maxTextLength?: number;
 }

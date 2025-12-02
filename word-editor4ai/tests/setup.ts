@@ -88,6 +88,14 @@ global.Word = {
     right: 'Right',
     justified: 'Justified',
   },
+  ShapeType: {
+    unsupported: 'Unsupported',
+    textBox: 'TextBox',
+    geometricShape: 'GeometricShape',
+    group: 'Group',
+    picture: 'Picture',
+    canvas: 'Canvas',
+  },
 } as any;
 
 // Mock ResizeObserver for FluentUI components

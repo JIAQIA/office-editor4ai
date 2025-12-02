@@ -18,6 +18,7 @@ import { DocumentStats } from "./tools/DocumentStats";
 import PageContent from "./tools/PageContent";
 import SelectedContent from "./tools/SelectedContent";
 import HeaderFooterContent from "./tools/HeaderFooterContent";
+import TextBoxContent from "./tools/TextBoxContent";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -166,6 +167,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <HeaderFooterContent />
+            </div>
+          </>
+        );
+      case "textbox-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文本框内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档中的文本框内容，支持选择范围或可见区域，可获取文本框的文本、段落和元数据信息
+            </p>
+            <div className={styles.toolContainer}>
+              <TextBoxContent />
             </div>
           </>
         );

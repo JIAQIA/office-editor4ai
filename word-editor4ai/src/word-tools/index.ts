@@ -19,3 +19,4 @@ export * from "./pageContent";
 export * from "./selectedContent";
 export * from "./rangeContent";
 export * from "./headerFooterContent";
+export * from "./textBoxContent";
