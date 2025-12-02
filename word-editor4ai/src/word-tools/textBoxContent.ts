@@ -9,11 +9,7 @@
 
 /* global Word, console */
 
-import type {
-  TextBoxInfo,
-  GetTextBoxOptions,
-  ParagraphElement,
-} from "./types";
+import type { TextBoxInfo, GetTextBoxOptions, ParagraphElement } from "./types";
 
 // 重新导出类型供外部使用 / Re-export types for external use
 export type { TextBoxInfo, GetTextBoxOptions };
@@ -51,9 +47,7 @@ export type { TextBoxInfo, GetTextBoxOptions };
  * });
  * ```
  */
-export async function getTextBoxes(
-  options: GetTextBoxOptions = {}
-): Promise<TextBoxInfo[]> {
+export async function getTextBoxes(options: GetTextBoxOptions = {}): Promise<TextBoxInfo[]> {
   const {
     includeText = true,
     includeParagraphs = false,
@@ -65,14 +59,18 @@ export async function getTextBoxes(
     return await Word.run(async (context) => {
       // 获取当前选中的范围 / Get current selection range
       const selection = context.document.getSelection();
-      selection.load("isEmpty");
+      selection.load("text");
       await context.sync();
 
       let shapes: Word.ShapeCollection;
       let rangeType: "selection" | "visible";
 
-      // 判断是否有选择 / Check if there is a selection
-      if (!selection.isEmpty) {
+      // 判断是否有选择（通过文本内容判断，避免使用导航属性 isEmpty）
+      // Check if there is a selection (by checking text content, avoiding navigation property isEmpty)
+      const selectionText = selection.text;
+      const hasSelection = selectionText && selectionText.length > 0;
+
+      if (hasSelection) {
         // 有选择，从文档主体获取所有形状，稍后过滤选择范围内的 / Has selection, get all shapes from body, filter later
         shapes = context.document.body.shapes;
         rangeType = "selection";
@@ -100,11 +98,15 @@ export async function getTextBoxes(
       }
 
       if (textBoxShapes.length === 0) {
-        console.log(`在${rangeType === "selection" ? "选择范围" : "可见区域"}内未找到文本框 / No text boxes found in ${rangeType === "selection" ? "selection" : "visible area"}`);
+        console.log(
+          `在${rangeType === "selection" ? "选择范围" : "可见区域"}内未找到文本框 / No text boxes found in ${rangeType === "selection" ? "selection" : "visible area"}`
+        );
         return [];
       }
 
-      console.log(`在${rangeType === "selection" ? "选择范围" : "可见区域"}内找到 ${textBoxShapes.length} 个文本框 / Found ${textBoxShapes.length} text boxes in ${rangeType === "selection" ? "selection" : "visible area"}`);
+      console.log(
+        `在${rangeType === "selection" ? "选择范围" : "可见区域"}内找到 ${textBoxShapes.length} 个文本框 / Found ${textBoxShapes.length} text boxes in ${rangeType === "selection" ? "selection" : "visible area"}`
+      );
 
       // 批量加载文本框的基本属性 / Batch load basic properties of text boxes
       for (const shape of textBoxShapes) {
@@ -125,7 +127,10 @@ export async function getTextBoxes(
               body.load("paragraphs");
             }
           } catch (error) {
-            console.warn(`加载文本框 ${shape.name} 的文本内容失败 / Failed to load text content of text box ${shape.name}:`, error);
+            console.warn(
+              `加载文本框 ${shape.name} 的文本内容失败 / Failed to load text content of text box ${shape.name}:`,
+              error
+            );
           }
         }
         await context.sync();
@@ -143,15 +148,21 @@ export async function getTextBoxes(
             paragraphs.load("items");
             shapesWithParagraphs.push(shape);
           } catch (error) {
-            console.warn(`加载文本框 ${shape.name} 段落失败，将跳过段落详情 / Failed to load paragraphs for text box ${shape.name}, will skip paragraph details:`, error);
+            console.warn(
+              `加载文本框 ${shape.name} 段落失败，将跳过段落详情 / Failed to load paragraphs for text box ${shape.name}, will skip paragraph details:`,
+              error
+            );
           }
         }
-        
+
         if (shapesWithParagraphs.length > 0) {
           try {
             await context.sync();
           } catch (error) {
-            console.warn(`同步段落集合失败，将跳过所有段落详情 / Failed to sync paragraph collections, will skip all paragraph details:`, error);
+            console.warn(
+              `同步段落集合失败，将跳过所有段落详情 / Failed to sync paragraph collections, will skip all paragraph details:`,
+              error
+            );
             shapesWithParagraphs.length = 0; // 清空数组 / Clear array
           }
         }
@@ -168,10 +179,13 @@ export async function getTextBoxes(
                 );
               }
             } catch (error) {
-              console.warn(`加载文本框 ${shape.name} 段落详细属性失败 / Failed to load detailed paragraph properties for text box ${shape.name}:`, error);
+              console.warn(
+                `加载文本框 ${shape.name} 段落详细属性失败 / Failed to load detailed paragraph properties for text box ${shape.name}:`,
+                error
+              );
             }
           }
-          
+
           try {
             await context.sync();
           } catch (error) {
@@ -244,11 +258,17 @@ export async function getTextBoxes(
 
                   textBoxInfo.paragraphs = paragraphElements;
                 } catch (error) {
-                  console.warn(`获取文本框 ${shape.name} 的段落详情失败 / Failed to get paragraph details for text box ${shape.name}:`, error);
+                  console.warn(
+                    `获取文本框 ${shape.name} 的段落详情失败 / Failed to get paragraph details for text box ${shape.name}:`,
+                    error
+                  );
                 }
               }
             } catch (error) {
-              console.warn(`获取文本框 ${shape.name} 的文本内容失败 / Failed to get text content of text box ${shape.name}:`, error);
+              console.warn(
+                `获取文本框 ${shape.name} 的文本内容失败 / Failed to get text content of text box ${shape.name}:`,
+                error
+              );
             }
           }
 
