@@ -94,7 +94,7 @@ function countWords(text: string): number {
   // 分离中文字符和英文单词 / Separate Chinese characters and English words
   // 中文字符每个算一个词 / Each Chinese character counts as one word
   const chineseChars = cleanText.match(/[\u4e00-\u9fa5]/g) || [];
-  
+
   // 英文单词（连续的字母数字字符）/ English words (consecutive alphanumeric characters)
   const englishWords = cleanText.match(/[a-zA-Z0-9]+/g) || [];
 
@@ -129,11 +129,7 @@ function countWords(text: string): number {
 export async function getDocumentStats(
   options: GetDocumentStatsOptions = {}
 ): Promise<DocumentStats> {
-  const {
-    includeHeaderFooter = false,
-    includeNotes = false,
-    includeHeadingStats = true,
-  } = options;
+  const { includeHeaderFooter = false, includeNotes = false, includeHeadingStats = true } = options;
 
   return Word.run(async (context) => {
     try {
@@ -158,7 +154,7 @@ export async function getDocumentStats(
 
       // 获取文档主体 / Get document body
       const body = context.document.body;
-      
+
       // 批量加载所有需要的集合 / Batch load all required collections
       const paragraphs = body.paragraphs;
       const tables = body.tables;
@@ -208,26 +204,36 @@ export async function getDocumentStats(
 
         await context.sync();
 
+        // 批量加载所有列表对象 / Batch load all list objects
+        const listObjects: Word.List[] = [];
         for (let i = 0; i < paragraphs.items.length; i++) {
           const para = paragraphs.items[i];
-
-          // 统计列表 / Count lists
           if (para.isListItem) {
             try {
-              // 通过 paragraph 的 listOrNullObject 属性获取列表对象
-              // Get list object through paragraph's listOrNullObject property
               const list = para.listOrNullObject;
               list.load("id,isNullObject");
-              await context.sync();
-              if (!list.isNullObject) {
-                listIdSet.add(list.id);
-              }
+              listObjects.push(list);
             } catch {
               // 忽略错误 / Ignore errors
             }
           }
+        }
 
-          // 统计标题 / Count headings
+        // 一次性同步所有列表对象 / Sync all list objects at once
+        if (listObjects.length > 0) {
+          await context.sync();
+
+          // 收集列表 ID / Collect list IDs
+          for (const list of listObjects) {
+            if (!list.isNullObject) {
+              listIdSet.add(list.id);
+            }
+          }
+        }
+
+        // 统计标题 / Count headings
+        for (let i = 0; i < paragraphs.items.length; i++) {
+          const para = paragraphs.items[i];
           if (includeHeadingStats && isHeadingStyle(para.style)) {
             const level = extractHeadingLevel(para.style);
             stats.headingCounts[level] = (stats.headingCounts[level] || 0) + 1;
@@ -253,6 +259,8 @@ export async function getDocumentStats(
       if (includeHeaderFooter) {
         let headerFooterText = "";
 
+        // 批量加载所有节的页眉页脚 / Batch load all section headers and footers
+        const headerFooterObjects: Word.Body[] = [];
         for (let i = 0; i < sections.items.length; i++) {
           const section = sections.items[i];
 
@@ -275,25 +283,28 @@ export async function getDocumentStats(
             footerFirst.load("text");
             footerEven.load("text");
 
-            await context.sync();
-
-            // 统计页眉页脚文本 / Count header footer text
-            const headerFooterTexts = [
-              headerPrimary.text,
-              headerFirst.text,
-              headerEven.text,
-              footerPrimary.text,
-              footerFirst.text,
-              footerEven.text,
-            ];
-
-            for (const text of headerFooterTexts) {
-              if (text) {
-                headerFooterText += text;
-              }
-            }
+            headerFooterObjects.push(
+              headerPrimary,
+              headerFirst,
+              headerEven,
+              footerPrimary,
+              footerFirst,
+              footerEven
+            );
           } catch {
-            // 忽略页眉页脚获取错误 / Ignore header footer errors
+            // 忽略错误 / Ignore errors
+          }
+        }
+
+        // 一次性同步所有页眉页脚 / Sync all headers and footers at once
+        if (headerFooterObjects.length > 0) {
+          await context.sync();
+
+          // 收集页眉页脚文本 / Collect header footer text
+          for (const hf of headerFooterObjects) {
+            if (hf.text) {
+              headerFooterText += hf.text;
+            }
           }
         }
 
@@ -445,11 +456,11 @@ export function formatDocumentStats(stats: DocumentStats): string {
     lines.push(``);
     lines.push(`标题统计 / Heading Statistics:`);
     lines.push(`  总标题数 / Total Headings: ${stats.totalHeadingCount}`);
-    
+
     const levels = Object.keys(stats.headingCounts)
       .map(Number)
       .sort((a, b) => a - b);
-    
+
     for (const level of levels) {
       lines.push(`  标题 ${level} / Heading ${level}: ${stats.headingCounts[level]}`);
     }

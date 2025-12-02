@@ -69,7 +69,7 @@ export async function getSelectedContent(
     return await Word.run(async (context) => {
       // 获取当前选中的范围 / Get current selection range
       const selection = context.document.getSelection();
-      
+
       // 加载选中范围的基本属性 / Load basic properties of selection
       // eslint-disable-next-line office-addins/no-navigational-load -- 必须预加载导航属性以优化后续批量操作性能 / Must preload navigation properties to optimize subsequent batch operations
       selection.load("text,isEmpty,paragraphs,tables,contentControls");
@@ -120,7 +120,8 @@ export async function getSelectedContent(
 
       // 批量加载表格属性 / Batch load table properties
       if (includeTables) {
-        for (const table of selection.tables.items) {
+        const tables = selection.tables;
+        for (const table of tables.items) {
           table.load("rowCount");
           table.columns.load("items");
           if (includeText && detailedMetadata) {
@@ -131,7 +132,8 @@ export async function getSelectedContent(
 
       // 批量加载内容控件属性 / Batch load content control properties
       if (includeContentControls) {
-        for (const control of selection.contentControls.items) {
+        const contentControls = selection.contentControls;
+        for (const control of contentControls.items) {
           control.load("text,title,tag,type,cannotDelete,cannotEdit,placeholderText");
         }
       }
@@ -149,7 +151,8 @@ export async function getSelectedContent(
 
       // 加载表格单元格 / Load table cells
       if (includeTables && includeText && detailedMetadata) {
-        for (const table of selection.tables.items) {
+        const tables = selection.tables;
+        for (const table of tables.items) {
           for (const row of table.rows.items) {
             row.cells.load("items");
           }
@@ -160,7 +163,8 @@ export async function getSelectedContent(
 
       // 批量加载单元格属性 / Batch load cell properties
       if (includeTables && includeText && detailedMetadata) {
-        for (const table of selection.tables.items) {
+        const tables = selection.tables;
+        for (const table of tables.items) {
           for (const row of table.rows.items) {
             for (const cell of row.cells.items) {
               cell.load("value,width");
@@ -229,7 +233,8 @@ export async function getSelectedContent(
       // 获取选中范围中的表格 / Get tables in the selection
       if (includeTables) {
         try {
-          for (const table of selection.tables.items) {
+          const tables = selection.tables;
+          for (const table of tables.items) {
             const columns = table.columns;
 
             const tableElement: TableElement = {
@@ -283,7 +288,8 @@ export async function getSelectedContent(
       // 获取选中范围中的内容控件 / Get content controls in the selection
       if (includeContentControls) {
         try {
-          for (const control of selection.contentControls.items) {
+          const contentControls = selection.contentControls;
+          for (const control of contentControls.items) {
             let controlText = control.text;
             if (maxTextLength && controlText.length > maxTextLength) {
               controlText = controlText.substring(0, maxTextLength) + "...";
@@ -339,7 +345,7 @@ export async function getSelectedContent(
         elements,
         metadata: {
           isEmpty: false,
-          characterCount: selection.text.length,
+          characterCount: selectionText.length,
           paragraphCount,
           tableCount,
           imageCount,

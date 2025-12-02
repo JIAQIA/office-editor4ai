@@ -11,7 +11,6 @@
 
 import type {
   PageInfo,
-  AnyContentElement,
   ParagraphElement,
   TableElement,
   InlinePictureElement,

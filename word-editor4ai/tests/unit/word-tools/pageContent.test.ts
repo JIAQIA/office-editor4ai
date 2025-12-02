@@ -8,13 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-  getPageContent,
-  getPageText,
-  getPageStats,
-  type PageInfo,
-  type GetPageContentOptions,
-} from "../../../src/word-tools";
+import { getPageContent, getPageText, getPageStats } from "../../../src/word-tools";
 
 describe("pageContent - 页面内容获取工具", () => {
   let originalWordRun: any;
@@ -80,6 +74,12 @@ describe("pageContent - 页面内容获取工具", () => {
       // 验证图片元素的存在 / Verify image elements presence
       const imagesInResult = resultWithImages.elements.filter((e) => e.type === "InlinePicture");
       expect(imagesInResult.length).toBeGreaterThan(0);
+
+      // 验证图片元素不存在 / Verify image elements absence
+      const imagesInResultWithout = resultWithoutImages.elements.filter(
+        (e) => e.type === "InlinePicture"
+      );
+      expect(imagesInResultWithout.length).toBe(0);
     });
 
     it("应该支持 includeTables 选项 | Should support includeTables option", async () => {
@@ -93,6 +93,10 @@ describe("pageContent - 页面内容获取工具", () => {
       // 验证表格元素的存在 / Verify table elements presence
       const tablesInResult = resultWithTables.elements.filter((e) => e.type === "Table");
       expect(tablesInResult.length).toBeGreaterThan(0);
+
+      // 验证表格元素不存在 / Verify table elements absence
+      const tablesInResultWithout = resultWithoutTables.elements.filter((e) => e.type === "Table");
+      expect(tablesInResultWithout.length).toBe(0);
     });
 
     it("应该支持 includeContentControls 选项 | Should support includeContentControls option", async () => {
@@ -104,8 +108,16 @@ describe("pageContent - 页面内容获取工具", () => {
       const resultWithoutControls = await getPageContent(1, { includeContentControls: false });
 
       // 验证内容控件元素的存在 / Verify content control elements presence
-      const controlsInResult = resultWithControls.elements.filter((e) => e.type === "ContentControl");
+      const controlsInResult = resultWithControls.elements.filter(
+        (e) => e.type === "ContentControl"
+      );
       expect(controlsInResult.length).toBeGreaterThan(0);
+
+      // 验证内容控件元素不存在 / Verify content control elements absence
+      const controlsInResultWithout = resultWithoutControls.elements.filter(
+        (e) => e.type === "ContentControl"
+      );
+      expect(controlsInResultWithout.length).toBe(0);
     });
 
     it("应该支持 detailedMetadata 选项 | Should support detailedMetadata option", async () => {
@@ -346,6 +358,7 @@ function createMockContextWithPage(pageNumber: number, text: string) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -387,6 +400,7 @@ function createMockContextWithPages(pageCount: number) {
             items: mockPages,
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -455,6 +469,7 @@ function createMockContextWithImages(pageNumber: number, imageCount: number) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -509,6 +524,7 @@ function createMockContextWithTables(pageNumber: number, tableCount: number) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -561,6 +577,7 @@ function createMockContextWithContentControls(pageNumber: number, controlCount: 
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -620,6 +637,7 @@ function createMockContextWithDetailedParagraph(pageNumber: number) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -679,6 +697,7 @@ function createMockContextWithMultipleParagraphs(pageNumber: number, paragraphCo
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -744,6 +763,7 @@ function createMockContextWithTableCells(pageNumber: number, rowCount: number, c
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -785,6 +805,7 @@ function createMockContextWithEmptyPage(pageNumber: number) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },
@@ -877,6 +898,7 @@ function createMockContextWithMixedContent(pageNumber: number) {
             items: [mockPage],
             load: vi.fn().mockReturnThis(),
           },
+          load: vi.fn().mockReturnThis(),
         }),
       },
     },

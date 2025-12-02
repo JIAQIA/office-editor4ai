@@ -84,6 +84,10 @@ export async function getPageContent(
       // 获取文档的所有页面 / Get all pages in the document
       // 通过 body 的 range 来获取 pages / Get pages through body's range
       const bodyRange = context.document.body.getRange();
+      // eslint-disable-next-line office-addins/no-navigational-load -- 必须预加载导航属性以访问 pages / Must preload navigation property to access pages
+      bodyRange.load("pages");
+      await context.sync();
+
       const pages = bodyRange.pages;
       pages.load("items");
       await context.sync();
@@ -137,7 +141,8 @@ export async function getPageContent(
 
       // 批量加载表格属性 / Batch load table properties
       if (includeTables) {
-        for (const table of pageRange.tables.items) {
+        const tables = pageRange.tables;
+        for (const table of tables.items) {
           table.load("rowCount");
           table.columns.load("items");
           if (includeText && detailedMetadata) {
@@ -148,7 +153,8 @@ export async function getPageContent(
 
       // 批量加载内容控件属性 / Batch load content control properties
       if (includeContentControls) {
-        for (const control of pageRange.contentControls.items) {
+        const contentControls = pageRange.contentControls;
+        for (const control of contentControls.items) {
           control.load("text,title,tag,type,cannotDelete,cannotEdit,placeholderText");
         }
       }
@@ -166,7 +172,8 @@ export async function getPageContent(
 
       // 加载表格单元格 / Load table cells
       if (includeTables && includeText && detailedMetadata) {
-        for (const table of pageRange.tables.items) {
+        const tables = pageRange.tables;
+        for (const table of tables.items) {
           for (const row of table.rows.items) {
             row.cells.load("items");
           }
@@ -177,7 +184,8 @@ export async function getPageContent(
 
       // 批量加载单元格属性 / Batch load cell properties
       if (includeTables && includeText && detailedMetadata) {
-        for (const table of pageRange.tables.items) {
+        const tables = pageRange.tables;
+        for (const table of tables.items) {
           for (const row of table.rows.items) {
             for (const cell of row.cells.items) {
               cell.load("value,width");
@@ -251,7 +259,8 @@ export async function getPageContent(
       // 获取页面中的表格 / Get tables in the page
       if (includeTables) {
         try {
-          for (const table of pageRange.tables.items) {
+          const tables = pageRange.tables;
+          for (const table of tables.items) {
             const columns = table.columns;
 
             const tableElement: TableElement = {
@@ -305,7 +314,8 @@ export async function getPageContent(
       // 获取页面中的内容控件 / Get content controls in the page
       if (includeContentControls) {
         try {
-          for (const control of pageRange.contentControls.items) {
+          const contentControls = pageRange.contentControls;
+          for (const control of contentControls.items) {
             let controlText = control.text;
             if (maxTextLength && controlText.length > maxTextLength) {
               controlText = controlText.substring(0, maxTextLength) + "...";

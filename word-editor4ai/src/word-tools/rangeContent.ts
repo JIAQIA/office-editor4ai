@@ -10,15 +10,15 @@
 /* global Word, console */
 
 import type {
-  RangeLocator,
-  ParagraphElement,
-  TableElement,
-  InlinePictureElement,
-  ContentControlElement,
   AnyContentElement,
-  TableCellInfo,
+  ContentControlElement,
   ContentInfo,
   GetContentOptions,
+  InlinePictureElement,
+  ParagraphElement,
+  RangeLocator,
+  TableCellInfo,
+  TableElement,
 } from "./types";
 
 /**
@@ -94,7 +94,9 @@ export async function getRangeContent(
           range = await getContentControlRange(context, locator);
           break;
         default:
-          throw new Error(`不支持的定位器类型 / Unsupported locator type: ${(locator as any).type}`);
+          throw new Error(
+            `不支持的定位器类型 / Unsupported locator type: ${(locator as RangeLocator).type}`
+          );
       }
 
       if (!range) {
@@ -102,7 +104,7 @@ export async function getRangeContent(
       }
 
       // 加载范围的基本属性 / Load basic properties of range
-      // eslint-disable-next-line office-addins/no-navigational-load -- 必须预加载导航属性以优化后续批量操作性能 / Must preload navigation properties to optimize subsequent batch operations
+
       range.load("text,isEmpty,paragraphs,tables,contentControls");
       await context.sync();
 
@@ -405,8 +407,7 @@ async function getBookmarkRange(context: Word.RequestContext, name: string): Pro
   // 查找匹配的书签（通过内容控件的 tag 或 title）/ Find matching bookmark (via content control tag or title)
   for (const control of contentControls.items) {
     if (control.title === name || control.tag === name) {
-      const range = control.getRange();
-      return range;
+      return control.getRange();
     }
   }
 
@@ -482,8 +483,7 @@ async function getHeadingRange(
   }
 
   const targetHeading = matchingHeadings[index];
-  const range = targetHeading.getRange();
-  return range;
+  return targetHeading.getRange();
 }
 
 /**
@@ -518,8 +518,7 @@ async function getParagraphRange(
   const startRange = startParagraph.getRange(Word.RangeLocation.start);
   const endRange = endParagraph.getRange(Word.RangeLocation.end);
 
-  const range = startRange.expandTo(endRange);
-  return range;
+  return startRange.expandTo(endRange);
 }
 
 /**
@@ -537,8 +536,7 @@ async function getSectionRange(context: Word.RequestContext, index: number): Pro
   }
 
   const section = sections.items[index];
-  const range = section.body.getRange();
-  return range;
+  return section.body.getRange();
 }
 
 /**
@@ -589,6 +587,5 @@ async function getContentControlRange(
   }
 
   const targetControl = matchingControls[index];
-  const range = targetControl.getRange();
-  return range;
+  return targetControl.getRange();
 }

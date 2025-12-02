@@ -56,7 +56,36 @@ async function parseContentElements(
 
     await context.sync();
 
-    // 处理段落 / Process paragraphs
+    // 批量加载所有段落的内联图片 / Batch load all inline pictures from paragraphs
+    const allInlinePictures: { paraIndex: number; pictures: Word.InlinePictureCollection }[] = [];
+    for (let i = 0; i < paragraphs.items.length; i++) {
+      const para = paragraphs.items[i];
+      try {
+        const inlinePictures = para.inlinePictures;
+        inlinePictures.load("items");
+        allInlinePictures.push({ paraIndex: i, pictures: inlinePictures });
+      } catch {
+        // 忽略内联图片获取错误 / Ignore inline picture errors
+      }
+    }
+
+    // 一次性同步所有内联图片集合 / Sync all inline picture collections at once
+    if (allInlinePictures.length > 0) {
+      await context.sync();
+
+      // 批量加载所有图片的详细属性 / Batch load all picture details
+      for (const { pictures } of allInlinePictures) {
+        for (let j = 0; j < pictures.items.length; j++) {
+          const pic = pictures.items[j];
+          pic.load(["width", "height", "altTextDescription", "hyperlink"]);
+        }
+      }
+
+      // 一次性同步所有图片属性 / Sync all picture properties at once
+      await context.sync();
+    }
+
+    // 处理段落和内联图片 / Process paragraphs and inline pictures
     for (let i = 0; i < paragraphs.items.length; i++) {
       const para = paragraphs.items[i];
 
@@ -77,21 +106,11 @@ async function parseContentElements(
 
       elements.push(element);
 
-      // 检查段落中的内联图片 / Check inline pictures in paragraph
-      try {
-        const inlinePictures = para.inlinePictures;
-        inlinePictures.load("items");
-        await context.sync();
-
-        for (let j = 0; j < inlinePictures.items.length; j++) {
-          const pic = inlinePictures.items[j];
-          pic.load(["width", "height", "altTextDescription", "hyperlink"]);
-        }
-
-        await context.sync();
-
-        for (let j = 0; j < inlinePictures.items.length; j++) {
-          const pic = inlinePictures.items[j];
+      // 添加已加载的内联图片 / Add loaded inline pictures
+      const pictureData = allInlinePictures.find((p) => p.paraIndex === i);
+      if (pictureData) {
+        for (let j = 0; j < pictureData.pictures.items.length; j++) {
+          const pic = pictureData.pictures.items[j];
           const picElement: InlinePictureElement = {
             id: `para-${i}-pic-${j}`,
             type: "InlinePicture",
@@ -102,8 +121,6 @@ async function parseContentElements(
           };
           elements.push(picElement);
         }
-      } catch (error) {
-        // 忽略内联图片获取错误 / Ignore inline picture errors
       }
     }
 
@@ -131,7 +148,7 @@ async function parseContentElements(
         };
         elements.push(tableElement);
       }
-    } catch (error) {
+    } catch {
       // 忽略表格获取错误 / Ignore table errors
     }
 
@@ -163,7 +180,7 @@ async function parseContentElements(
         };
         elements.push(ccElement);
       }
-    } catch (error) {
+    } catch {
       // 忽略内容控件获取错误 / Ignore content control errors
     }
   } catch (error) {
