@@ -17,6 +17,7 @@ import DocumentSections from "./tools/DocumentSections";
 import { DocumentStats } from "./tools/DocumentStats";
 import PageContent from "./tools/PageContent";
 import SelectedContent from "./tools/SelectedContent";
+import HeaderFooterContent from "./tools/HeaderFooterContent";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -151,6 +152,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <SelectedContent />
+            </div>
+          </>
+        );
+      case "header-footer-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              页眉页脚内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档所有节的页眉页脚内容，支持按节索引查询和详细元素解析
+            </p>
+            <div className={styles.toolContainer}>
+              <HeaderFooterContent />
             </div>
           </>
         );

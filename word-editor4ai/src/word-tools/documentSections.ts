@@ -9,17 +9,7 @@
 
 /* global Word, console */
 
-/**
- * 页眉页脚类型 / Header Footer Type
- */
-export enum HeaderFooterType {
-  /** 首页 / First page */
-  FirstPage = "firstPage",
-  /** 奇数页 / Odd pages */
-  OddPages = "oddPages",
-  /** 偶数页 / Even pages */
-  EvenPages = "evenPages",
-}
+import { HeaderFooterType } from "./types";
 
 /**
  * 页眉页脚信息 / Header Footer Info

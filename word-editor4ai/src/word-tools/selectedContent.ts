@@ -20,6 +20,9 @@ import type {
   GetContentOptions,
 } from "./types";
 
+// 重新导出类型供外部使用 / Re-export types for external use
+export type { ContentInfo };
+
 /**
  * 获取选中内容的选项 / Get Selected Content Options
  */

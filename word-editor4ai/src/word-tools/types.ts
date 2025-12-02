@@ -272,3 +272,80 @@ export interface GetContentOptions {
   /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
   maxTextLength?: number;
 }
+
+/**
+ * 页眉页脚类型 / Header Footer Type
+ */
+export enum HeaderFooterType {
+  /** 首页 / First page */
+  FirstPage = "firstPage",
+  /** 奇数页 / Odd pages */
+  OddPages = "oddPages",
+  /** 偶数页 / Even pages */
+  EvenPages = "evenPages",
+}
+
+/**
+ * 单个页眉或页脚的内容信息 / Single Header or Footer Content Info
+ */
+export interface HeaderFooterContentItem {
+  /** 类型 / Type */
+  type: HeaderFooterType;
+  /** 是否存在 / Exists */
+  exists: boolean;
+  /** 文本内容 / Text content */
+  text?: string;
+  /** 内容元素列表 / Content elements list */
+  elements?: AnyContentElement[];
+  /** 是否链接到上一节 / Link to previous section */
+  linkToPrevious?: boolean;
+}
+
+/**
+ * 单个节的页眉页脚信息 / Single Section Header Footer Info
+ */
+export interface SectionHeaderFooterInfo {
+  /** 节索引（从0开始）/ Section index (0-based) */
+  sectionIndex: number;
+  /** 页眉列表 / Headers list */
+  headers: HeaderFooterContentItem[];
+  /** 页脚列表 / Footers list */
+  footers: HeaderFooterContentItem[];
+  /** 是否首页不同 / Different first page */
+  differentFirstPage: boolean;
+  /** 是否奇偶页不同 / Different odd and even pages */
+  differentOddAndEven: boolean;
+}
+
+/**
+ * 文档所有页眉页脚信息 / Document All Headers Footers Info
+ */
+export interface DocumentHeaderFooterInfo {
+  /** 所有节的页眉页脚信息 / All sections header footer info */
+  sections: SectionHeaderFooterInfo[];
+  /** 文档总节数 / Total section count */
+  totalSections: number;
+  /** 元数据 / Metadata */
+  metadata?: {
+    /** 是否有任何页眉 / Has any header */
+    hasAnyHeader: boolean;
+    /** 是否有任何页脚 / Has any footer */
+    hasAnyFooter: boolean;
+    /** 页眉总数 / Total header count */
+    totalHeaders: number;
+    /** 页脚总数 / Total footer count */
+    totalFooters: number;
+  };
+}
+
+/**
+ * 获取页眉页脚内容的选项 / Get Header Footer Content Options
+ */
+export interface GetHeaderFooterContentOptions {
+  /** 指定节索引（可选，不指定则获取所有节）/ Specific section index (optional, get all if not specified) */
+  sectionIndex?: number;
+  /** 是否包含详细内容元素，默认为 false / Include detailed content elements, default false */
+  includeElements?: boolean;
+  /** 是否包含元数据统计，默认为 true / Include metadata statistics, default true */
+  includeMetadata?: boolean;
+}
