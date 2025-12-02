@@ -159,3 +159,116 @@ export interface PageInfo {
   /** 页面的完整文本 / Complete text of the page */
   text?: string;
 }
+
+/**
+ * 范围定位器类型 / Range Locator Type
+ */
+export type RangeLocatorType = "bookmark" | "heading" | "paragraph" | "section" | "contentControl";
+
+/**
+ * 书签定位器 / Bookmark Locator
+ */
+export interface BookmarkLocator {
+  type: "bookmark";
+  /** 书签名称 / Bookmark name */
+  name: string;
+}
+
+/**
+ * 标题定位器 / Heading Locator
+ */
+export interface HeadingLocator {
+  type: "heading";
+  /** 标题文本（精确匹配或部分匹配）/ Heading text (exact or partial match) */
+  text?: string;
+  /** 标题级别（1-9）/ Heading level (1-9) */
+  level?: number;
+  /** 标题索引（从0开始，同级别中的第几个）/ Heading index (0-based, which one among same level) */
+  index?: number;
+}
+
+/**
+ * 段落定位器 / Paragraph Locator
+ */
+export interface ParagraphLocator {
+  type: "paragraph";
+  /** 段落索引（从0开始）/ Paragraph index (0-based) */
+  startIndex: number;
+  /** 结束段落索引（可选，不指定则只获取单个段落）/ End paragraph index (optional, if not specified, only get single paragraph) */
+  endIndex?: number;
+}
+
+/**
+ * 节定位器 / Section Locator
+ */
+export interface SectionLocator {
+  type: "section";
+  /** 节索引（从0开始）/ Section index (0-based) */
+  index: number;
+}
+
+/**
+ * 内容控件定位器 / Content Control Locator
+ */
+export interface ContentControlLocator {
+  type: "contentControl";
+  /** 控件标题 / Control title */
+  title?: string;
+  /** 控件标签 / Control tag */
+  tag?: string;
+  /** 控件索引（从0开始）/ Control index (0-based) */
+  index?: number;
+}
+
+/**
+ * 范围定位器联合类型 / Range Locator Union Type
+ */
+export type RangeLocator =
+  | BookmarkLocator
+  | HeadingLocator
+  | ParagraphLocator
+  | SectionLocator
+  | ContentControlLocator;
+
+/**
+ * 内容信息 / Content Info
+ */
+export interface ContentInfo {
+  /** 文本内容 / Text content */
+  text: string;
+  /** 内容的元素列表 / List of elements in content */
+  elements: AnyContentElement[];
+  /** 内容的元数据 / Content metadata */
+  metadata?: {
+    /** 是否为空 / Is empty */
+    isEmpty: boolean;
+    /** 字符数 / Character count */
+    characterCount: number;
+    /** 段落数 / Paragraph count */
+    paragraphCount: number;
+    /** 表格数 / Table count */
+    tableCount: number;
+    /** 图片数 / Image count */
+    imageCount: number;
+    /** 定位器类型（仅用于范围内容）/ Locator type (only for range content) */
+    locatorType?: string;
+  };
+}
+
+/**
+ * 获取内容的选项 / Get Content Options
+ */
+export interface GetContentOptions {
+  /** 是否包含文本内容，默认为 true / Include text content, default true */
+  includeText?: boolean;
+  /** 是否包含图片信息，默认为 true / Include image info, default true */
+  includeImages?: boolean;
+  /** 是否包含表格信息，默认为 true / Include table info, default true */
+  includeTables?: boolean;
+  /** 是否包含内容控件，默认为 true / Include content controls, default true */
+  includeContentControls?: boolean;
+  /** 是否包含详细的元数据，默认为 false / Include detailed metadata, default false */
+  detailedMetadata?: boolean;
+  /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
+  maxTextLength?: number;
+}

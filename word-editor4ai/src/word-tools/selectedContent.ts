@@ -16,48 +16,14 @@ import type {
   ContentControlElement,
   AnyContentElement,
   TableCellInfo,
+  ContentInfo,
+  GetContentOptions,
 } from "./types";
-
-/**
- * 选中内容信息 / Selected Content Info
- */
-export interface ContentInfo {
-  /** 选中的文本内容 / Selected text content */
-  text: string;
-  /** 选中内容的元素列表 / List of elements in selection */
-  elements: AnyContentElement[];
-  /** 选中范围的元数据 / Selection range metadata */
-  metadata?: {
-    /** 是否为空选择 / Is empty selection */
-    isEmpty: boolean;
-    /** 选中内容的字符数 / Character count */
-    characterCount: number;
-    /** 选中内容的段落数 / Paragraph count */
-    paragraphCount: number;
-    /** 选中内容的表格数 / Table count */
-    tableCount: number;
-    /** 选中内容的图片数 / Image count */
-    imageCount: number;
-  };
-}
 
 /**
  * 获取选中内容的选项 / Get Selected Content Options
  */
-export interface GetSelectedContentOptions {
-  /** 是否包含文本内容，默认为 true / Include text content, default true */
-  includeText?: boolean;
-  /** 是否包含图片信息，默认为 true / Include image info, default true */
-  includeImages?: boolean;
-  /** 是否包含表格信息，默认为 true / Include table info, default true */
-  includeTables?: boolean;
-  /** 是否包含内容控件，默认为 true / Include content controls, default true */
-  includeContentControls?: boolean;
-  /** 是否包含详细的元数据，默认为 false / Include detailed metadata, default false */
-  detailedMetadata?: boolean;
-  /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
-  maxTextLength?: number;
-}
+export type GetSelectedContentOptions = GetContentOptions;
 
 /**
  * 获取当前选中的内容

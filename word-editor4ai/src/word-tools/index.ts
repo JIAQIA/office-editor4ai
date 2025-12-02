@@ -17,3 +17,4 @@ export * from "./documentSections";
 export * from "./documentStats";
 export * from "./pageContent";
 export * from "./selectedContent";
+export * from "./rangeContent";
