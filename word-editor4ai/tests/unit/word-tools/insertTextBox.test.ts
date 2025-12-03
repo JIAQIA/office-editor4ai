@@ -72,6 +72,26 @@ describe("insertTextBox", () => {
     mockContext.document.getSelection.mockReturnValue(mockRange);
     mockRange.insertTextBox.mockReturnValue(mockTextBox);
     mockTextBox.body.getRange.mockReturnValue(mockTextRange);
+    
+    // 重置 mockTextBox 属性 / Reset mockTextBox properties
+    mockTextBox.name = "";
+    mockTextBox.lockAspectRatio = false;
+    mockTextBox.visible = true;
+    mockTextBox.left = 0;
+    mockTextBox.top = 0;
+    mockTextBox.rotation = 0;
+    
+    // 重置 mockTextRange.font 属性 / Reset mockTextRange.font properties
+    mockTextRange.font.name = "";
+    mockTextRange.font.size = 12;
+    mockTextRange.font.bold = false;
+    mockTextRange.font.italic = false;
+    mockTextRange.font.underline = "None";
+    mockTextRange.font.color = "#000000";
+    mockTextRange.font.highlightColor = "";
+    mockTextRange.font.strikeThrough = false;
+    mockTextRange.font.superscript = false;
+    mockTextRange.font.subscript = false;
   });
 
   describe("基本功能 / Basic functionality", () => {
@@ -339,17 +359,19 @@ describe("insertTextBox", () => {
 
       expect(result.success).toBe(true);
       expect(result.textBoxId).toBe("textbox-test-textbox-id");
+      // 验证 insertTextBox 被正确调用，包含位置参数 / Verify insertTextBox is called correctly with position parameters
       expect(mockRange.insertTextBox).toHaveBeenCalledWith("Complete Text Box", {
         width: 250,
         height: 180,
         left: 50,
         top: 100,
       });
+      // 验证直接设置的属性 / Verify directly set properties
       expect(mockTextBox.name).toBe("CompleteTextBox");
       expect(mockTextBox.lockAspectRatio).toBe(true);
-      expect(mockTextBox.left).toBe(50);
-      expect(mockTextBox.top).toBe(100);
       expect(mockTextBox.rotation).toBe(30);
+      // 注意：left 和 top 是通过 insertShapeOptions 传递的，不会直接设置到 textBox 对象上
+      // Note: left and top are passed via insertShapeOptions, not directly set on textBox object
     });
   });
 });
