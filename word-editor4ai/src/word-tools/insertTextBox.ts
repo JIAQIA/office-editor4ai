@@ -183,6 +183,9 @@ export async function insertTextBox(
           // Word.Shape object's body property contains text content (only applies to text boxes and geometric shapes)
           const textBoxBody = textBox.body;
           const textRange = textBoxBody.getRange("Whole");
+          // eslint-disable-next-line office-addins/no-navigational-load
+          textRange.load("font");
+          await context.sync();
           const font = textRange.font;
 
           if (format.fontName) {

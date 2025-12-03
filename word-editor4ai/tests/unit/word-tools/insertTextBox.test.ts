@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { insertTextBox, insertTextBoxes } from "../../../src/word-tools/insertTextBox";
-import type { InsertTextBoxResult, TextBoxOptions } from "../../../src/word-tools/insertTextBox";
+import { insertTextBox, insertTextBoxes } from "../../../src/word-tools";
+import type { TextBoxOptions } from "../../../src/word-tools";
 
 // Mock Word API
 const mockContext = {
@@ -53,6 +53,7 @@ const mockTextRange = {
     superscript: false,
     subscript: false,
   },
+  load: vi.fn(),
 };
 
 // Mock Word.run
@@ -72,7 +73,7 @@ describe("insertTextBox", () => {
     mockContext.document.getSelection.mockReturnValue(mockRange);
     mockRange.insertTextBox.mockReturnValue(mockTextBox);
     mockTextBox.body.getRange.mockReturnValue(mockTextRange);
-    
+
     // 重置 mockTextBox 属性 / Reset mockTextBox properties
     mockTextBox.name = "";
     mockTextBox.lockAspectRatio = false;
@@ -80,7 +81,7 @@ describe("insertTextBox", () => {
     mockTextBox.left = 0;
     mockTextBox.top = 0;
     mockTextBox.rotation = 0;
-    
+
     // 重置 mockTextRange.font 属性 / Reset mockTextRange.font properties
     mockTextRange.font.name = "";
     mockTextRange.font.size = 12;
