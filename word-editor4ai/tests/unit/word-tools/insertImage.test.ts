@@ -124,8 +124,8 @@ describe("insertImage", () => {
 
   it("应该支持浮动图片的不同环绕方式", async () => {
     const wrapTypes: Array<
-      "Square" | "Tight" | "Through" | "TopAndBottom" | "Behind" | "InFrontOf"
-    > = ["Square", "Tight", "Through", "TopAndBottom", "Behind", "InFrontOf"];
+      "Square" | "Tight" | "Through" | "TopBottom" | "Behind" | "Front"
+    > = ["Square", "Tight", "Through", "TopBottom", "Behind", "Front"];
 
     for (const wrapType of wrapTypes) {
       const result = await insertImage({

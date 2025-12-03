@@ -577,3 +577,16 @@ export interface ReplaceSelectionOptions {
  * 插入位置类型 / Insert Location Type
  */
 export type InsertLocation = "Start" | "End" | "Before" | "After" | "Replace";
+
+/**
+ * 文本环绕方式 / Text Wrapping Type
+ * 基于 Word.ShapeTextWrapType / Based on Word.ShapeTextWrapType
+ */
+export type WrapType =
+  | "Inline" // 嵌入型（内联）/ Inline with text
+  | "Square" // 四周型环绕 / Square wrapping
+  | "Tight" // 紧密型环绕 / Tight wrapping
+  | "Through" // 穿越型环绕 / Through wrapping
+  | "TopBottom" // 上下型环绕 / Top and bottom wrapping
+  | "Behind" // 衬于文字下方 / Behind text
+  | "Front"; // 浮于文字上方 / In front of text

@@ -9,26 +9,15 @@
 
 /* global Word, console */
 
-import type { InsertLocation } from "./types";
+import type { InsertLocation, WrapType } from "./types";
 
 // 重新导出以保持向后兼容性 / Re-export for backward compatibility
-export type { InsertLocation };
+export type { InsertLocation, WrapType };
 
 /**
  * 图片布局类型 / Image Layout Type
  */
 export type ImageLayoutType = "inline" | "floating";
-
-/**
- * 文本环绕方式 / Text Wrapping Type
- */
-export type WrapType =
-  | "Square" // 四周型环绕 / Square wrapping
-  | "Tight" // 紧密型环绕 / Tight wrapping
-  | "Through" // 穿越型环绕 / Through wrapping
-  | "TopAndBottom" // 上下型环绕 / Top and bottom wrapping
-  | "Behind" // 衬于文字下方 / Behind text
-  | "InFrontOf"; // 浮于文字上方 / In front of text
 
 /**
  * 图片定位选项 / Image Position Options
@@ -92,15 +81,35 @@ export interface InsertImageOptions {
 export interface InsertImageResult {
   /** 是否成功 / Success */
   success: boolean;
-  /** 图片标识符（使用 altTextTitle 作为标识，如果提供）/ Image identifier (uses altTextTitle as identifier if provided) */
+  /** 图片标识符（内联图片使用 altText，浮动图片使用 shape ID）/ Image identifier (inline pictures use altText, floating pictures use shape ID) */
   imageId?: string;
   /** 错误信息（如果失败）/ Error message (if failed) */
   error?: string;
 }
 
 /**
- * 在文档中插入图片（支持内联和浮动）
- * Insert image in document (supports inline and floating)
+ * 在文档中插入图片（支持内联和浮动，支持文字环绕）
+ * Insert image in document (supports inline and floating with text wrapping)
+ *
+ * @remarks
+ * - 内联图片（layoutType: "inline"）：使用 insertInlinePictureFromBase64，不支持文字环绕
+ * - 浮动图片（layoutType: "floating"）：使用 insertPictureFromBase64，返回 Word.Shape 对象，支持文字环绕
+ * - 文字环绕类型通过 floatingOptions.wrapType 设置
+ * - Inline pictures (layoutType: "inline"): Uses insertInlinePictureFromBase64, does not support text wrapping
+ * - Floating pictures (layoutType: "floating"): Uses insertPictureFromBase64, returns Word.Shape object, supports text wrapping
+ * - Text wrapping type is set via floatingOptions.wrapType
+ *
+ * @example
+ * ```typescript
+ * // 插入浮动图片，四周型环绕 / Insert floating picture with square wrapping
+ * await insertImage({
+ *   base64: "...",
+ *   layoutType: "floating",
+ *   floatingOptions: {
+ *     wrapType: "Square"
+ *   }
+ * });
+ * ```
  */
 export async function insertImage(options: InsertImageOptions): Promise<InsertImageResult> {
   const {
@@ -194,64 +203,95 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
         // Use altTextTitle as identifier (if provided)
         imageId = altText || undefined;
       } else if (layoutType === "floating") {
-        // 注意：Word JavaScript API 对浮动图片的支持有限
-        // Note: Word JavaScript API has limited support for floating images
-        // 我们先插入为内联图片，然后尝试应用浮动属性
-        // We first insert as inline picture, then try to apply floating properties
+        // 插入浮动图片（返回 Word.Shape 对象）
+        // Insert floating picture (returns Word.Shape object)
+        // 注意：insertPictureFromBase64 需要 WordApiDesktop 1.2
+        // Note: insertPictureFromBase64 requires WordApiDesktop 1.2
+        const insertShapeOptions: Word.InsertShapeOptions = {};
 
-        const inlinePicture = insertRange.insertInlinePictureFromBase64(
-          cleanBase64,
-          insertLocation
-        );
-
-        // 设置基本属性 / Set basic properties
+        // 设置位置和尺寸 / Set position and size
         if (width !== undefined) {
-          inlinePicture.width = width;
+          insertShapeOptions.width = width;
         }
         if (height !== undefined) {
-          inlinePicture.height = height;
+          insertShapeOptions.height = height;
         }
-        if (altText) {
-          inlinePicture.altTextTitle = altText;
+        if (floatingOptions?.position?.left !== undefined) {
+          insertShapeOptions.left = floatingOptions.position.left;
         }
-        if (description) {
-          inlinePicture.altTextDescription = description;
-        }
-        if (keepAspectRatio) {
-          inlinePicture.lockAspectRatio = true;
-        }
-        if (hyperlink) {
-          inlinePicture.hyperlink = hyperlink;
+        if (floatingOptions?.position?.top !== undefined) {
+          insertShapeOptions.top = floatingOptions.position.top;
         }
 
-        // 尝试应用浮动选项 / Try to apply floating options
-        // 注意：这些 API 可能在某些 Word 版本中不可用
-        // Note: These APIs may not be available in some Word versions
-        if (floatingOptions) {
+        // 插入浮动图片 / Insert floating picture
+        const pictureShape = insertRange.insertPictureFromBase64(
+          cleanBase64,
+          insertShapeOptions
+        );
+
+        // 设置形状属性 / Set shape properties
+        // 注意：Word.Shape 只有 altTextDescription 属性，没有 altTextTitle
+        // Note: Word.Shape only has altTextDescription property, not altTextTitle
+        if (description) {
+          pictureShape.altTextDescription = description;
+        } else if (altText) {
+          // 如果没有提供 description，使用 altText 作为 description
+          // If description is not provided, use altText as description
+          pictureShape.altTextDescription = altText;
+        }
+        if (keepAspectRatio) {
+          pictureShape.lockAspectRatio = true;
+        }
+
+        // 设置文字环绕 / Set text wrapping
+        if (floatingOptions?.wrapType) {
           try {
-            // Word JavaScript API 目前对浮动图片的控制有限
-            // 这里我们记录选项，但实际应用可能需要 OOXML 或其他方法
-            // Word JavaScript API currently has limited control over floating images
-            // We log the options here, but actual application may require OOXML or other methods
-            console.warn(
-              "浮动图片选项已记录，但 Word JavaScript API 对浮动图片的支持有限。" +
-                "某些选项可能需要通过 OOXML 实现。/ " +
-                "Floating image options logged, but Word JavaScript API has limited support for floating images. " +
-                "Some options may require OOXML implementation.",
-              floatingOptions
-            );
+            const textWrap = pictureShape.textWrap;
+            // 将我们的 WrapType 映射到 Word.ShapeTextWrapType
+            // Map our WrapType to Word.ShapeTextWrapType
+            const wrapTypeMap: Record<WrapType, Word.ShapeTextWrapType> = {
+              Inline: Word.ShapeTextWrapType.inline,
+              Square: Word.ShapeTextWrapType.square,
+              Tight: Word.ShapeTextWrapType.tight,
+              Through: Word.ShapeTextWrapType.through,
+              TopBottom: Word.ShapeTextWrapType.topBottom,
+              Behind: Word.ShapeTextWrapType.behind,
+              Front: Word.ShapeTextWrapType.front,
+            };
+            textWrap.type = wrapTypeMap[floatingOptions.wrapType];
           } catch (error) {
-            console.warn("应用浮动选项时出错 / Error applying floating options:", error);
+            console.warn("设置文字环绕时出错 / Error setting text wrapping:", error);
           }
         }
 
+        // 设置其他浮动选项 / Set other floating options
+        if (floatingOptions) {
+          try {
+            if (floatingOptions.allowOverlap !== undefined) {
+              pictureShape.allowOverlap = floatingOptions.allowOverlap;
+            }
+            // 注意：lockAnchor 属性在当前 API 中可能不可用
+            // Note: lockAnchor property may not be available in current API
+          } catch (error) {
+            console.warn("设置浮动选项时出错 / Error setting floating options:", error);
+          }
+        }
+
+        // 加载形状 ID / Load shape ID
+        pictureShape.load("id");
         await context.sync();
 
-        // Word API 的 InlinePicture 没有 id 属性
-        // InlinePicture in Word API does not have id property
-        // 使用 altTextTitle 作为标识符（如果提供）
-        // Use altTextTitle as identifier (if provided)
-        imageId = altText || undefined;
+        // 使用形状 ID 作为标识符 / Use shape ID as identifier
+        imageId = `shape-${pictureShape.id}`;
+        
+        // 注意：浮动图片作为 Shape 对象，不支持 hyperlink 属性
+        // Note: Floating pictures as Shape objects do not support hyperlink property
+        if (hyperlink) {
+          console.warn(
+            "浮动图片不支持超链接属性。如需超链接，请使用内联图片。/ " +
+            "Floating pictures do not support hyperlink property. Use inline pictures for hyperlinks."
+          );
+        }
       }
 
       await context.sync();

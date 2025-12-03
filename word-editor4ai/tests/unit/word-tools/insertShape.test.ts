@@ -44,6 +44,9 @@ const mockShape = {
   body: {
     getRange: vi.fn(),
   },
+  textWrap: {
+    type: "",
+  },
   load: vi.fn(),
 };
 
@@ -57,6 +60,15 @@ global.Word = {
   ShapeType: {
     rectangle: "Rectangle",
     ellipse: "Ellipse",
+  },
+  ShapeTextWrapType: {
+    inline: "inline",
+    square: "square",
+    tight: "tight",
+    through: "through",
+    topBottom: "topBottom",
+    behind: "behind",
+    front: "front",
   },
   ShapeLineStyle: {
     single: "Single",
@@ -472,6 +484,90 @@ describe("insertShape", () => {
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#E1F5FE");
       // 线条样式不支持，应保持默认值 / Line styles not supported, should keep default values
       expect(mockShape.line.color).toBe("");
+    });
+  });
+
+  describe("文字环绕 / Text wrapping", () => {
+    beforeEach(() => {
+      // 重置 textWrap mock / Reset textWrap mock
+      mockShape.textWrap.type = "";
+    });
+
+    it("应该设置四周型环绕 / Should set square wrapping", async () => {
+      const options: ShapeOptions = {
+        wrapType: "Square",
+      };
+
+      await insertShape("Rectangle", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("square");
+    });
+
+    it("应该设置紧密型环绕 / Should set tight wrapping", async () => {
+      const options: ShapeOptions = {
+        wrapType: "Tight",
+      };
+
+      await insertShape("Ellipse", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("tight");
+    });
+
+    it("应该设置上下型环绕 / Should set top-bottom wrapping", async () => {
+      const options: ShapeOptions = {
+        wrapType: "TopBottom",
+      };
+
+      await insertShape("Triangle", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("topBottom");
+    });
+
+    it("应该设置浮于文字上方 / Should set in front of text", async () => {
+      const options: ShapeOptions = {
+        wrapType: "Front",
+      };
+
+      await insertShape("Rectangle", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("front");
+    });
+
+    it("应该设置衬于文字下方 / Should set behind text", async () => {
+      const options: ShapeOptions = {
+        wrapType: "Behind",
+      };
+
+      await insertShape("Rectangle", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("behind");
+    });
+
+    it("应该同时设置样式和文字环绕 / Should set both style and text wrapping", async () => {
+      const options: ShapeOptions = {
+        width: 150,
+        height: 100,
+        fillColor: "#FF5722",
+        wrapType: "Square",
+        text: "Wrapped Shape",
+      };
+
+      await insertShape("RoundRectangle", "End", options);
+
+      expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#FF5722");
+      expect(mockShape.textWrap.type).toBe("square");
+      expect(mockTextRange.insertText).toHaveBeenCalledWith("Wrapped Shape", "Replace");
+    });
+
+    it("未设置 wrapType 时不应修改文字环绕 / Should not modify text wrapping when wrapType is not set", async () => {
+      const options: ShapeOptions = {
+        width: 100,
+        height: 100,
+      };
+
+      await insertShape("Rectangle", "End", options);
+
+      expect(mockShape.textWrap.type).toBe("");
     });
   });
 });

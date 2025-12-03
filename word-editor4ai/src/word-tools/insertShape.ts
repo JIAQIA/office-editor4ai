@@ -9,10 +9,10 @@
 
 /* global Word, console */
 
-import type { InsertLocation } from "./types";
+import type { InsertLocation, WrapType } from "./types";
 
 // 重新导出以保持向后兼容性 / Re-export for backward compatibility
-export type { InsertLocation };
+export type { InsertLocation, WrapType };
 
 /**
  * 形状选项 / Shape Options
@@ -56,6 +56,8 @@ export interface ShapeOptions {
   lineStyle?: string;
   /** 形状文本内容（仅适用于支持文本的形状）/ Shape text content (only for shapes that support text) */
   text?: string;
+  /** 文字环绕方式 / Text wrapping type */
+  wrapType?: WrapType;
 }
 
 /**
@@ -240,6 +242,7 @@ export type WordShapeType =
  * - 支持的形状类型基于 Word.GeometricShapeType 枚举
  * - 插入位置基于当前选择或文档范围
  * - 当前仅支持填充颜色，不支持线条样式（Word.Shape 不提供 line 属性）
+ * - 支持文字环绕设置（通过 shape.textWrap 属性）
  * - 某些高级属性（如精确定位、线条样式）可能需要 OOXML
  *
  * Note: Word JavaScript API support for shapes
@@ -247,6 +250,7 @@ export type WordShapeType =
  * - Supported shape types based on Word.GeometricShapeType enum
  * - Insert location is based on current selection or document range
  * - Currently only fill color is supported, line styles are not supported (Word.Shape does not expose line property)
+ * - Text wrapping is supported (via shape.textWrap property)
  * - Some advanced properties (like precise positioning, line styles) may require OOXML
  *
  * @example
@@ -269,6 +273,13 @@ export type WordShapeType =
  *   text: "Hello World",
  *   fillColor: "#0078D4"
  * });
+ *
+ * // 插入带文字环绕的形状
+ * await insertShape("Rectangle", "End", {
+ *   width: 150,
+ *   height: 100,
+ *   wrapType: "Square"
+ * });
  * ```
  */
 export async function insertShape(
@@ -290,6 +301,7 @@ export async function insertShape(
     lineWeight,
     lineStyle,
     text,
+    wrapType,
   } = options;
 
   // 验证参数 / Validate parameters
@@ -397,6 +409,27 @@ export async function insertShape(
           textRange.insertText(text, "Replace");
         } catch (error) {
           console.warn("添加形状文本时出错 / Error adding shape text:", error);
+        }
+      }
+
+      // 设置文字环绕（如果提供）/ Set text wrapping (if provided)
+      if (wrapType) {
+        try {
+          const textWrap = shape.textWrap;
+          // 将 WrapType 映射到 Word.ShapeTextWrapType
+          // Map WrapType to Word.ShapeTextWrapType
+          const wrapTypeMap: Record<WrapType, Word.ShapeTextWrapType> = {
+            Inline: Word.ShapeTextWrapType.inline,
+            Square: Word.ShapeTextWrapType.square,
+            Tight: Word.ShapeTextWrapType.tight,
+            Through: Word.ShapeTextWrapType.through,
+            TopBottom: Word.ShapeTextWrapType.topBottom,
+            Behind: Word.ShapeTextWrapType.behind,
+            Front: Word.ShapeTextWrapType.front,
+          };
+          textWrap.type = wrapTypeMap[wrapType];
+        } catch (error) {
+          console.warn("设置文字环绕时出错 / Error setting text wrapping:", error);
         }
       }
 
