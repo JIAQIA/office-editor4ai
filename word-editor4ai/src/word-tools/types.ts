@@ -7,6 +7,8 @@
  * 描述: Word 工具集公共类型定义
  */
 
+/* global Word */
+
 /**
  * 内容元素基础信息 / Base Content Element Info
  */

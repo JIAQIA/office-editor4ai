@@ -71,7 +71,7 @@ function applyTextFormat(range: Word.Range, format: TextFormat): void {
  */
 async function getOriginalFormat(range: Word.Range): Promise<TextFormat> {
   const font = range.font;
-  // eslint-disable-next-line office-addins/no-navigational-load
+
   font.load([
     "name",
     "size",
@@ -224,6 +224,7 @@ export async function replaceSelection(options: ReplaceSelectionOptions): Promis
         }
 
         // 按顺序插入图片 / Insert images in order
+        const insertedPictures: Word.InlinePicture[] = [];
         for (const imageData of images) {
           try {
             // 移除 base64 前缀（如果有）/ Remove base64 prefix (if exists)
@@ -233,10 +234,7 @@ export async function replaceSelection(options: ReplaceSelectionOptions): Promis
             }
 
             // 插入图片 / Insert image
-            const inlinePicture = imageInsertRange.insertInlinePictureFromBase64(
-              base64Data,
-              "End"
-            );
+            const inlinePicture = imageInsertRange.insertInlinePictureFromBase64(base64Data, "End");
 
             // 设置图片属性 / Set image properties
             if (imageData.width !== undefined) {
@@ -249,7 +247,7 @@ export async function replaceSelection(options: ReplaceSelectionOptions): Promis
               inlinePicture.altTextTitle = imageData.altText;
             }
 
-            await context.sync();
+            insertedPictures.push(inlinePicture);
 
             // 更新插入位置到当前图片之后 / Update insert position to after current image
             imageInsertRange = inlinePicture.getRange("End");
@@ -257,6 +255,11 @@ export async function replaceSelection(options: ReplaceSelectionOptions): Promis
             console.warn(`插入图片失败 / Failed to insert image:`, error);
             // 继续插入下一张图片 / Continue to insert next image
           }
+        }
+
+        // 批量同步所有图片插入操作 / Batch sync all image insert operations
+        if (insertedPictures.length > 0) {
+          await context.sync();
         }
       }
 
