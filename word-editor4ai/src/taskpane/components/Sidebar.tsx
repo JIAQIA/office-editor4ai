@@ -310,6 +310,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <span className={styles.label}>创建表格</span>
             </div>
           </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "create" && currentTool === "insert-textbox"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("create", "insert-textbox")}
+          >
+            <div className={styles.menuItemContent}>
+              <Textbox24Regular className={styles.icon} />
+              <span className={styles.label}>插入文本框</span>
+            </div>
+          </Button>
         </div>
       )}
 

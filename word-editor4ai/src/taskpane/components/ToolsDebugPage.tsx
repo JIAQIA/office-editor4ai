@@ -29,6 +29,7 @@ import { CreateTableDebug } from "./tools/CreateTableDebug";
 import { DeleteTableDebug } from "./tools/DeleteTableDebug";
 import { UpdateTableDebug } from "./tools/UpdateTableDebug";
 import { QueryTableDebug } from "./tools/QueryTableDebug";
+import { InsertTextBoxDebug } from "./tools/InsertTextBoxDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -304,6 +305,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <QueryTableDebug />
+            </div>
+          </>
+        );
+      case "insert-textbox":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入文本框工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入文本框，支持自定义尺寸、位置、旋转角度和文本格式
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertTextBoxDebug />
             </div>
           </>
         );
