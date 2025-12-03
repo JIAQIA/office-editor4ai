@@ -57,6 +57,34 @@ import {
   type TableInfo,
 } from "../../../word-tools";
 
+// 辅助函数：安全获取 Word 样式名称 / Helper function: safely get Word style name
+const getWordStyleName = (styleName: keyof typeof Word.BuiltInStyleName): string => {
+  if (typeof Word !== "undefined" && Word.BuiltInStyleName) {
+    return Word.BuiltInStyleName[styleName] as string;
+  }
+  // 测试环境的默认值 / Default values for test environment
+  const styleMap: Record<string, string> = {
+    tableGrid: "TableGrid",
+    plainTable1: "PlainTable1",
+    plainTable2: "PlainTable2",
+    gridTable1Light: "GridTable1Light",
+    gridTable2: "GridTable2",
+    gridTable3: "GridTable3",
+    gridTable4: "GridTable4",
+    gridTable5Dark: "GridTable5Dark",
+    gridTable6Colorful: "GridTable6Colorful",
+    gridTable7Colorful: "GridTable7Colorful",
+    listTable1Light: "ListTable1Light",
+    listTable2: "ListTable2",
+    listTable3: "ListTable3",
+    listTable4: "ListTable4",
+    listTable5Dark: "ListTable5Dark",
+    listTable6Colorful: "ListTable6Colorful",
+    listTable7Colorful: "ListTable7Colorful",
+  };
+  return styleMap[styleName] || "TableGrid";
+};
+
 const useStyles = makeStyles({
   container: {
     display: "flex",
@@ -141,7 +169,9 @@ export const InsertTableDebug: React.FC = () => {
   const [headerRow, setHeaderRow] = useState<string>("");
   const [columnWidths, setColumnWidths] = useState<string>("");
   const [alignment, setAlignment] = useState<TableAlignment>("Left");
-  const [styleType, setStyleType] = useState<TableStyleType>(Word.BuiltInStyleName.tableGrid);
+  const [styleType, setStyleType] = useState<TableStyleType>(
+    getWordStyleName("tableGrid") as TableStyleType
+  );
   const [firstRow, setFirstRow] = useState(true);
   const [bandedRows, setBandedRows] = useState(false);
   const [borderStyle, setBorderStyle] = useState<BorderStyle>("Single");
@@ -716,23 +746,23 @@ export const InsertTableDebug: React.FC = () => {
                   selectedOptions={[styleType]}
                   onOptionSelect={(_, data) => setStyleType(data.optionValue as TableStyleType)}
                 >
-                  <Option value={Word.BuiltInStyleName.tableGrid}>网格</Option>
-                  <Option value={Word.BuiltInStyleName.plainTable1}>简单样式1</Option>
-                  <Option value={Word.BuiltInStyleName.plainTable2}>简单样式2</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable1Light}>浅色网格1</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable2}>网格2</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable3}>网格3</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable4}>网格4</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable5Dark}>深色网格5</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable6Colorful}>彩色网格6</Option>
-                  <Option value={Word.BuiltInStyleName.gridTable7Colorful}>彩色网格7</Option>
-                  <Option value={Word.BuiltInStyleName.listTable1Light}>浅色列表1</Option>
-                  <Option value={Word.BuiltInStyleName.listTable2}>列表2</Option>
-                  <Option value={Word.BuiltInStyleName.listTable3}>列表3</Option>
-                  <Option value={Word.BuiltInStyleName.listTable4}>列表4</Option>
-                  <Option value={Word.BuiltInStyleName.listTable5Dark}>深色列表5</Option>
-                  <Option value={Word.BuiltInStyleName.listTable6Colorful}>彩色列表6</Option>
-                  <Option value={Word.BuiltInStyleName.listTable7Colorful}>彩色列表7</Option>
+                  <Option value={getWordStyleName("tableGrid")}>网格</Option>
+                  <Option value={getWordStyleName("plainTable1")}>简单样式1</Option>
+                  <Option value={getWordStyleName("plainTable2")}>简单样式2</Option>
+                  <Option value={getWordStyleName("gridTable1Light")}>浅色网格1</Option>
+                  <Option value={getWordStyleName("gridTable2")}>网格2</Option>
+                  <Option value={getWordStyleName("gridTable3")}>网格3</Option>
+                  <Option value={getWordStyleName("gridTable4")}>网格4</Option>
+                  <Option value={getWordStyleName("gridTable5Dark")}>深色网格5</Option>
+                  <Option value={getWordStyleName("gridTable6Colorful")}>彩色网格6</Option>
+                  <Option value={getWordStyleName("gridTable7Colorful")}>彩色网格7</Option>
+                  <Option value={getWordStyleName("listTable1Light")}>浅色列表1</Option>
+                  <Option value={getWordStyleName("listTable2")}>列表2</Option>
+                  <Option value={getWordStyleName("listTable3")}>列表3</Option>
+                  <Option value={getWordStyleName("listTable4")}>列表4</Option>
+                  <Option value={getWordStyleName("listTable5Dark")}>深色列表5</Option>
+                  <Option value={getWordStyleName("listTable6Colorful")}>彩色列表6</Option>
+                  <Option value={getWordStyleName("listTable7Colorful")}>彩色列表7</Option>
                 </Dropdown>
               </Field>
 

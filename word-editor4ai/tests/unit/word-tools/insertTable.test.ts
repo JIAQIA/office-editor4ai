@@ -17,11 +17,13 @@ import {
   InsertTableOptions,
   UpdateTableOptions,
 } from "../../../src/word-tools";
-import { mockWordRun } from "../../utils/test-utils";
+import { mockWordRun, createMockWordContext } from "../../utils/test-utils";
 
 describe("table 工具函数测试", () => {
   beforeEach(() => {
-    mockWordRun();
+    // 在每个测试前重新初始化 mock / Re-initialize mock before each test
+    const context = createMockWordContext();
+    mockWordRun(context);
   });
 
   test("插入表格 - 基本功能", async () => {
