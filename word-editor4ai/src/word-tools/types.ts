@@ -418,3 +418,93 @@ export interface GetTextBoxOptions {
   /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
   maxTextLength?: number;
 }
+
+/**
+ * 批注引用范围的位置信息 / Comment Range Location Info
+ *
+ * @remarks
+ * 注意：start、end 和 storyType 是导航属性，在 Office Add-ins 中加载这些属性会降低性能
+ * Note: start, end and storyType are navigation properties, loading them in Office Add-ins will slow down performance
+ */
+export interface CommentRangeLocation {
+  /** 范围样式 / Range style */
+  style?: string;
+  /** 范围所在段落索引（如果可获取）/ Paragraph index if available */
+  paragraphIndex?: number;
+  /** 文本哈希值，用于识别重复引用 / Text hash for identifying duplicate references */
+  textHash?: string;
+  /** 文本长度（字符数）/ Text length in characters */
+  textLength?: number;
+  /** 是否为列表项 / Is list item */
+  isListItem?: boolean;
+  /** 列表级别（如果是列表项）/ List level if is list item */
+  listLevel?: number;
+  /** 字体名称 / Font name */
+  font?: string;
+  /** 字体大小（磅）/ Font size in points */
+  fontSize?: number;
+  /** 是否加粗 / Is bold */
+  isBold?: boolean;
+  /** 是否斜体 / Is italic */
+  isItalic?: boolean;
+  /** 是否有下划线 / Is underlined */
+  isUnderlined?: boolean;
+  /** 高亮颜色 / Highlight color */
+  highlightColor?: string;
+}
+
+/**
+ * 批注回复信息 / Comment Reply Info
+ */
+export interface CommentReplyInfo {
+  /** 回复唯一标识 / Reply unique ID */
+  id: string;
+  /** 回复内容 / Reply content */
+  content: string;
+  /** 回复作者 / Reply author */
+  authorName?: string;
+  /** 回复作者邮箱 / Reply author email */
+  authorEmail?: string;
+  /** 回复创建时间 / Reply creation date */
+  creationDate?: Date;
+}
+
+/**
+ * 批注信息 / Comment Info
+ */
+export interface CommentInfo {
+  /** 批注唯一标识 / Comment unique ID */
+  id: string;
+  /** 批注内容 / Comment content */
+  content: string;
+  /** 批注作者 / Comment author */
+  authorName?: string;
+  /** 批注作者邮箱 / Comment author email */
+  authorEmail?: string;
+  /** 批注创建时间 / Comment creation date */
+  creationDate?: Date;
+  /** 批注是否已解决 / Comment is resolved */
+  resolved?: boolean;
+  /** 批注关联的文本 / Comment associated text */
+  associatedText?: string;
+  /** 批注引用范围的位置信息 / Comment range location info */
+  rangeLocation?: CommentRangeLocation;
+  /** 批注回复列表 / Comment replies */
+  replies?: CommentReplyInfo[];
+}
+
+/**
+ * 获取批注的选项 / Get Comments Options
+ */
+export interface GetCommentsOptions {
+  /** 是否包含已解决的批注，默认为 true / Include resolved comments, default true */
+  includeResolved?: boolean;
+  /** 是否包含批注回复，默认为 true / Include comment replies, default true */
+  includeReplies?: boolean;
+  /** 是否包含关联文本，默认为 true / Include associated text, default true */
+  includeAssociatedText?: boolean;
+  /** 是否包含详细的元数据，默认为 false / Include detailed metadata, default false */
+  detailedMetadata?: boolean;
+  /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
+  maxTextLength?: number;
+}

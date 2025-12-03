@@ -19,6 +19,7 @@ import PageContent from "./tools/PageContent";
 import SelectedContent from "./tools/SelectedContent";
 import HeaderFooterContent from "./tools/HeaderFooterContent";
 import TextBoxContent from "./tools/TextBoxContent";
+import Comments from "./tools/Comments";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -181,6 +182,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <TextBoxContent />
+            </div>
+          </>
+        );
+      case "comments":
+        return (
+          <>
+            <h1 className={styles.title}>
+              批注内容获取工具
+            </h1>
+            <p className={styles.subtitle}>
+              获取文档中的批注内容，支持选择范围或整个文档，可获取批注的内容、作者、回复和关联文本等信息
+            </p>
+            <div className={styles.toolContainer}>
+              <Comments />
             </div>
           </>
         );
