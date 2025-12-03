@@ -251,14 +251,8 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
                 "end",
               ]);
               // 加载字体属性 / Load font properties
-              range.font.load([
-                "name",
-                "size",
-                "bold",
-                "italic",
-                "underline",
-                "highlightColor",
-              ]);
+              // eslint-disable-next-line office-addins/no-navigational-load
+              range.font.load(["name", "size", "bold", "italic", "underline", "highlightColor"]);
               rangeMap.set(comment.id, range);
             } catch (error) {
               console.warn(
@@ -278,7 +272,9 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
       if (includeAssociatedText && rangeMap.size > 0) {
         try {
           await context.sync();
-          console.log(`成功同步 ${rangeMap.size} 个批注范围 / Successfully synced ${rangeMap.size} comment ranges`);
+          console.log(
+            `成功同步 ${rangeMap.size} 个批注范围 / Successfully synced ${rangeMap.size} comment ranges`
+          );
         } catch (error) {
           console.warn(`同步批注范围失败 / Failed to sync comment ranges:`, error);
         }
@@ -300,7 +296,9 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
           await context.sync();
 
           allParagraphs = paragraphs.items;
-          console.log(`成功加载 ${allParagraphs.length} 个段落 / Successfully loaded ${allParagraphs.length} paragraphs`);
+          console.log(
+            `成功加载 ${allParagraphs.length} 个段落 / Successfully loaded ${allParagraphs.length} paragraphs`
+          );
         } catch (paraError) {
           console.warn(`加载段落信息失败 / Failed to load paragraph info:`, paraError);
         }
@@ -345,7 +343,7 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
               // 处理文本信息 / Process text info
               try {
                 const rangeText = range.text || "";
-                
+
                 let associatedText = rangeText;
                 if (maxTextLength && associatedText.length > maxTextLength) {
                   associatedText = associatedText.substring(0, maxTextLength) + "...";
@@ -366,7 +364,7 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
                     // If comment text is in paragraph text, consider it this paragraph
                     if (para.text && para.text.includes(rangeText)) {
                       commentInfo.rangeLocation.paragraphIndex = i;
-                      
+
                       // 添加列表信息 / Add list info
                       try {
                         if (para.isListItem && para.listItem) {
@@ -460,15 +458,15 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
 
 /**
  * 根据文本哈希识别重复的批注引用 / Identify duplicate comment references by text hash
- * 
+ *
  * @param comments - 批注列表 / Comment list
  * @returns 重复引用的分组 / Grouped duplicate references
- * 
+ *
  * @example
  * ```typescript
  * const comments = await getComments({ includeAssociatedText: true });
  * const duplicates = findDuplicateReferences(comments);
- * 
+ *
  * duplicates.forEach(group => {
  *   console.log(`文本 "${group.text}" 被引用了 ${group.comments.length} 次`);
  *   console.log(`批注 ID: ${group.comments.map(c => c.id).join(', ')}`);
@@ -492,8 +490,13 @@ export function findDuplicateReferences(
   }
 
   // 只返回有重复的组 / Only return groups with duplicates
-  const duplicates: Array<{ textHash: string; text: string; count: number; comments: CommentInfo[] }> = [];
-  
+  const duplicates: Array<{
+    textHash: string;
+    text: string;
+    count: number;
+    comments: CommentInfo[];
+  }> = [];
+
   hashMap.forEach((commentList, hash) => {
     if (commentList.length > 1) {
       duplicates.push({
