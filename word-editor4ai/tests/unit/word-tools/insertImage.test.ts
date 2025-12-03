@@ -58,7 +58,8 @@ describe("insertImage", () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.imageId).toBe("浮动图片");
+    // 浮动图片返回 shape ID / Floating pictures return shape ID
+    expect(result.imageId).toBe("shape-mock-shape-id");
   });
 
   it("应该支持不同的插入位置", async () => {

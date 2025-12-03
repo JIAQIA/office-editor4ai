@@ -62,6 +62,17 @@ global.Word = {
       load: vi.fn(),
     };
 
+    const mockShape = {
+      id: 'mock-shape-id',
+      altTextDescription: '',
+      lockAspectRatio: false,
+      allowOverlap: false,
+      textWrap: {
+        type: '',
+      },
+      load: vi.fn(),
+    };
+
     const mockRange = {
       text: 'Mock text',
       paragraphs: {
@@ -77,6 +88,7 @@ global.Word = {
       },
       insertText: vi.fn().mockReturnThis(),
       insertInlinePictureFromBase64: vi.fn().mockReturnValue(mockInlinePicture),
+      insertPictureFromBase64: vi.fn().mockReturnValue(mockShape),
       getRange: vi.fn().mockReturnThis(),
       load: vi.fn(),
     };
@@ -117,6 +129,15 @@ global.Word = {
     group: 'Group',
     picture: 'Picture',
     canvas: 'Canvas',
+  },
+  ShapeTextWrapType: {
+    inline: 'inline',
+    square: 'square',
+    tight: 'tight',
+    through: 'through',
+    topBottom: 'topBottom',
+    behind: 'behind',
+    front: 'front',
   },
 } as any;
 
