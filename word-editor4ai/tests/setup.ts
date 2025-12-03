@@ -51,6 +51,17 @@ global.Word = {
       load: vi.fn(),
     };
 
+    const mockInlinePicture = {
+      width: 0,
+      height: 0,
+      altTextTitle: '',
+      altTextDescription: '',
+      lockAspectRatio: false,
+      hyperlink: '',
+      getRange: vi.fn().mockReturnThis(),
+      load: vi.fn(),
+    };
+
     const mockRange = {
       text: 'Mock text',
       paragraphs: {
@@ -65,12 +76,7 @@ global.Word = {
         color: '#000000',
       },
       insertText: vi.fn().mockReturnThis(),
-      insertInlinePictureFromBase64: vi.fn().mockReturnValue({
-        width: 0,
-        height: 0,
-        altTextTitle: '',
-        getRange: vi.fn().mockReturnThis(),
-      }),
+      insertInlinePictureFromBase64: vi.fn().mockReturnValue(mockInlinePicture),
       getRange: vi.fn().mockReturnThis(),
       load: vi.fn(),
     };
@@ -91,6 +97,7 @@ global.Word = {
           items: [],
           load: vi.fn(),
         },
+        getSelection: vi.fn().mockReturnValue(mockRange),
         load: vi.fn(),
       },
       sync: vi.fn().mockResolvedValue(undefined),

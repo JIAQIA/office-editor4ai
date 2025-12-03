@@ -22,13 +22,13 @@ export type ImageLayoutType = "inline" | "floating";
 /**
  * 文本环绕方式 / Text Wrapping Type
  */
-export type WrapType = 
-  | "Square"      // 四周型环绕 / Square wrapping
-  | "Tight"       // 紧密型环绕 / Tight wrapping
-  | "Through"     // 穿越型环绕 / Through wrapping
+export type WrapType =
+  | "Square" // 四周型环绕 / Square wrapping
+  | "Tight" // 紧密型环绕 / Tight wrapping
+  | "Through" // 穿越型环绕 / Through wrapping
   | "TopAndBottom" // 上下型环绕 / Top and bottom wrapping
-  | "Behind"      // 衬于文字下方 / Behind text
-  | "InFrontOf";  // 浮于文字上方 / In front of text
+  | "Behind" // 衬于文字下方 / Behind text
+  | "InFrontOf"; // 浮于文字上方 / In front of text
 
 /**
  * 图片定位选项 / Image Position Options
@@ -137,7 +137,7 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
       // 获取插入范围 / Get insert range
       let insertRange: Word.Range;
       const selection = context.document.getSelection();
-      
+
       switch (insertLocation) {
         case "Start":
           insertRange = context.document.body.getRange("Start");
@@ -187,19 +187,18 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
         }
 
         await context.sync();
-        
+
         // Word API 的 InlinePicture 没有 id 属性
         // InlinePicture in Word API does not have id property
         // 使用 altTextTitle 作为标识符（如果提供）
         // Use altTextTitle as identifier (if provided)
         imageId = altText || undefined;
-
       } else if (layoutType === "floating") {
         // 注意：Word JavaScript API 对浮动图片的支持有限
         // Note: Word JavaScript API has limited support for floating images
         // 我们先插入为内联图片，然后尝试应用浮动属性
         // We first insert as inline picture, then try to apply floating properties
-        
+
         const inlinePicture = insertRange.insertInlinePictureFromBase64(
           cleanBase64,
           insertLocation
@@ -236,9 +235,9 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
             // We log the options here, but actual application may require OOXML or other methods
             console.warn(
               "浮动图片选项已记录，但 Word JavaScript API 对浮动图片的支持有限。" +
-              "某些选项可能需要通过 OOXML 实现。/ " +
-              "Floating image options logged, but Word JavaScript API has limited support for floating images. " +
-              "Some options may require OOXML implementation.",
+                "某些选项可能需要通过 OOXML 实现。/ " +
+                "Floating image options logged, but Word JavaScript API has limited support for floating images. " +
+                "Some options may require OOXML implementation.",
               floatingOptions
             );
           } catch (error) {
@@ -247,7 +246,7 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
         }
 
         await context.sync();
-        
+
         // Word API 的 InlinePicture 没有 id 属性
         // InlinePicture in Word API does not have id property
         // 使用 altTextTitle 作为标识符（如果提供）
@@ -262,7 +261,6 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
       success: true,
       imageId,
     };
-
   } catch (error) {
     console.error("插入图片失败 / Insert image failed:", error);
     return {
@@ -275,9 +273,7 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
 /**
  * 批量插入图片 / Batch Insert Images
  */
-export async function insertImages(
-  images: InsertImageOptions[]
-): Promise<InsertImageResult[]> {
+export async function insertImages(images: InsertImageOptions[]): Promise<InsertImageResult[]> {
   const results: InsertImageResult[] = [];
 
   for (const imageOptions of images) {
