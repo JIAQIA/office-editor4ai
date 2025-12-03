@@ -198,8 +198,9 @@ export const AppendTextDebug: React.FC<AppendTextDebugProps> = ({ appendText, ap
   return (
     <div className={styles.container}>
       <div className={styles.formRow}>
-        <Label>要追加的文本内容:</Label>
+        <Label htmlFor="text-content-input">要追加的文本内容:</Label>
         <Textarea
+          id="text-content-input"
           value={text}
           onChange={(e) => setText(e.target.value)}
           resize="vertical"
@@ -216,8 +217,8 @@ export const AppendTextDebug: React.FC<AppendTextDebugProps> = ({ appendText, ap
       {applyFormat && (
         <div className={styles.formatContainer}>
           <div className={styles.formRow}>
-            <Label>字体名称:</Label>
-            <Input value={fontName} onChange={(e) => setFontName(e.target.value)} />
+            <Label htmlFor="font-name-input">字体名称:</Label>
+            <Input id="font-name-input" value={fontName} onChange={(e) => setFontName(e.target.value)} />
           </div>
 
           <div className={styles.formRow}>

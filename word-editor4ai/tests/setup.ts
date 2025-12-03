@@ -57,6 +57,21 @@ global.Word = {
         items: [mockParagraph],
         load: vi.fn(),
       },
+      font: {
+        name: '',
+        size: 12,
+        bold: false,
+        italic: false,
+        color: '#000000',
+      },
+      insertText: vi.fn().mockReturnThis(),
+      insertInlinePictureFromBase64: vi.fn().mockReturnValue({
+        width: 0,
+        height: 0,
+        altTextTitle: '',
+        getRange: vi.fn().mockReturnThis(),
+      }),
+      getRange: vi.fn().mockReturnThis(),
       load: vi.fn(),
     };
 
