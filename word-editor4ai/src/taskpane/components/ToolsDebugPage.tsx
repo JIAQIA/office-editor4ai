@@ -25,6 +25,7 @@ import { insertText } from "../taskpane";
 import { appendText } from "../../word-tools";
 import { AppendTextDebug } from "./tools/AppendTextDebug";
 import { InsertImageDebug } from "./tools/InsertImageDebug";
+import { InsertTableDebug } from "./tools/InsertTableDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -244,6 +245,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertImageDebug />
+            </div>
+          </>
+        );
+      case "insert-table":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入表格工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入和管理表格，支持插入、更新、查询、删除表格，以及行列操作、单元格格式化和合并等功能
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertTableDebug />
             </div>
           </>
         );

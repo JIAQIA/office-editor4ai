@@ -9,10 +9,10 @@
 
 /* global Word, console */
 
-/**
- * 图片插入位置类型 / Image Insert Location Type
- */
-export type InsertLocation = "Start" | "End" | "Before" | "After" | "Replace";
+import type { InsertLocation } from "./types";
+
+// 重新导出以保持向后兼容性 / Re-export for backward compatibility
+export type { InsertLocation };
 
 /**
  * 图片布局类型 / Image Layout Type

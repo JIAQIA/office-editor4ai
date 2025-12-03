@@ -572,3 +572,8 @@ export interface ReplaceSelectionOptions {
   /** 是否替换选中内容（默认为 true）/ Replace selection (default true) */
   replaceSelection?: boolean;
 }
+
+/**
+ * 插入位置类型 / Insert Location Type
+ */
+export type InsertLocation = "Start" | "End" | "Before" | "After" | "Replace";

@@ -33,6 +33,7 @@ import {
   ArrowSwap24Regular,
   ArrowDown24Regular,
   Image24Regular,
+  Table24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -293,6 +294,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <Image24Regular className={styles.icon} />
               <span className={styles.label}>插入图片</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "create" && currentTool === "insert-table"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("create", "insert-table")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>插入表格</span>
             </div>
           </Button>
         </div>
