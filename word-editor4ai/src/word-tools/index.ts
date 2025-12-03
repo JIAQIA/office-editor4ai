@@ -23,3 +23,4 @@ export * from "./textBoxContent";
 export * from "./comments";
 export * from "./replaceSelection";
 export * from "./appendText";
+export * from "./insertImage";

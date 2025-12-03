@@ -24,6 +24,7 @@ import { ReplaceSelection } from "./tools/ReplaceSelection";
 import { insertText } from "../taskpane";
 import { appendText } from "../../word-tools";
 import { AppendTextDebug } from "./tools/AppendTextDebug";
+import { InsertImageDebug } from "./tools/InsertImageDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -229,6 +230,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
               <AppendTextDebug 
                 appendText={appendText}
               />
+            </div>
+          </>
+        );
+      case "insert-image":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入图片工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入图片，支持内联和浮动布局，可配置尺寸、位置、文字环绕等选项
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertImageDebug />
             </div>
           </>
         );
