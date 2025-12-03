@@ -35,7 +35,7 @@ describe("InsertShapeDebug", () => {
     it("应该显示形状类型下拉列表 / Should display shape type dropdown", () => {
       render(<InsertShapeDebug />);
 
-      const dropdown = screen.getByRole("combobox");
+      const dropdown = screen.getByRole("combobox", { name: /形状类型/i });
       expect(dropdown).toBeInTheDocument();
     });
 

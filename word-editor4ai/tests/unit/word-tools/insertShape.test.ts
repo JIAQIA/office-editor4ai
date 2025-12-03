@@ -24,6 +24,7 @@ const mockContext = {
 
 const mockRange = {
   insertShape: vi.fn(),
+  insertGeometricShape: vi.fn(),
 };
 
 const mockShape = {
@@ -69,7 +70,7 @@ describe("insertShape", () => {
     vi.clearAllMocks();
     mockContext.document.body.getRange.mockReturnValue(mockRange);
     mockContext.document.getSelection.mockReturnValue(mockRange);
-    mockRange.insertShape.mockReturnValue(mockShape);
+    mockRange.insertGeometricShape.mockReturnValue(mockShape);
     mockShape.body.getRange.mockReturnValue(mockTextRange);
 
     // 重置 mockShape 属性 / Reset mockShape properties
@@ -89,7 +90,7 @@ describe("insertShape", () => {
       expect(result.success).toBe(true);
       expect(result.shapeId).toBe("shape-test-shape-id");
       expect(result.error).toBeUndefined();
-      expect(mockRange.insertShape).toHaveBeenCalledWith("Rectangle", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Rectangle", {
         width: 100,
         height: 100,
       });
@@ -106,7 +107,7 @@ describe("insertShape", () => {
 
       for (const location of locations) {
         await insertShape("Ellipse", location);
-        expect(mockRange.insertShape).toHaveBeenCalledWith("Ellipse", {
+        expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Ellipse", {
           width: 100,
           height: 100,
         });
@@ -116,7 +117,7 @@ describe("insertShape", () => {
     it("应该使用默认位置 End / Should use default location End", async () => {
       await insertShape("Diamond");
 
-      expect(mockRange.insertShape).toHaveBeenCalledWith("Diamond", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Diamond", {
         width: 100,
         height: 100,
       });
@@ -127,7 +128,7 @@ describe("insertShape", () => {
 
       for (const shapeType of shapeTypes) {
         await insertShape(shapeType, "End");
-        expect(mockRange.insertShape).toHaveBeenCalledWith(shapeType, {
+        expect(mockRange.insertGeometricShape).toHaveBeenCalledWith(shapeType, {
           width: 100,
           height: 100,
         });
@@ -141,7 +142,7 @@ describe("insertShape", () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("必须提供形状类型");
-      expect(mockRange.insertShape).not.toHaveBeenCalled();
+      expect(mockRange.insertGeometricShape).not.toHaveBeenCalled();
     });
   });
 
@@ -154,7 +155,7 @@ describe("insertShape", () => {
 
       await insertShape("Rectangle", "End", options);
 
-      expect(mockRange.insertShape).toHaveBeenCalledWith("Rectangle", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Rectangle", {
         width: 200,
         height: 150,
       });
@@ -199,7 +200,7 @@ describe("insertShape", () => {
 
       await insertShape("Rectangle", "End", options);
 
-      expect(mockRange.insertShape).toHaveBeenCalledWith("Rectangle", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Rectangle", {
         width: 100,
         height: 100,
         left: 100,
@@ -220,37 +221,59 @@ describe("insertShape", () => {
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#FF0000");
     });
 
-    it("应该设置线条颜色 / Should set line color", async () => {
+    it("应该忽略线条颜色（API 不支持）/ Should ignore line color (API not supported)", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const options: ShapeOptions = {
         lineColor: "#0000FF",
       };
 
       await insertShape("Rectangle", "End", options);
 
-      expect(mockShape.line.color).toBe("#0000FF");
+      // 线条颜色不应该被设置 / Line color should not be set
+      expect(mockShape.line.color).toBe("");
+      // 应该输出警告 / Should output warning
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("线条样式设置暂不支持")
+      );
+      consoleSpy.mockRestore();
     });
 
-    it("应该设置线条宽度 / Should set line weight", async () => {
+    it("应该忽略线条宽度（API 不支持）/ Should ignore line weight (API not supported)", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const options: ShapeOptions = {
         lineWeight: 3,
       };
 
       await insertShape("Rectangle", "End", options);
 
-      expect(mockShape.line.weight).toBe(3);
+      // 线条宽度不应该被设置 / Line weight should not be set
+      expect(mockShape.line.weight).toBe(1);
+      // 应该输出警告 / Should output warning
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("线条样式设置暂不支持")
+      );
+      consoleSpy.mockRestore();
     });
 
-    it("应该设置线条样式 / Should set line style", async () => {
+    it("应该忽略线条样式（API 不支持）/ Should ignore line style (API not supported)", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const options: ShapeOptions = {
         lineStyle: "Dash",
       };
 
       await insertShape("Rectangle", "End", options);
 
-      expect(mockShape.line.style).toBe("Dash");
+      // 线条样式不应该被设置 / Line style should not be set
+      expect(mockShape.line.style).toBe("Single");
+      // 应该输出警告 / Should output warning
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("线条样式设置暂不支持")
+      );
+      consoleSpy.mockRestore();
     });
 
-    it("应该同时设置填充和线条样式 / Should set both fill and line styles", async () => {
+    it("应该设置填充但忽略线条样式 / Should set fill but ignore line styles", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
       const options: ShapeOptions = {
         fillColor: "#FF0000",
         lineColor: "#0000FF",
@@ -260,10 +283,17 @@ describe("insertShape", () => {
 
       await insertShape("Ellipse", "End", options);
 
+      // 填充颜色应该被设置 / Fill color should be set
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#FF0000");
-      expect(mockShape.line.color).toBe("#0000FF");
-      expect(mockShape.line.weight).toBe(2);
-      expect(mockShape.line.style).toBe("Dot");
+      // 线条样式不应该被设置 / Line styles should not be set
+      expect(mockShape.line.color).toBe("");
+      expect(mockShape.line.weight).toBe(1);
+      expect(mockShape.line.style).toBe("Single");
+      // 应该输出警告 / Should output warning
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining("线条样式设置暂不支持")
+      );
+      consoleSpy.mockRestore();
     });
   });
 
@@ -298,7 +328,7 @@ describe("insertShape", () => {
   describe("错误处理 / Error handling", () => {
     it("应该处理插入失败 / Should handle insert failure", async () => {
       const error = new Error("Insert failed");
-      mockRange.insertShape.mockImplementationOnce(() => {
+      mockRange.insertGeometricShape.mockImplementationOnce(() => {
         throw error;
       });
 
@@ -337,7 +367,7 @@ describe("insertShape", () => {
 
       expect(results).toHaveLength(3);
       expect(results.every((r) => r.success)).toBe(true);
-      expect(mockRange.insertShape).toHaveBeenCalledTimes(3);
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledTimes(3);
     });
 
     it("应该返回每个形状的结果 / Should return result for each shape", async () => {
@@ -379,7 +409,7 @@ describe("insertShape", () => {
       expect(result.success).toBe(true);
       expect(result.shapeId).toBe("shape-test-shape-id");
       // 验证 insertShape 被正确调用，包含位置参数 / Verify insertShape is called correctly with position parameters
-      expect(mockRange.insertShape).toHaveBeenCalledWith("RoundRectangle", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("RoundRectangle", {
         width: 250,
         height: 180,
         left: 50,
@@ -391,9 +421,10 @@ describe("insertShape", () => {
       expect(mockShape.rotation).toBe(30);
       // 验证样式 / Verify styles
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#FF0000");
-      expect(mockShape.line.color).toBe("#0000FF");
-      expect(mockShape.line.weight).toBe(2);
-      expect(mockShape.line.style).toBe("Dash");
+      // 线条样式不支持，应保持默认值 / Line styles not supported, should keep default values
+      expect(mockShape.line.color).toBe("");
+      expect(mockShape.line.weight).toBe(1);
+      expect(mockShape.line.style).toBe("Single");
       // 验证文本 / Verify text
       expect(mockTextRange.insertText).toHaveBeenCalledWith("Complete Shape", "Replace");
     });
@@ -410,13 +441,14 @@ describe("insertShape", () => {
       const result = await insertShape("Ellipse", "End", options);
 
       expect(result.success).toBe(true);
-      expect(mockRange.insertShape).toHaveBeenCalledWith("Ellipse", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("Ellipse", {
         width: 150,
         height: 150,
       });
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#0078D4");
-      expect(mockShape.line.color).toBe("#000000");
-      expect(mockShape.line.weight).toBe(3);
+      // 线条样式不支持，应保持默认值 / Line styles not supported, should keep default values
+      expect(mockShape.line.color).toBe("");
+      expect(mockShape.line.weight).toBe(1);
     });
 
     it("应该插入流程图形状 / Should insert flowchart shape", async () => {
@@ -432,13 +464,14 @@ describe("insertShape", () => {
       const result = await insertShape("FlowChartProcess", "End", options);
 
       expect(result.success).toBe(true);
-      expect(mockRange.insertShape).toHaveBeenCalledWith("FlowChartProcess", {
+      expect(mockRange.insertGeometricShape).toHaveBeenCalledWith("FlowChartProcess", {
         width: 200,
         height: 100,
       });
       expect(mockTextRange.insertText).toHaveBeenCalledWith("Process", "Replace");
       expect(mockShape.fill.setSolidColor).toHaveBeenCalledWith("#E1F5FE");
-      expect(mockShape.line.color).toBe("#01579B");
+      // 线条样式不支持，应保持默认值 / Line styles not supported, should keep default values
+      expect(mockShape.line.color).toBe("");
     });
   });
 });
