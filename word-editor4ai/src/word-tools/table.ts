@@ -215,7 +215,6 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
     headerFormat,
     dataFormat,
     title,
-    description,
   } = options;
 
   // 验证参数 / Validate parameters
@@ -340,6 +339,9 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
       // 应用表头格式 / Apply header format
       if (headerFormat && (headerRow || data?.[0])) {
         const headerRowObj = table.rows.getFirst();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        headerRowObj.load("cells");
+        await context.sync();
         await applyCellFormat(headerRowObj.cells, headerFormat, context);
       }
 
@@ -412,6 +414,7 @@ async function applyCellFormat(
     }
 
     // 应用字体格式 / Apply font format
+    cell.body.load("font");
     const font = cell.body.font;
     if (format.fontName) {
       font.name = format.fontName;
@@ -447,6 +450,9 @@ export async function updateTable(options: UpdateTableOptions): Promise<InsertTa
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
 
         // 尝试获取父表格 / Try to get parent table
         const parentTable = selection.parentTableOrNullObject;
@@ -616,6 +622,10 @@ export async function updateCell(options: UpdateCellOptions): Promise<InsertTabl
           cell.shadingColor = format.backgroundColor;
         }
 
+        // 应用字体格式 / Apply font format
+        // eslint-disable-next-line office-addins/no-navigational-load
+        cell.load("body/font");
+        await context.sync();
         const font = cell.body.font;
         if (format.fontName) {
           font.name = format.fontName;
@@ -666,6 +676,9 @@ export async function getTableInfo(tableIndex?: number): Promise<TableInfo | nul
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
 
         // 尝试获取父表格 / Try to get parent table
         const parentTable = selection.parentTableOrNullObject;
@@ -730,12 +743,15 @@ export async function getAllTablesInfo(): Promise<TableInfo[]> {
       tables.load("items");
       await context.sync();
 
-      for (let i = 0; i < tables.items.length; i++) {
-        const table = tables.items[i];
+      // 批量加载所有表格数据以避免循环中的sync / Batch load all table data to avoid sync in loop
+      for (const table of tables.items) {
         table.load("rowCount, style, alignment, width, values");
         table.columns.load("items");
-        await context.sync();
+      }
+      await context.sync();
 
+      for (let i = 0; i < tables.items.length; i++) {
+        const table = tables.items[i];
         tablesInfo.push({
           index: i,
           rowCount: table.rowCount,
@@ -770,6 +786,9 @@ export async function deleteTable(tableIndex?: number): Promise<InsertTableResul
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
 
         // 尝试获取父表格 / Try to get parent table
         const parentTable = selection.parentTableOrNullObject;
@@ -852,6 +871,10 @@ export async function addTableRows(
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
+
         const parentTable = selection.parentTableOrNullObject;
         parentTable.load("isNullObject");
         await context.sync();
@@ -937,6 +960,10 @@ export async function addTableColumns(
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
+
         const parentTable = selection.parentTableOrNullObject;
         parentTable.load("isNullObject");
         await context.sync();
@@ -1020,6 +1047,10 @@ export async function deleteTableRows(
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
+
         const parentTable = selection.parentTableOrNullObject;
         parentTable.load("isNullObject");
         await context.sync();
@@ -1097,6 +1128,10 @@ export async function deleteTableColumns(
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
+
         const parentTable = selection.parentTableOrNullObject;
         parentTable.load("isNullObject");
         await context.sync();
@@ -1179,6 +1214,10 @@ export async function mergeCells(
       // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
       if (tableIndex === undefined) {
         const selection = context.document.getSelection();
+        // eslint-disable-next-line office-addins/no-navigational-load
+        selection.load("parentTableOrNullObject");
+        await context.sync();
+
         const parentTable = selection.parentTableOrNullObject;
         parentTable.load("isNullObject");
         await context.sync();
