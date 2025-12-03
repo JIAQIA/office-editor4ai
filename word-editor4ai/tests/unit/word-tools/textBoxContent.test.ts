@@ -231,7 +231,12 @@ function createMockContextWithTextBoxes(hasSelection: boolean, textBoxCount: num
 
   // 创建模拟的选择范围 / Create mock selection range
   const mockSelection = {
+    text: hasSelection ? "some text" : "",
     isEmpty: !hasSelection,
+    shapes: {
+      items: hasSelection ? mockTextBoxes : [],
+      load: vi.fn().mockReturnThis(),
+    },
     load: vi.fn().mockReturnThis(),
     getRange: vi.fn().mockReturnValue({
       getRange: vi.fn().mockReturnValue({

@@ -59,23 +59,38 @@ export async function getTextBoxes(options: GetTextBoxOptions = {}): Promise<Tex
     return await Word.run(async (context) => {
       // 获取当前选中的范围 / Get current selection range
       const selection = context.document.getSelection();
-      selection.load("text");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      selection.load("shapes");
       await context.sync();
 
       let shapes: Word.ShapeCollection;
       let rangeType: "selection" | "visible";
 
-      // 判断是否有选择（通过文本内容判断，避免使用导航属性 isEmpty）
-      // Check if there is a selection (by checking text content, avoiding navigation property isEmpty)
-      const selectionText = selection.text;
-      const hasSelection = selectionText && selectionText.length > 0;
+      // 尝试获取选中的形状 / Try to get selected shapes
+      // 如果用户选中了文本框，应该从 selection.shapes 获取
+      // If user selected a text box, should get from selection.shapes
+      try {
+        shapes = selection.shapes;
+        shapes.load("items");
+        await context.sync();
 
-      if (hasSelection) {
-        // 有选择，从文档主体获取所有形状，稍后过滤选择范围内的 / Has selection, get all shapes from body, filter later
-        shapes = context.document.body.shapes;
-        rangeType = "selection";
-      } else {
-        // 没有选择，从文档主体获取所有形状 / No selection, get all shapes from body
+        // 如果选中了形状，使用选中的形状 / If shapes are selected, use selected shapes
+        if (shapes.items.length > 0) {
+          rangeType = "selection";
+          console.log(
+            `检测到选中了 ${shapes.items.length} 个形状 / Detected ${shapes.items.length} selected shapes`
+          );
+        } else {
+          // 没有选中形状，从文档主体获取所有形状 / No shapes selected, get all shapes from body
+          shapes = context.document.body.shapes;
+          rangeType = "visible";
+        }
+      } catch (error) {
+        // 如果获取选中形状失败，回退到获取文档所有形状 / If getting selected shapes fails, fallback to all shapes
+        console.warn(
+          "获取选中形状失败，将获取文档所有形状 / Failed to get selected shapes, will get all shapes:",
+          error
+        );
         shapes = context.document.body.shapes;
         rangeType = "visible";
       }
