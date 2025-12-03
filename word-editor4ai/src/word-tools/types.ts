@@ -423,14 +423,22 @@ export interface GetTextBoxOptions {
  * 批注引用范围的位置信息 / Comment Range Location Info
  *
  * @remarks
- * 注意：start、end 和 storyType 是导航属性，在 Office Add-ins 中加载这些属性会降低性能
- * Note: start, end and storyType are navigation properties, loading them in Office Add-ins will slow down performance
+ * 注意：start、end 等是导航属性，在 Office Add-ins 中加载这些属性会降低性能
+ * 但为了提供精确的位置信息，这些属性是必需的
+ * Note: start, end etc. are navigation properties, loading them in Office Add-ins will slow down performance
+ * But these properties are necessary to provide precise location information
  */
 export interface CommentRangeLocation {
   /** 范围样式 / Range style */
   style?: string;
   /** 范围所在段落索引（如果可获取）/ Paragraph index if available */
   paragraphIndex?: number;
+  /** 范围起始位置（字符偏移）/ Range start position (character offset) */
+  start?: number;
+  /** 范围结束位置（字符偏移）/ Range end position (character offset) */
+  end?: number;
+  /** 故事类型（MainText, Footnotes, Headers 等）/ Story type (MainText, Footnotes, Headers, etc.) */
+  storyType?: string;
   /** 文本哈希值，用于识别重复引用 / Text hash for identifying duplicate references */
   textHash?: string;
   /** 文本长度（字符数）/ Text length in characters */

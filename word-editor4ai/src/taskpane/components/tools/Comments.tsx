@@ -282,6 +282,32 @@ const Comments: React.FC = () => {
               {/* 位置信息和元数据 / Location info and metadata */}
               {comment.rangeLocation && (
                 <div className={styles.metadataGrid} style={{ marginTop: "8px" }}>
+                  {comment.rangeLocation.start !== undefined && (
+                    <>
+                      <span className={styles.metadataLabel}>位置:</span>
+                      <span className={styles.metadataValue}>
+                        字符 {comment.rangeLocation.start} - {comment.rangeLocation.end || comment.rangeLocation.start}
+                      </span>
+                    </>
+                  )}
+                  {comment.rangeLocation.paragraphIndex !== undefined && (
+                    <>
+                      <span className={styles.metadataLabel}>段落:</span>
+                      <span className={styles.metadataValue}>第 {comment.rangeLocation.paragraphIndex + 1} 段</span>
+                    </>
+                  )}
+                  {comment.rangeLocation.storyType && (
+                    <>
+                      <span className={styles.metadataLabel}>区域:</span>
+                      <span className={styles.metadataValue}>{comment.rangeLocation.storyType}</span>
+                    </>
+                  )}
+                  {comment.rangeLocation.style && (
+                    <>
+                      <span className={styles.metadataLabel}>样式:</span>
+                      <span className={styles.metadataValue}>{comment.rangeLocation.style}</span>
+                    </>
+                  )}
                   {comment.rangeLocation.textHash && (
                     <>
                       <span className={styles.metadataLabel}>文本哈希:</span>
@@ -292,18 +318,6 @@ const Comments: React.FC = () => {
                     <>
                       <span className={styles.metadataLabel}>文本长度:</span>
                       <span className={styles.metadataValue}>{comment.rangeLocation.textLength} 字符</span>
-                    </>
-                  )}
-                  {comment.rangeLocation.paragraphIndex !== undefined && (
-                    <>
-                      <span className={styles.metadataLabel}>段落:</span>
-                      <span className={styles.metadataValue}>第 {comment.rangeLocation.paragraphIndex + 1} 段</span>
-                    </>
-                  )}
-                  {comment.rangeLocation.style && (
-                    <>
-                      <span className={styles.metadataLabel}>样式:</span>
-                      <span className={styles.metadataValue}>{comment.rangeLocation.style}</span>
                     </>
                   )}
                   {comment.rangeLocation.isListItem && (

@@ -247,6 +247,8 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
                 "font",
                 "hyperlink",
                 "isEmpty",
+                "start",
+                "end",
               ]);
               // 加载字体属性 / Load font properties
               range.font.load([
@@ -276,40 +278,126 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
       if (includeAssociatedText && rangeMap.size > 0) {
         try {
           await context.sync();
+          console.log(`成功同步 ${rangeMap.size} 个批注范围 / Successfully synced ${rangeMap.size} comment ranges`);
         } catch (error) {
           console.warn(`同步批注范围失败 / Failed to sync comment ranges:`, error);
         }
       }
 
-      // 第三步：处理关联文本和位置信息 / Step 3: Process associated text and location info
+      // 第三步：批量获取段落信息 / Step 3: Batch load paragraph info
+      let allParagraphs: Word.Paragraph[] = [];
+      if (includeAssociatedText && rangeMap.size > 0) {
+        try {
+          // 获取文档所有段落 / Get all paragraphs in document
+          const paragraphs = context.document.body.paragraphs;
+          paragraphs.load("items");
+          await context.sync();
+
+          // 加载每个段落的文本，用于匹配 / Load text of each paragraph for matching
+          for (const para of paragraphs.items) {
+            para.load(["text", "isListItem", "listItem"]);
+          }
+          await context.sync();
+
+          allParagraphs = paragraphs.items;
+          console.log(`成功加载 ${allParagraphs.length} 个段落 / Successfully loaded ${allParagraphs.length} paragraphs`);
+        } catch (paraError) {
+          console.warn(`加载段落信息失败 / Failed to load paragraph info:`, paraError);
+        }
+      }
+
+      // 第四步：处理关联文本和位置信息 / Step 4: Process associated text and location info
       for (const commentInfo of commentInfoList) {
         try {
           if (includeAssociatedText) {
             const range = rangeMap.get(commentInfo.id);
-            if (range && range.text !== undefined) {
-              let associatedText = range.text;
-              if (maxTextLength && associatedText.length > maxTextLength) {
-                associatedText = associatedText.substring(0, maxTextLength) + "...";
-              }
-              commentInfo.associatedText = associatedText;
-
-              // 添加位置信息和元数据 / Add location info and metadata
+            if (range) {
+              // 初始化 rangeLocation，先设置基本属性 / Initialize rangeLocation with basic properties
               commentInfo.rangeLocation = {
                 style: range.style,
-                textHash: simpleHash(range.text),
-                textLength: range.text.length,
               };
+
+              // 添加 Range 位置信息 / Add Range position info
+              try {
+                if (range.start !== undefined) {
+                  commentInfo.rangeLocation.start = range.start;
+                }
+                if (range.end !== undefined) {
+                  commentInfo.rangeLocation.end = range.end;
+                }
+                // 获取 storyType（需要通过 parentBody 访问）
+                // Get storyType (needs to access through parentBody)
+                try {
+                  const parentBody = range.parentBody;
+                  if (parentBody && parentBody.type !== undefined) {
+                    commentInfo.rangeLocation.storyType = parentBody.type;
+                  }
+                } catch (storyError) {
+                  console.warn(`获取 storyType 失败 / Failed to get storyType:`, storyError);
+                }
+              } catch (posError) {
+                console.warn(
+                  `获取批注 ${commentInfo.id} 的位置信息失败 / Failed to get position info for comment ${commentInfo.id}:`,
+                  posError
+                );
+              }
+
+              // 处理文本信息 / Process text info
+              try {
+                const rangeText = range.text || "";
+                
+                let associatedText = rangeText;
+                if (maxTextLength && associatedText.length > maxTextLength) {
+                  associatedText = associatedText.substring(0, maxTextLength) + "...";
+                }
+                commentInfo.associatedText = associatedText;
+
+                // 添加文本元数据 / Add text metadata
+                if (rangeText) {
+                  commentInfo.rangeLocation.textHash = simpleHash(rangeText);
+                }
+                commentInfo.rangeLocation.textLength = rangeText.length;
+
+                // 查找段落索引 / Find paragraph index
+                if (allParagraphs.length > 0 && rangeText) {
+                  for (let i = 0; i < allParagraphs.length; i++) {
+                    const para = allParagraphs[i];
+                    // 如果批注文本在段落文本中，则认为是该段落
+                    // If comment text is in paragraph text, consider it this paragraph
+                    if (para.text && para.text.includes(rangeText)) {
+                      commentInfo.rangeLocation.paragraphIndex = i;
+                      
+                      // 添加列表信息 / Add list info
+                      try {
+                        if (para.isListItem && para.listItem) {
+                          commentInfo.rangeLocation.isListItem = true;
+                          commentInfo.rangeLocation.listLevel = para.listItem.level;
+                        }
+                      } catch (listError) {
+                        console.warn(`获取列表信息失败 / Failed to get list info:`, listError);
+                      }
+                      break;
+                    }
+                  }
+                }
+              } catch (textError) {
+                console.warn(
+                  `处理批注 ${commentInfo.id} 的文本信息失败 / Failed to process text info for comment ${commentInfo.id}:`,
+                  textError
+                );
+              }
 
               // 添加字体和格式化信息 / Add font and formatting info
               try {
-                if (range.font) {
-                  commentInfo.rangeLocation.font = range.font.name;
-                  commentInfo.rangeLocation.fontSize = range.font.size;
-                  commentInfo.rangeLocation.isBold = range.font.bold;
-                  commentInfo.rangeLocation.isItalic = range.font.italic;
+                const font = range.font;
+                if (font && font.name !== undefined) {
+                  commentInfo.rangeLocation.font = font.name;
+                  commentInfo.rangeLocation.fontSize = font.size;
+                  commentInfo.rangeLocation.isBold = font.bold;
+                  commentInfo.rangeLocation.isItalic = font.italic;
                   commentInfo.rangeLocation.isUnderlined =
-                    range.font.underline !== "None" && range.font.underline !== undefined;
-                  commentInfo.rangeLocation.highlightColor = range.font.highlightColor;
+                    font.underline !== "None" && font.underline !== undefined;
+                  commentInfo.rangeLocation.highlightColor = font.highlightColor;
                 }
               } catch (fontError) {
                 console.warn(
@@ -317,20 +405,6 @@ export async function getComments(options: GetCommentsOptions = {}): Promise<Com
                   fontError
                 );
               }
-
-              // 注意：列表项信息（isListItem, listLevel）需要通过 Paragraph 对象获取
-              // 这需要额外的 sync 操作，会影响性能，因此暂时不获取
-              // Note: List item info (isListItem, listLevel) requires accessing Paragraph object
-              // This needs extra sync operations which affects performance, so skipped for now
-              // TODO: 如果需要列表信息，考虑在批量加载时一次性获取所有段落的列表属性
-              // TODO: If list info is needed, consider batch loading all paragraph list properties at once
-
-              // 注意：获取段落索引需要多次 sync，这是一个性能权衡
-              // 如果需要段落索引，建议在外部批量处理所有批注
-              // Note: Getting paragraph index requires multiple syncs, this is a performance tradeoff
-              // If paragraph index is needed, recommend batch processing all comments externally
-              // 暂时跳过段落索引以避免性能问题 / Skip paragraph index for now to avoid performance issues
-              // TODO: 实现批量获取段落索引的优化方案 / TODO: Implement optimized batch paragraph index retrieval
             }
           }
 

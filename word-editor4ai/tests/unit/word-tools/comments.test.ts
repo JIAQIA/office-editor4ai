@@ -210,16 +210,20 @@ describe("comments - 批注内容获取工具", () => {
       expect(result[0].rangeLocation?.textHash).toBeDefined();
       expect(result[0].rangeLocation?.textLength).toBe(29); // "Associated text for comment 1"
       
+      // Range 位置信息 / Range position info
+      expect(result[0].rangeLocation?.start).toBe(0);
+      expect(result[0].rangeLocation?.end).toBe(29);
+      expect(result[0].rangeLocation?.storyType).toBe("MainText");
+      
+      // 段落位置信息 / Paragraph position info
+      expect(result[0].rangeLocation?.paragraphIndex).toBe(0);
+      
       // 字体信息 / Font info
       expect(result[0].rangeLocation?.font).toBe("Calibri");
       expect(result[0].rangeLocation?.fontSize).toBe(11);
       expect(result[0].rangeLocation?.isBold).toBe(false);
       expect(result[0].rangeLocation?.isItalic).toBe(false);
       expect(result[0].rangeLocation?.isUnderlined).toBe(false);
-      
-      // 注意：paragraphIndex 获取需要多次 sync，已暂时移除以避免性能问题
-      // Note: paragraphIndex retrieval requires multiple syncs, temporarily removed to avoid performance issues
-      // expect(result[0].rangeLocation?.paragraphIndex).toBe(0);
     });
   });
 
@@ -331,10 +335,9 @@ function createMockContextWithComments(
       getRange: vi.fn().mockReturnValue({
         text: `Associated text for comment ${i + 1}`,
         start: i * 100,
+        end: i * 100 + 29, // "Associated text for comment X" 长度为 29
         style: "Normal",
-        storyType: "MainText",
         isEmpty: false,
-        isListItem: false,
         font: {
           name: "Calibri",
           size: 11,
@@ -345,6 +348,7 @@ function createMockContextWithComments(
           load: vi.fn().mockReturnThis(),
         },
         parentBody: {
+          type: "MainText",
           paragraphs: {
             items: [
               {
@@ -375,6 +379,14 @@ function createMockContextWithComments(
     load: vi.fn().mockReturnThis(),
   };
 
+  // 创建模拟的段落 / Create mock paragraphs
+  const mockParagraphs = Array.from({ length: commentCount }, (_, i) => ({
+    text: `Associated text for comment ${i + 1}`,
+    isListItem: false,
+    listItem: null,
+    load: vi.fn().mockReturnThis(),
+  }));
+
   return {
     document: {
       getSelection: vi.fn().mockReturnValue(mockSelection),
@@ -383,6 +395,10 @@ function createMockContextWithComments(
           items: mockComments,
           load: vi.fn().mockReturnThis(),
         }),
+        paragraphs: {
+          items: mockParagraphs,
+          load: vi.fn().mockReturnThis(),
+        },
       },
     },
     sync: vi.fn().mockResolvedValue(undefined),
