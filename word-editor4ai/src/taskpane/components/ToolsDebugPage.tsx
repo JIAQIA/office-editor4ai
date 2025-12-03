@@ -30,6 +30,7 @@ import { DeleteTableDebug } from "./tools/DeleteTableDebug";
 import { UpdateTableDebug } from "./tools/UpdateTableDebug";
 import { QueryTableDebug } from "./tools/QueryTableDebug";
 import { InsertTextBoxDebug } from "./tools/InsertTextBoxDebug";
+import { InsertShapeDebug } from "./tools/InsertShapeDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -319,6 +320,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertTextBoxDebug />
+            </div>
+          </>
+        );
+      case "insert-shape":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入形状工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入各种形状，支持自定义样式、尺寸和位置
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertShapeDebug />
             </div>
           </>
         );

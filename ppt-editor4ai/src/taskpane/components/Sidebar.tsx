@@ -48,12 +48,45 @@ const useStyles = makeStyles({
     borderRight: `1px solid ${tokens.colorNeutralStroke1}`,
     display: "flex",
     flexDirection: "column",
-    padding: "8px 0",
     transition: "width 0.3s ease",
     flexShrink: 0,
   },
   sidebarCollapsed: {
     width: "48px",
+  },
+  scrollContainer: {
+    flex: 1,
+    overflowY: "auto",
+    overflowX: "hidden",
+    padding: "8px 0",
+    // 隐藏滚动条但保持滚动功能 / Hide scrollbar but keep scroll functionality
+    scrollbarWidth: "thin",
+    scrollbarColor: "transparent transparent",
+    "::-webkit-scrollbar": {
+      width: "6px",
+    },
+    "::-webkit-scrollbar-track": {
+      background: "transparent",
+    },
+    "::-webkit-scrollbar-thumb": {
+      background: "transparent",
+      borderRadius: "3px",
+    },
+    ":hover": {
+      scrollbarColor: `${tokens.colorNeutralStroke2} transparent`,
+      "::-webkit-scrollbar-thumb": {
+        background: tokens.colorNeutralStroke2,
+      },
+    },
+  },
+  scrollContainerCollapsed: {
+    padding: "8px 2px",
+  },
+  toggleButtonWrapper: {
+    padding: "8px 0",
+    flexShrink: 0,
+  },
+  toggleButtonWrapperCollapsed: {
     padding: "8px 2px",
   },
   toggleButton: {
@@ -192,16 +225,20 @@ const Sidebar: React.FC<SidebarProps> = ({
   return (
     <div className={`${styles.sidebar} ${isCollapsed ? styles.sidebarCollapsed : ""}`}>
       {/* 折叠/展开按钮 / Toggle button */}
-      <Button
-        appearance="subtle"
-        className={`${styles.toggleButton} ${isCollapsed ? styles.toggleButtonCollapsed : ""}`}
-        onClick={onToggleCollapse}
-        title={isCollapsed ? "展开侧边栏" : "折叠侧边栏"}
-      >
-        {isCollapsed ? <Navigation24Regular /> : <Dismiss24Regular />}
-      </Button>
+      <div className={`${styles.toggleButtonWrapper} ${isCollapsed ? styles.toggleButtonWrapperCollapsed : ""}`}>
+        <Button
+          appearance="subtle"
+          className={`${styles.toggleButton} ${isCollapsed ? styles.toggleButtonCollapsed : ""}`}
+          onClick={onToggleCollapse}
+          title={isCollapsed ? "展开侧边栏" : "折叠侧边栏"}
+        >
+          {isCollapsed ? <Navigation24Regular /> : <Dismiss24Regular />}
+        </Button>
+      </div>
 
-      {/* 首页菜单项 */}
+      {/* 可滚动菜单容器 / Scrollable menu container */}
+      <div className={`${styles.scrollContainer} ${isCollapsed ? styles.scrollContainerCollapsed : ""}`}>
+        {/* 首页菜单项 */}
       <Button
         appearance="subtle"
         className={`${styles.menuItem} ${isCollapsed ? styles.menuItemCollapsed : ""} ${
@@ -601,6 +638,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </Button>
         </div>
       )}
+      </div>
     </div>
   );
 };
