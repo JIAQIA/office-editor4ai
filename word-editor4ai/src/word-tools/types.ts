@@ -516,3 +516,57 @@ export interface GetCommentsOptions {
   /** 文本内容的最大长度，默认不限制 / Max text length, default unlimited */
   maxTextLength?: number;
 }
+
+/**
+ * 文本格式 / Text Format
+ */
+export interface TextFormat {
+  /** 字体名称 / Font name */
+  fontName?: string;
+  /** 字体大小（磅）/ Font size in points */
+  fontSize?: number;
+  /** 是否加粗 / Is bold */
+  bold?: boolean;
+  /** 是否斜体 / Is italic */
+  italic?: boolean;
+  /** 下划线类型 / Underline type */
+  underline?: Word.UnderlineType | string;
+  /** 字体颜色 / Font color */
+  color?: string;
+  /** 高亮颜色 / Highlight color */
+  highlightColor?: string;
+  /** 删除线 / Strikethrough */
+  strikeThrough?: boolean;
+  /** 上标 / Superscript */
+  superscript?: boolean;
+  /** 下标 / Subscript */
+  subscript?: boolean;
+}
+
+/**
+ * 图片数据 / Image Data
+ */
+export interface ImageData {
+  /** Base64 编码的图片数据 / Base64 encoded image data */
+  base64: string;
+  /** 图片宽度（磅），可选 / Image width in points, optional */
+  width?: number;
+  /** 图片高度（磅），可选 / Image height in points, optional */
+  height?: number;
+  /** 替代文本，可选 / Alt text, optional */
+  altText?: string;
+}
+
+/**
+ * 替换选中内容的选项 / Replace Selection Options
+ */
+export interface ReplaceSelectionOptions {
+  /** 文本内容 / Text content */
+  text?: string;
+  /** 文本格式（可选，不指定则使用原格式）/ Text format (optional, use original format if not specified) */
+  format?: TextFormat;
+  /** 图片列表（可选，按顺序插入）/ Image list (optional, insert in order) */
+  images?: ImageData[];
+  /** 是否替换选中内容（默认为 true）/ Replace selection (default true) */
+  replaceSelection?: boolean;
+}

@@ -20,6 +20,7 @@ import SelectedContent from "./tools/SelectedContent";
 import HeaderFooterContent from "./tools/HeaderFooterContent";
 import TextBoxContent from "./tools/TextBoxContent";
 import Comments from "./tools/Comments";
+import { ReplaceSelection } from "./tools/ReplaceSelection";
 import { insertText } from "../taskpane";
 
 interface ToolsDebugPageProps {
@@ -196,6 +197,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <Comments />
+            </div>
+          </>
+        );
+      case "replace-selection":
+        return (
+          <>
+            <h1 className={styles.title}>
+              替换选中内容工具
+            </h1>
+            <p className={styles.subtitle}>
+              替换或插入文本到选中位置，支持自定义格式（字体、字号、颜色等）或保持原格式
+            </p>
+            <div className={styles.toolContainer}>
+              <ReplaceSelection />
             </div>
           </>
         );
