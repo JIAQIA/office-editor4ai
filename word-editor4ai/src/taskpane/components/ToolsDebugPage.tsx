@@ -25,7 +25,10 @@ import { insertText } from "../taskpane";
 import { appendText } from "../../word-tools";
 import { AppendTextDebug } from "./tools/AppendTextDebug";
 import { InsertImageDebug } from "./tools/InsertImageDebug";
-import { InsertTableDebug } from "./tools/InsertTableDebug";
+import { CreateTableDebug } from "./tools/CreateTableDebug";
+import { DeleteTableDebug } from "./tools/DeleteTableDebug";
+import { UpdateTableDebug } from "./tools/UpdateTableDebug";
+import { QueryTableDebug } from "./tools/QueryTableDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -248,17 +251,59 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </div>
           </>
         );
-      case "insert-table":
+      case "create-table":
         return (
           <>
             <h1 className={styles.title}>
-              插入表格工具
+              创建表格工具
             </h1>
             <p className={styles.subtitle}>
-              在文档中插入和管理表格，支持插入、更新、查询、删除表格，以及行列操作、单元格格式化和合并等功能
+              在文档中插入表格，支持自定义行列数、样式、边框、对齐方式等选项
             </p>
             <div className={styles.toolContainer}>
-              <InsertTableDebug />
+              <CreateTableDebug />
+            </div>
+          </>
+        );
+      case "delete-table":
+        return (
+          <>
+            <h1 className={styles.title}>
+              删除表格工具
+            </h1>
+            <p className={styles.subtitle}>
+              删除文档中的表格，支持按索引删除或删除选中的表格
+            </p>
+            <div className={styles.toolContainer}>
+              <DeleteTableDebug />
+            </div>
+          </>
+        );
+      case "update-table":
+        return (
+          <>
+            <h1 className={styles.title}>
+              更新表格工具
+            </h1>
+            <p className={styles.subtitle}>
+              更新表格内容和格式，支持更新整个表格、单个单元格、行列操作和单元格合并
+            </p>
+            <div className={styles.toolContainer}>
+              <UpdateTableDebug />
+            </div>
+          </>
+        );
+      case "query-table":
+        return (
+          <>
+            <h1 className={styles.title}>
+              查询表格工具
+            </h1>
+            <p className={styles.subtitle}>
+              查询文档中的表格信息，支持查询单个表格或所有表格的详细信息
+            </p>
+            <div className={styles.toolContainer}>
+              <QueryTableDebug />
             </div>
           </>
         );

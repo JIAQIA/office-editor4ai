@@ -259,8 +259,10 @@ export const InsertTableDebug: React.FC = () => {
     setResult(null);
 
     try {
+      // 如果索引为空，不传递 tableIndex 以使用选中的表格 / If index is empty, don't pass tableIndex to use selected table
+      const index = updateTableIndex.trim() === "" ? undefined : parseInt(updateTableIndex);
       const options: UpdateTableOptions = {
-        tableIndex: parseInt(updateTableIndex),
+        tableIndex: index,
         data: parseTableData(updateData),
         alignment,
         styleOptions: {
@@ -342,7 +344,9 @@ export const InsertTableDebug: React.FC = () => {
     setResult(null);
 
     try {
-      const info = await getTableInfo(parseInt(queryTableIndex));
+      // 如果索引为空，传递 undefined 以使用选中的表格 / If index is empty, pass undefined to use selected table
+      const index = queryTableIndex.trim() === "" ? undefined : parseInt(queryTableIndex);
+      const info = await getTableInfo(index);
 
       if (info) {
         setTableInfo(info);
@@ -394,7 +398,9 @@ export const InsertTableDebug: React.FC = () => {
     setResult(null);
 
     try {
-      const deleteResult = await deleteTable(parseInt(deleteTableIndex));
+      // 如果索引为空，传递 undefined 以使用选中的表格 / If index is empty, pass undefined to use selected table
+      const index = deleteTableIndex.trim() === "" ? undefined : parseInt(deleteTableIndex);
+      const deleteResult = await deleteTable(index);
 
       if (deleteResult.success) {
         setResult({

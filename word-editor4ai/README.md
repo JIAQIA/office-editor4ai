@@ -89,7 +89,7 @@ insertListItem(text: string, listType: 'bullet' | 'number', location: InsertLoca
 insertImage(imageData: string, location: InsertLocation, options?: ImageOptions): Promise<void>
 
 // 插入表格
-insertTable(rows: number, cols: number, location: InsertLocation, data?: string[][]): Promise<void>
+table(rows: number, cols: number, location: InsertLocation, data?: string[][]): Promise<void>
 
 // 插入文本框
 insertTextBox(text: string, location: InsertLocation, options?: TextBoxOptions): Promise<void>

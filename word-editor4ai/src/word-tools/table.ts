@@ -135,8 +135,8 @@ export interface InsertTableOptions {
  * 更新表格选项 / Update Table Options
  */
 export interface UpdateTableOptions {
-  /** 表格索引（从0开始）/ Table index (0-based) */
-  tableIndex: number;
+  /** 表格索引（从0开始，可选）。如果为空，尝试获取当前选中的表格 / Table index (0-based, optional). If empty, try to get the currently selected table */
+  tableIndex?: number;
   /** 新的表格数据（可选）/ New table data (optional) */
   data?: string[][];
   /** 表格样式选项 / Table style options */
@@ -257,8 +257,11 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
       // 插入表格 / Insert table
       // Word API 的 insertTable 只支持 "Before" 和 "After"，其他位置通过 Range 来控制
       // Word API's insertTable only supports "Before" and "After", other positions are controlled by Range
-      const apiInsertLocation: Word.InsertLocation.before | Word.InsertLocation.after | "Before" | "After" =
-        insertLocation === "Start" || insertLocation === "Before" ? "Before" : "After";
+      const apiInsertLocation:
+        | Word.InsertLocation.before
+        | Word.InsertLocation.after
+        | "Before"
+        | "After" = insertLocation === "Start" || insertLocation === "Before" ? "Before" : "After";
       // insertTable 的第四个参数需要 string[][]（二维数组）
       // The 4th parameter of insertTable requires string[][] (2D array)
       const initialValues = headerRow ? [headerRow] : data?.[0] ? [data[0]] : undefined;
@@ -283,7 +286,7 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
       if (columnWidths !== undefined) {
         table.columns.load("items");
         await context.sync();
-        
+
         if (typeof columnWidths === "number") {
           // 所有列使用相同宽度 / All columns use same width
           for (let j = 0; j < cols; j++) {
@@ -344,7 +347,7 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
       if (dataFormat) {
         table.rows.load("items");
         await context.sync();
-        
+
         const startRow = headerRow || data?.[0] ? 1 : 0;
         for (let i = startRow; i < rows; i++) {
           const row = table.rows.items[i];
@@ -389,10 +392,14 @@ export async function insertTable(options: InsertTableOptions): Promise<InsertTa
  * 应用单元格格式
  * Apply cell format
  */
-async function applyCellFormat(cells: Word.TableCellCollection, format: CellFormatOptions, context: Word.RequestContext): Promise<void> {
+async function applyCellFormat(
+  cells: Word.TableCellCollection,
+  format: CellFormatOptions,
+  context: Word.RequestContext
+): Promise<void> {
   cells.load("items");
   await context.sync();
-  
+
   for (const cell of cells.items) {
     if (format.alignment) {
       cell.horizontalAlignment = format.alignment as Word.Alignment;
@@ -432,16 +439,42 @@ export async function updateTable(options: UpdateTableOptions): Promise<InsertTa
   const { tableIndex, data, styleOptions, borderOptions, columnWidths, alignment } = options;
 
   try {
+    let actualTableIndex: number | undefined;
+
     await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+      let table: Word.Table;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+
+        // 尝试获取父表格 / Try to get parent table
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        // 直接使用 parentTable / Use parentTable directly
+        table = parentTable;
+        actualTableIndex = -1; // 无法确定索引 / Cannot determine index
+      } else {
+        // 使用提供的索引 / Use provided index
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
-
-      const table = tables.items[tableIndex];
       table.load("rowCount");
       await context.sync();
 
@@ -450,7 +483,7 @@ export async function updateTable(options: UpdateTableOptions): Promise<InsertTa
         table.columns.load("items");
         await context.sync();
         const columnCount = table.columns.items.length;
-        
+
         for (let i = 0; i < data.length && i < table.rowCount; i++) {
           const rowData = data[i];
           for (let j = 0; j < rowData.length && j < columnCount; j++) {
@@ -520,7 +553,7 @@ export async function updateTable(options: UpdateTableOptions): Promise<InsertTa
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("更新表格失败 / Update table failed:", error);
@@ -559,7 +592,9 @@ export async function updateCell(options: UpdateCellOptions): Promise<InsertTabl
 
       const columnCount = table.columns.items.length;
       if (columnIndex < 0 || columnIndex >= columnCount) {
-        throw new Error(`列索引 ${columnIndex} 超出范围 / Column index ${columnIndex} out of range`);
+        throw new Error(
+          `列索引 ${columnIndex} 超出范围 / Column index ${columnIndex} out of range`
+        );
       }
 
       const cell = table.getCell(rowIndex, columnIndex);
@@ -618,27 +653,54 @@ export async function updateCell(options: UpdateCellOptions): Promise<InsertTabl
 /**
  * 获取表格信息
  * Get table info
+ * @param tableIndex 表格索引（可选）。如果为空，尝试获取当前选中的表格 / Table index (optional). If empty, try to get the currently selected table
  */
-export async function getTableInfo(tableIndex: number): Promise<TableInfo | null> {
+export async function getTableInfo(tableIndex?: number): Promise<TableInfo | null> {
   try {
     let tableInfo: TableInfo | null = null;
 
     await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+      let table: Word.Table;
+      let actualTableIndex: number;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+
+        // 尝试获取父表格 / Try to get parent table
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        // 直接使用 parentTable / Use parentTable directly
+        table = parentTable;
+        actualTableIndex = -1; // 无法确定索引 / Cannot determine index
+      } else {
+        // 使用提供的索引 / Use provided index
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.load("rowCount, style, alignment, width, values");
       table.columns.load("items");
       await context.sync();
 
       tableInfo = {
-        index: tableIndex,
+        index: actualTableIndex,
         rowCount: table.rowCount,
         columnCount: table.columns.items.length,
         data: table.values as string[][],
@@ -696,27 +758,67 @@ export async function getAllTablesInfo(): Promise<TableInfo[]> {
 /**
  * 删除表格
  * Delete table
+ * @param tableIndex 表格索引（可选）。如果为空，尝试删除当前选中的表格 / Table index (optional). If empty, try to delete the currently selected table
  */
-export async function deleteTable(tableIndex: number): Promise<InsertTableResult> {
+export async function deleteTable(tableIndex?: number): Promise<InsertTableResult> {
   try {
+    let actualTableIndex: number | undefined;
+
     await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+      let table: Word.Table | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+
+        // 尝试获取父表格 / Try to get parent table
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        // 加载表格的基本属性以确保对象完整 / Load basic properties to ensure object is complete
+        parentTable.load("rowCount");
+        await context.sync();
+
+        // 删除表格 / Delete table
+        parentTable.delete();
+
+        // 获取该表格在文档中的索引（用于返回值）/ Get the table index in document (for return value)
+        const allTables = context.document.body.tables;
+        allTables.load("items");
+        await context.sync();
+
+        // 由于表格已被删除，我们无法通过引用查找索引，返回 -1 表示未知索引
+        // Since table is deleted, we cannot find index by reference, return -1 for unknown index
+        actualTableIndex = -1;
+      } else {
+        // 使用提供的索引 / Use provided index
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
+
+        table.delete();
       }
-
-      const table = tables.items[tableIndex];
-      table.delete();
 
       await context.sync();
     });
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("删除表格失败 / Delete table failed:", error);
@@ -730,24 +832,51 @@ export async function deleteTable(tableIndex: number): Promise<InsertTableResult
 /**
  * 在表格中添加行
  * Add rows to table
+ * @param tableIndex 表格索引（可选）。如果为空，尝试使用当前选中的表格 / Table index (optional). If empty, try to use the currently selected table
+ * @param rowCount
+ * @param insertAt
+ * @param values
  */
 export async function addTableRows(
-  tableIndex: number,
+  tableIndex: number | undefined,
   rowCount: number,
   insertAt: "Start" | "End" = "End",
   values?: string[][]
 ): Promise<InsertTableResult> {
   try {
-    await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+    let actualTableIndex: number | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+    await Word.run(async (context) => {
+      let table: Word.Table;
+
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        table = parentTable;
+        actualTableIndex = undefined;
+      } else {
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.load(["rowCount"]);
       table.columns.load("items");
       await context.sync();
@@ -774,7 +903,7 @@ export async function addTableRows(
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("添加表格行失败 / Add table rows failed:", error);
@@ -788,24 +917,51 @@ export async function addTableRows(
 /**
  * 在表格中添加列
  * Add columns to table
+ * @param tableIndex 表格索引（可选）。如果为空，尝试使用当前选中的表格 / Table index (optional). If empty, try to use the currently selected table
+ * @param columnCount
+ * @param insertAt
+ * @param values
  */
 export async function addTableColumns(
-  tableIndex: number,
+  tableIndex: number | undefined,
   columnCount: number,
   insertAt: "Start" | "End" = "End",
   values?: string[][]
 ): Promise<InsertTableResult> {
   try {
-    await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+    let actualTableIndex: number | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+    await Word.run(async (context) => {
+      let table: Word.Table;
+
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        table = parentTable;
+        actualTableIndex = undefined;
+      } else {
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.load(["rowCount"]);
       table.columns.load("items");
       await context.sync();
@@ -832,7 +988,7 @@ export async function addTableColumns(
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("添加表格列失败 / Add table columns failed:", error);
@@ -846,28 +1002,56 @@ export async function addTableColumns(
 /**
  * 删除表格行
  * Delete table rows
+ * @param tableIndex 表格索引（可选）。如果为空，尝试使用当前选中的表格 / Table index (optional). If empty, try to use the currently selected table
+ * @param startRowIndex
+ * @param rowCount
  */
 export async function deleteTableRows(
-  tableIndex: number,
+  tableIndex: number | undefined,
   startRowIndex: number,
   rowCount: number = 1
 ): Promise<InsertTableResult> {
   try {
-    await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+    let actualTableIndex: number | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+    await Word.run(async (context) => {
+      let table: Word.Table;
+
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        table = parentTable;
+        actualTableIndex = undefined;
+      } else {
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.load("rowCount");
       await context.sync();
 
       if (startRowIndex < 0 || startRowIndex >= table.rowCount) {
-        throw new Error(`行索引 ${startRowIndex} 超出范围 / Row index ${startRowIndex} out of range`);
+        throw new Error(
+          `行索引 ${startRowIndex} 超出范围 / Row index ${startRowIndex} out of range`
+        );
       }
 
       // 删除行 / Delete rows
@@ -881,7 +1065,7 @@ export async function deleteTableRows(
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("删除表格行失败 / Delete table rows failed:", error);
@@ -895,23 +1079,49 @@ export async function deleteTableRows(
 /**
  * 删除表格列
  * Delete table columns
+ * @param tableIndex 表格索引（可选）。如果为空，尝试使用当前选中的表格 / Table index (optional). If empty, try to use the currently selected table
+ * @param startColumnIndex
+ * @param columnCount
  */
 export async function deleteTableColumns(
-  tableIndex: number,
+  tableIndex: number | undefined,
   startColumnIndex: number,
   columnCount: number = 1
 ): Promise<InsertTableResult> {
   try {
-    await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+    let actualTableIndex: number | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+    await Word.run(async (context) => {
+      let table: Word.Table;
+
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        table = parentTable;
+        actualTableIndex = undefined;
+      } else {
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.columns.load("items");
       await context.sync();
       const tableColumnCount = table.columns.items.length;
@@ -933,7 +1143,7 @@ export async function deleteTableColumns(
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("删除表格列失败 / Delete table columns failed:", error);
@@ -947,25 +1157,53 @@ export async function deleteTableColumns(
 /**
  * 合并单元格
  * Merge cells
+ * @param tableIndex 表格索引（可选）。如果为空，尝试使用当前选中的表格 / Table index (optional). If empty, try to use the currently selected table
+ * @param startRowIndex
+ * @param startColumnIndex
+ * @param endRowIndex
+ * @param endColumnIndex
  */
 export async function mergeCells(
-  tableIndex: number,
+  tableIndex: number | undefined,
   startRowIndex: number,
   startColumnIndex: number,
   endRowIndex: number,
   endColumnIndex: number
 ): Promise<InsertTableResult> {
   try {
-    await Word.run(async (context) => {
-      const tables = context.document.body.tables;
-      tables.load("items");
-      await context.sync();
+    let actualTableIndex: number | undefined;
 
-      if (tableIndex < 0 || tableIndex >= tables.items.length) {
-        throw new Error(`表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`);
+    await Word.run(async (context) => {
+      let table: Word.Table;
+
+      // 如果没有提供表格索引，尝试获取选中的表格 / If no table index provided, try to get selected table
+      if (tableIndex === undefined) {
+        const selection = context.document.getSelection();
+        const parentTable = selection.parentTableOrNullObject;
+        parentTable.load("isNullObject");
+        await context.sync();
+
+        if (parentTable.isNullObject) {
+          throw new Error("光标未在任何表格内 / Cursor is not inside any table");
+        }
+
+        table = parentTable;
+        actualTableIndex = undefined;
+      } else {
+        const tables = context.document.body.tables;
+        tables.load("items");
+        await context.sync();
+
+        if (tableIndex < 0 || tableIndex >= tables.items.length) {
+          throw new Error(
+            `表格索引 ${tableIndex} 超出范围 / Table index ${tableIndex} out of range`
+          );
+        }
+
+        table = tables.items[tableIndex];
+        actualTableIndex = tableIndex;
       }
 
-      const table = tables.items[tableIndex];
       table.load("rowCount");
       table.columns.load("items");
       await context.sync();
@@ -997,7 +1235,7 @@ export async function mergeCells(
 
     return {
       success: true,
-      tableIndex,
+      tableIndex: actualTableIndex,
     };
   } catch (error) {
     console.error("合并单元格失败 / Merge cells failed:", error);

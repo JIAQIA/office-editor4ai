@@ -299,15 +299,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Button
             appearance="subtle"
             className={`${styles.submenuItem} ${
-              currentPage === "create" && currentTool === "insert-table"
+              currentPage === "create" && currentTool === "create-table"
                 ? styles.submenuItemActive
                 : styles.submenuItemHover
             }`}
-            onClick={() => onNavigate("create", "insert-table")}
+            onClick={() => onNavigate("create", "create-table")}
           >
             <div className={styles.menuItemContent}>
               <Table24Regular className={styles.icon} />
-              <span className={styles.label}>插入表格</span>
+              <span className={styles.label}>创建表格</span>
             </div>
           </Button>
         </div>
@@ -321,7 +321,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         }`}
         onClick={() => {
           if (isCollapsed) {
-            // 暂时没有工具，不导航
+            onNavigate("delete", "delete-table");
           } else {
             setDeleteExpanded(!deleteExpanded);
           }
@@ -346,10 +346,23 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </Button>
 
-      {/* 删除元素类二级菜单 - 暂时为空 */}
+      {/* 删除元素类二级菜单 */}
       {!isCollapsed && (
         <div className={`${styles.submenu} ${!deleteExpanded ? styles.submenuCollapsed : ""}`}>
-          {/* 后续添加删除类工具 */}
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "delete" && currentTool === "delete-table"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("delete", "delete-table")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>删除表格</span>
+            </div>
+          </Button>
         </div>
       )}
 
@@ -399,6 +412,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <ArrowSwap24Regular className={styles.icon} />
               <span className={styles.label}>替换选中内容</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "update" && currentTool === "update-table"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("update", "update-table")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>更新表格</span>
             </div>
           </Button>
         </div>
@@ -564,6 +591,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <Comment24Regular className={styles.icon} />
               <span className={styles.label}>批注内容获取</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "query" && currentTool === "query-table"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("query", "query-table")}
+          >
+            <div className={styles.menuItemContent}>
+              <Table24Regular className={styles.icon} />
+              <span className={styles.label}>查询表格</span>
             </div>
           </Button>
         </div>
