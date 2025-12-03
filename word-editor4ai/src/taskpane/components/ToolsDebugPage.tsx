@@ -22,6 +22,8 @@ import TextBoxContent from "./tools/TextBoxContent";
 import Comments from "./tools/Comments";
 import { ReplaceSelection } from "./tools/ReplaceSelection";
 import { insertText } from "../taskpane";
+import { appendText } from "../../word-tools";
+import { AppendTextDebug } from "./tools/AppendTextDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -211,6 +213,22 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <ReplaceSelection />
+            </div>
+          </>
+        );
+      case "append-text":
+        return (
+          <>
+            <h1 className={styles.title}>
+              文档末尾追加文本工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档末尾追加文本或图片，支持自定义文本格式
+            </p>
+            <div className={styles.toolContainer}>
+              <AppendTextDebug 
+                appendText={appendText}
+              />
             </div>
           </>
         );

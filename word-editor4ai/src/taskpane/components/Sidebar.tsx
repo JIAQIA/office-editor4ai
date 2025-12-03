@@ -31,6 +31,7 @@ import {
   Textbox24Regular,
   Comment24Regular,
   ArrowSwap24Regular,
+  ArrowDown24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -263,6 +264,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className={styles.menuItemContent}>
               <TextGrammarSettings24Regular className={styles.icon} />
               <span className={styles.label}>文本插入工具</span>
+            </div>
+          </Button>
+          <Button
+            appearance="subtle"
+            className={`${styles.submenuItem} ${
+              currentPage === "create" && currentTool === "append-text"
+                ? styles.submenuItemActive
+                : styles.submenuItemHover
+            }`}
+            onClick={() => onNavigate("create", "append-text")}
+          >
+            <div className={styles.menuItemContent}>
+              <ArrowDown24Regular className={styles.icon} />
+              <span className={styles.label}>文档末尾追加文本</span>
             </div>
           </Button>
         </div>

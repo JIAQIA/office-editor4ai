@@ -22,3 +22,4 @@ export * from "./headerFooterContent";
 export * from "./textBoxContent";
 export * from "./comments";
 export * from "./replaceSelection";
+export * from "./appendText";
