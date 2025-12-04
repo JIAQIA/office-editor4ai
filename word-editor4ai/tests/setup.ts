@@ -89,6 +89,8 @@ global.Word = {
       insertText: vi.fn().mockReturnThis(),
       insertInlinePictureFromBase64: vi.fn().mockReturnValue(mockInlinePicture),
       insertPictureFromBase64: vi.fn().mockReturnValue(mockShape),
+      insertBreak: vi.fn().mockReturnThis(),
+      delete: vi.fn(),
       getRange: vi.fn().mockReturnThis(),
       load: vi.fn(),
     };
@@ -138,6 +140,16 @@ global.Word = {
     topBottom: 'topBottom',
     behind: 'behind',
     front: 'front',
+  },
+  BreakType: {
+    page: 'Page',
+    column: 'Column',
+    next: 'Next',
+    sectionNext: 'SectionNext',
+    sectionContinuous: 'SectionContinuous',
+    sectionEven: 'SectionEven',
+    sectionOdd: 'SectionOdd',
+    line: 'Line',
   },
 } as any;
 

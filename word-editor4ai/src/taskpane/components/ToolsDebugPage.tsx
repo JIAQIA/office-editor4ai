@@ -31,6 +31,7 @@ import { UpdateTableDebug } from "./tools/UpdateTableDebug";
 import { QueryTableDebug } from "./tools/QueryTableDebug";
 import { InsertTextBoxDebug } from "./tools/InsertTextBoxDebug";
 import { InsertShapeDebug } from "./tools/InsertShapeDebug";
+import { InsertPageBreakDebug } from "./tools/InsertPageBreakDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -334,6 +335,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertShapeDebug />
+            </div>
+          </>
+        );
+      case "insert-page-break":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入分页符工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入分页符，强制在指定位置开始新的一页
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertPageBreakDebug />
             </div>
           </>
         );

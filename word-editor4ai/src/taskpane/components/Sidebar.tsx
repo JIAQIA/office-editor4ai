@@ -382,6 +382,20 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span className={styles.label}>插入形状</span>
               </div>
             </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "create" && currentTool === "insert-page-break"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("create", "insert-page-break")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentPageBreak24Regular className={styles.icon} />
+                <span className={styles.label}>插入分页符</span>
+              </div>
+            </Button>
           </div>
         )}
 

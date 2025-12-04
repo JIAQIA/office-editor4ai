@@ -26,4 +26,5 @@ export * from "./appendText";
 export * from "./insertImage";
 export * from "./insertTextBox";
 export * from "./insertShape";
+export * from "./insertPageBreak";
 export * from "./table";
