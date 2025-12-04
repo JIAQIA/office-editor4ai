@@ -24,6 +24,7 @@ import {
   Eye24Regular,
   DocumentBulletList24Regular,
   DocumentPageBreak24Regular,
+  DocumentSplitHint24Regular,
   DocumentData24Regular,
   DocumentOnePage24Regular,
   TextEffects24Regular,
@@ -394,6 +395,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <DocumentPageBreak24Regular className={styles.icon} />
                 <span className={styles.label}>插入分页符</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "create" && currentTool === "insert-section-break"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("create", "insert-section-break")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentSplitHint24Regular className={styles.icon} />
+                <span className={styles.label}>插入分节符</span>
               </div>
             </Button>
           </div>

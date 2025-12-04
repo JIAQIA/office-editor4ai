@@ -32,6 +32,7 @@ import { QueryTableDebug } from "./tools/QueryTableDebug";
 import { InsertTextBoxDebug } from "./tools/InsertTextBoxDebug";
 import { InsertShapeDebug } from "./tools/InsertShapeDebug";
 import { InsertPageBreakDebug } from "./tools/InsertPageBreakDebug";
+import { InsertSectionBreakDebug } from "./tools/InsertSectionBreakDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -349,6 +350,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertPageBreakDebug />
+            </div>
+          </>
+        );
+      case "insert-section-break":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入分节符工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入分节符，将文档分成不同的节，每节可以有独立的页面设置
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertSectionBreakDebug />
             </div>
           </>
         );
