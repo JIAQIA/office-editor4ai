@@ -33,6 +33,11 @@ import { InsertTextBoxDebug } from "./tools/InsertTextBoxDebug";
 import { InsertShapeDebug } from "./tools/InsertShapeDebug";
 import { InsertPageBreakDebug } from "./tools/InsertPageBreakDebug";
 import { InsertSectionBreakDebug } from "./tools/InsertSectionBreakDebug";
+import { TableOfContentsDebug } from "./tools/TableOfContentsDebug";
+import { InsertTableOfContents } from "./tools/InsertTableOfContents";
+import { DeleteTableOfContents } from "./tools/DeleteTableOfContents";
+import { UpdateTableOfContents } from "./tools/UpdateTableOfContents";
+import { QueryTableOfContents } from "./tools/QueryTableOfContents";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -364,6 +369,76 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertSectionBreakDebug />
+            </div>
+          </>
+        );
+      case "insert-toc":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入目录工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入目录，支持自定义标题级别、页码显示等选项
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertTableOfContents />
+            </div>
+          </>
+        );
+      case "delete-toc":
+        return (
+          <>
+            <h1 className={styles.title}>
+              删除目录工具
+            </h1>
+            <p className={styles.subtitle}>
+              删除文档中的目录，支持按索引删除或删除所有目录
+            </p>
+            <div className={styles.toolContainer}>
+              <DeleteTableOfContents />
+            </div>
+          </>
+        );
+      case "update-toc":
+        return (
+          <>
+            <h1 className={styles.title}>
+              更新目录工具
+            </h1>
+            <p className={styles.subtitle}>
+              更新文档中的目录，支持按索引更新或更新所有目录
+            </p>
+            <div className={styles.toolContainer}>
+              <UpdateTableOfContents />
+            </div>
+          </>
+        );
+      case "query-toc":
+        return (
+          <>
+            <h1 className={styles.title}>
+              查询目录工具
+            </h1>
+            <p className={styles.subtitle}>
+              查询文档中的目录信息，获取所有目录的详细信息
+            </p>
+            <div className={styles.toolContainer}>
+              <QueryTableOfContents />
+            </div>
+          </>
+        );
+      case "table-of-contents":
+        return (
+          <>
+            <h1 className={styles.title}>
+              目录管理工具（已废弃）
+            </h1>
+            <p className={styles.subtitle}>
+              此工具已拆分为插入、删除、更新、查询四个独立工具，请从左侧菜单选择对应的工具
+            </p>
+            <div className={styles.toolContainer}>
+              <TableOfContentsDebug />
             </div>
           </>
         );

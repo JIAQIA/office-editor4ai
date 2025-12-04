@@ -29,3 +29,4 @@ export * from "./insertShape";
 export * from "./insertPageBreak";
 export * from "./insertSectionBreak";
 export * from "./table";
+export * from "./tableOfContents";

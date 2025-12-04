@@ -36,6 +36,7 @@ import {
   Image24Regular,
   Table24Regular,
   Shapes24Regular,
+  DocumentTable24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -411,6 +412,20 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <span className={styles.label}>插入分节符</span>
               </div>
             </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "create" && currentTool === "insert-toc"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("create", "insert-toc")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentTable24Regular className={styles.icon} />
+                <span className={styles.label}>插入目录</span>
+              </div>
+            </Button>
           </div>
         )}
 
@@ -462,6 +477,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <Table24Regular className={styles.icon} />
                 <span className={styles.label}>删除表格</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "delete" && currentTool === "delete-toc"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("delete", "delete-toc")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentTable24Regular className={styles.icon} />
+                <span className={styles.label}>删除目录</span>
               </div>
             </Button>
           </div>
@@ -529,6 +558,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <Table24Regular className={styles.icon} />
                 <span className={styles.label}>更新表格</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "update" && currentTool === "update-toc"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("update", "update-toc")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentTable24Regular className={styles.icon} />
+                <span className={styles.label}>更新目录</span>
               </div>
             </Button>
           </div>
@@ -708,6 +751,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <Table24Regular className={styles.icon} />
                 <span className={styles.label}>查询表格</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "query" && currentTool === "query-toc"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("query", "query-toc")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentTable24Regular className={styles.icon} />
+                <span className={styles.label}>查询目录</span>
               </div>
             </Button>
           </div>
