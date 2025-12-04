@@ -224,10 +224,7 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
         }
 
         // 插入浮动图片 / Insert floating picture
-        const pictureShape = insertRange.insertPictureFromBase64(
-          cleanBase64,
-          insertShapeOptions
-        );
+        const pictureShape = insertRange.insertPictureFromBase64(cleanBase64, insertShapeOptions);
 
         // 设置形状属性 / Set shape properties
         // 注意：Word.Shape 只有 altTextDescription 属性，没有 altTextTitle
@@ -283,13 +280,13 @@ export async function insertImage(options: InsertImageOptions): Promise<InsertIm
 
         // 使用形状 ID 作为标识符 / Use shape ID as identifier
         imageId = `shape-${pictureShape.id}`;
-        
+
         // 注意：浮动图片作为 Shape 对象，不支持 hyperlink 属性
         // Note: Floating pictures as Shape objects do not support hyperlink property
         if (hyperlink) {
           console.warn(
             "浮动图片不支持超链接属性。如需超链接，请使用内联图片。/ " +
-            "Floating pictures do not support hyperlink property. Use inline pictures for hyperlinks."
+              "Floating pictures do not support hyperlink property. Use inline pictures for hyperlinks."
           );
         }
       }
