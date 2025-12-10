@@ -30,3 +30,4 @@ export * from "./insertPageBreak";
 export * from "./insertSectionBreak";
 export * from "./table";
 export * from "./tableOfContents";
+export * from "./insertEquation";

@@ -37,6 +37,7 @@ import {
   Table24Regular,
   Shapes24Regular,
   DocumentTable24Regular,
+  MathFormula24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -424,6 +425,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <DocumentTable24Regular className={styles.icon} />
                 <span className={styles.label}>插入目录</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "create" && currentTool === "insert-equation"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("create", "insert-equation")}
+            >
+              <div className={styles.menuItemContent}>
+                <MathFormula24Regular className={styles.icon} />
+                <span className={styles.label}>插入公式</span>
               </div>
             </Button>
           </div>

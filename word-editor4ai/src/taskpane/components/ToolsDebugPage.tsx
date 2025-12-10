@@ -38,6 +38,7 @@ import { InsertTableOfContents } from "./tools/InsertTableOfContents";
 import { DeleteTableOfContents } from "./tools/DeleteTableOfContents";
 import { UpdateTableOfContents } from "./tools/UpdateTableOfContents";
 import { QueryTableOfContents } from "./tools/QueryTableOfContents";
+import { InsertEquationDebug } from "./tools/InsertEquationDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -425,6 +426,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <QueryTableOfContents />
+            </div>
+          </>
+        );
+      case "insert-equation":
+        return (
+          <>
+            <h1 className={styles.title}>
+              插入公式工具
+            </h1>
+            <p className={styles.subtitle}>
+              在文档中插入数学公式，支持 LaTeX 格式，包括分数、根号、求和、积分等常见数学符号
+            </p>
+            <div className={styles.toolContainer}>
+              <InsertEquationDebug />
             </div>
           </>
         );
