@@ -22,6 +22,7 @@ import TextBoxContent from "./tools/TextBoxContent";
 import Comments from "./tools/Comments";
 import { ReplaceSelection } from "./tools/ReplaceSelection";
 import { ReplaceTextDebug } from "./tools/ReplaceTextDebug";
+import { ReplaceImageDebug } from "./tools/ReplaceImageDebug";
 import { insertText } from "../taskpane";
 import { appendText } from "../../word-tools";
 import { AppendTextDebug } from "./tools/AppendTextDebug";
@@ -243,6 +244,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <ReplaceTextDebug />
+            </div>
+          </>
+        );
+      case "replace-image":
+        return (
+          <>
+            <h1 className={styles.title}>
+              替换图片工具
+            </h1>
+            <p className={styles.subtitle}>
+              统一的图片替换工具，支持四种定位方式：当前选区、按索引、搜索匹配、指定范围。可替换图片内容或更新图片属性
+            </p>
+            <div className={styles.toolContainer}>
+              <ReplaceImageDebug />
             </div>
           </>
         );

@@ -578,6 +578,20 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Button
               appearance="subtle"
               className={`${styles.submenuItem} ${
+                currentPage === "update" && currentTool === "replace-image"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("update", "replace-image")}
+            >
+              <div className={styles.menuItemContent}>
+                <Image24Regular className={styles.icon} />
+                <span className={styles.label}>替换图片</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
                 currentPage === "update" && currentTool === "update-table"
                   ? styles.submenuItemActive
                   : styles.submenuItemHover
