@@ -236,14 +236,16 @@ export async function insertTableOfContents(
       if (!finalOptions.showPageNumbers) {
         tocFieldCode += " \\n";
       }
-      
+
       const tocField = insertRange.insertField(
-        location === "Before" || location === "Start" ? Word.InsertLocation.before : Word.InsertLocation.after,
+        location === "Before" || location === "Start"
+          ? Word.InsertLocation.before
+          : Word.InsertLocation.after,
         Word.FieldType.toc,
         tocFieldCode,
         false
       );
-      
+
       // 获取目录的结果范围 / Get TOC result range
       const tocRange = tocField.result;
       tocField.load("code");
@@ -322,7 +324,9 @@ export async function updateTableOfContents(tocIndex?: number): Promise<UpdateTO
           field.updateResult();
           updatedCount = 1;
         } else {
-          throw new Error(`目录索引 ${tocIndex} 超出范围 (0-${fields.items.length - 1}) / TOC index ${tocIndex} out of range (0-${fields.items.length - 1})`);
+          throw new Error(
+            `目录索引 ${tocIndex} 超出范围 (0-${fields.items.length - 1}) / TOC index ${tocIndex} out of range (0-${fields.items.length - 1})`
+          );
         }
       } else {
         // 更新所有目录 / Update all TOCs
@@ -462,7 +466,7 @@ export async function getTableOfContentsList(): Promise<GetTOCListResult> {
         const field = fields.items[i];
         field.load("result");
         await context.sync();
-        
+
         const range = field.result;
         range.load("text");
 
