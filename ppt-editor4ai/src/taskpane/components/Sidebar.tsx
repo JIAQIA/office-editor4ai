@@ -50,9 +50,10 @@ const useStyles = makeStyles({
     flexDirection: "column",
     transition: "width 0.3s ease",
     flexShrink: 0,
+    boxSizing: "border-box",
   },
   sidebarCollapsed: {
-    width: "48px",
+    width: "56px",
   },
   scrollContainer: {
     flex: 1,
@@ -126,7 +127,7 @@ const useStyles = makeStyles({
     overflow: "hidden",
   },
   menuItemCollapsed: {
-    padding: "10px 4px",
+    padding: "10px 8px",
     justifyContent: "center",
     minWidth: "unset",
   },
