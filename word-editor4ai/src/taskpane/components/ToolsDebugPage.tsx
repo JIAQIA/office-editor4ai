@@ -21,6 +21,7 @@ import HeaderFooterContent from "./tools/HeaderFooterContent";
 import TextBoxContent from "./tools/TextBoxContent";
 import Comments from "./tools/Comments";
 import { ReplaceSelection } from "./tools/ReplaceSelection";
+import { ReplaceTextDebug } from "./tools/ReplaceTextDebug";
 import { insertText } from "../taskpane";
 import { appendText } from "../../word-tools";
 import { AppendTextDebug } from "./tools/AppendTextDebug";
@@ -228,6 +229,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <ReplaceSelection />
+            </div>
+          </>
+        );
+      case "replace-text":
+        return (
+          <>
+            <h1 className={styles.title}>
+              替换文本工具
+            </h1>
+            <p className={styles.subtitle}>
+              统一的文本替换工具，支持三种定位方式：当前选区、搜索匹配、指定范围（书签、标题、段落、节、内容控件）
+            </p>
+            <div className={styles.toolContainer}>
+              <ReplaceTextDebug />
             </div>
           </>
         );

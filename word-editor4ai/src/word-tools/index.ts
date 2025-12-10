@@ -31,3 +31,4 @@ export * from "./insertSectionBreak";
 export * from "./table";
 export * from "./tableOfContents";
 export * from "./insertEquation";
+export * from "./replaceText";
