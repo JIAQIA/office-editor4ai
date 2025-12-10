@@ -257,7 +257,8 @@ export async function insertTableOfContents(
 
       // 获取所有目录 / Get all TOCs
       const tocs = context.document.contentControls.getByTypes([Word.ContentControlType.richText]);
-      tocs.load("items");
+      // eslint-disable-next-line office-addins/no-navigational-load
+      tocs.load("items/length");
 
       await context.sync();
 
@@ -465,11 +466,13 @@ export async function getTableOfContentsList(): Promise<GetTOCListResult> {
       for (let i = 0; i < fields.items.length; i++) {
         const field = fields.items[i];
         field.load("result");
+        // eslint-disable-next-line office-addins/no-context-sync-in-loop
         await context.sync();
 
         const range = field.result;
         range.load("text");
 
+        // eslint-disable-next-line office-addins/no-context-sync-in-loop
         await context.sync();
 
         // 解析目录信息 / Parse TOC info
