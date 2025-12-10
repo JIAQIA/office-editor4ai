@@ -32,3 +32,4 @@ export * from "./table";
 export * from "./tableOfContents";
 export * from "./insertEquation";
 export * from "./replaceText";
+export * from "./exportContent";

@@ -38,6 +38,7 @@ import {
   Shapes24Regular,
   DocumentTable24Regular,
   MathFormula24Regular,
+  DocumentArrowDown24Regular,
 } from "@fluentui/react-icons";
 
 interface SidebarProps {
@@ -808,6 +809,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               <div className={styles.menuItemContent}>
                 <DocumentTable24Regular className={styles.icon} />
                 <span className={styles.label}>查询目录</span>
+              </div>
+            </Button>
+            <Button
+              appearance="subtle"
+              className={`${styles.submenuItem} ${
+                currentPage === "query" && currentTool === "export-content"
+                  ? styles.submenuItemActive
+                  : styles.submenuItemHover
+              }`}
+              onClick={() => onNavigate("query", "export-content")}
+            >
+              <div className={styles.menuItemContent}>
+                <DocumentArrowDown24Regular className={styles.icon} />
+                <span className={styles.label}>内容导出</span>
               </div>
             </Button>
           </div>

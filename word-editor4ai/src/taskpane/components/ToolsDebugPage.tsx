@@ -41,6 +41,7 @@ import { DeleteTableOfContents } from "./tools/DeleteTableOfContents";
 import { UpdateTableOfContents } from "./tools/UpdateTableOfContents";
 import { QueryTableOfContents } from "./tools/QueryTableOfContents";
 import { InsertEquationDebug } from "./tools/InsertEquationDebug";
+import { ExportContentDebug } from "./tools/ExportContentDebug";
 
 interface ToolsDebugPageProps {
   selectedTool: string;
@@ -470,6 +471,20 @@ const ToolsDebugPage: React.FC<ToolsDebugPageProps> = ({ selectedTool }) => {
             </p>
             <div className={styles.toolContainer}>
               <InsertEquationDebug />
+            </div>
+          </>
+        );
+      case "export-content":
+        return (
+          <>
+            <h1 className={styles.title}>
+              内容导出工具
+            </h1>
+            <p className={styles.subtitle}>
+              导出 Word 文档内容为 OOXML 或 HTML 格式，支持导出整个文档、选中区域或可见区域
+            </p>
+            <div className={styles.toolContainer}>
+              <ExportContentDebug />
             </div>
           </>
         );

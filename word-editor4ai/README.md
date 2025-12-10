@@ -225,16 +225,31 @@ getElementPosition(locator: ElementLocator): Promise<PositionInfo>
 getDocumentLayout(): Promise<DocumentLayoutInfo>
 ```
 
-### 15. **截图工具** `screenshot.ts`
+### 15. **内容导出工具** `exportContent.ts` ✅
 ```typescript
-// 截取指定页面
-capturePageScreenshot(pageNumber: number): Promise<string>
+// 导出 Word 文档内容为 OOXML、HTML 等格式
+exportContent(options?: ExportContentOptions): Promise<ExportContentResult>
 
-// 截取选中区域
-captureSelectionScreenshot(): Promise<string>
+// 导出选项
+interface ExportContentOptions {
+  scope?: 'document' | 'selection' | 'visible';  // 导出范围，默认 'selection'
+  format?: 'ooxml' | 'html' | 'pdf';             // 导出格式，默认 'ooxml'
+}
 
-// 截取指定范围
-captureRangeScreenshot(locator: RangeLocator): Promise<string>
+// 导出结果
+interface ExportContentResult {
+  content: string;          // 导出的内容数据（OOXML/HTML 为文本，PDF 为 Base64）
+  format: ExportFormat;     // 导出格式
+  scope: ExportScope;       // 导出范围
+  timestamp: number;        // 导出时间戳
+  size: number;             // 内容大小（字节）
+  mimeType: string;         // MIME 类型
+}
+
+// 支持的格式
+// - OOXML: Office Open XML 格式，保留完整格式信息
+// - HTML: HTML 格式，适合网页显示
+// - PDF: 暂不可用（Word API 限制）
 ```
 
 ---
