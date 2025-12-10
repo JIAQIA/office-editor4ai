@@ -159,6 +159,64 @@ function convertLatexToOoxml(latex: string): string {
 }
 
 /**
+ * 数学符号映射表 / Math symbol mapping
+ */
+const MATH_SYMBOLS: Record<string, string> = {
+  '\\pm': '±',
+  '\\mp': '∓',
+  '\\times': '×',
+  '\\div': '÷',
+  '\\cdot': '⋅',
+  '\\leq': '≤',
+  '\\geq': '≥',
+  '\\neq': '≠',
+  '\\approx': '≈',
+  '\\infty': '∞',
+  '\\to': '→',
+  '\\rightarrow': '→',
+  '\\leftarrow': '←',
+  '\\leftrightarrow': '↔',
+  '\\Rightarrow': '⇒',
+  '\\Leftarrow': '⇐',
+  '\\alpha': 'α',
+  '\\beta': 'β',
+  '\\gamma': 'γ',
+  '\\delta': 'δ',
+  '\\theta': 'θ',
+  '\\pi': 'π',
+  '\\sigma': 'σ',
+  '\\omega': 'ω',
+};
+
+/**
+ * 提取大括号内的内容（支持嵌套）
+ * Extract content within braces (supports nesting)
+ */
+function extractBracedContent(str: string, startIndex: number): { content: string; endIndex: number } | null {
+  if (str[startIndex] !== '{') return null;
+  
+  let braceCount = 1;
+  let i = startIndex + 1;
+  
+  while (i < str.length && braceCount > 0) {
+    if (str[i] === '\\') {
+      i += 2; // 跳过转义字符
+      continue;
+    }
+    if (str[i] === '{') braceCount++;
+    if (str[i] === '}') braceCount--;
+    i++;
+  }
+  
+  if (braceCount !== 0) return null; // 不匹配
+  
+  return {
+    content: str.substring(startIndex + 1, i - 1),
+    endIndex: i - 1
+  };
+}
+
+/**
  * 将 LaTeX 表达式转换为 OMML（Office Math Markup Language）格式
  * Convert LaTeX expression to OMML (Office Math Markup Language) format
  *
@@ -173,6 +231,24 @@ function convertLatexToOmml(latex: string): string {
   let result = latex;
 
   console.log("原始输入 / Original input:", latex);
+  
+  // 先替换数学符号 / Replace math symbols first
+  for (const [latexSymbol, unicodeSymbol] of Object.entries(MATH_SYMBOLS)) {
+    result = result.replace(new RegExp(latexSymbol.replace(/\\/g, '\\\\'), 'g'), unicodeSymbol);
+  }
+
+  // 处理极限符号 \lim_{x \to \infty} f(x) / Handle limit \lim_{x \to \infty} f(x)
+  result = result.replace(/\\lim_\{([^}]+)\}/g, (_, condition) => {
+    const placeholder = `§PLACEHOLDER§${placeholders.length}§`;
+    placeholders.push(
+      `<m:sSub>` +
+        `<m:e><m:r><m:t>lim</m:t></m:r></m:e>` +
+        `<m:sub><m:r><m:t>${condition}</m:t></m:r></m:sub>` +
+      `</m:sSub>`
+    );
+    console.log("极限替换 / Limit replaced:", placeholder);
+    return placeholder;
+  });
 
   // 处理求和符号 \sum_{i=1}^{n} x_i / Handle summation \sum_{i=1}^{n} x_i
   result = result.replace(/\\sum_\{([^}]+)\}\^\{([^}]+)\}\s*([^ ]+)/g, (_, lower, upper, body) => {
@@ -211,20 +287,65 @@ function convertLatexToOmml(latex: string): string {
   });
 
   // 处理分数 \frac{}{} / Handle fraction \frac{}{}
-  result = result.replace(/\\frac{([^}]+)}{([^}]+)}/g, (_, num, den) => {
-    const placeholder = `§PLACEHOLDER§${placeholders.length}§`;
-    placeholders.push(`<m:f><m:num><m:r><m:t>${num}</m:t></m:r></m:num><m:den><m:r><m:t>${den}</m:t></m:r></m:den></m:f>`);
-    console.log("分数替换 / Fraction replaced:", placeholder);
-    return placeholder;
-  });
+  // 需要递归处理，因为分子分母可能包含其他结构
+  let i = 0;
+  while (i < result.length) {
+    if (result.substring(i, i + 6) === '\\frac{') {
+      const numResult = extractBracedContent(result, i + 5);
+      if (numResult) {
+        const denResult = extractBracedContent(result, numResult.endIndex + 1);
+        if (denResult) {
+          // 递归处理分子和分母
+          const numOmml = convertLatexToOmml(numResult.content);
+          const denOmml = convertLatexToOmml(denResult.content);
+          
+          const placeholder = `§PLACEHOLDER§${placeholders.length}§`;
+          placeholders.push(
+            `<m:f>` +
+              `<m:num>${numOmml.replace(/<m:oMath[^>]*>|<\/m:oMath>/g, '')}</m:num>` +
+              `<m:den>${denOmml.replace(/<m:oMath[^>]*>|<\/m:oMath>/g, '')}</m:den>` +
+            `</m:f>`
+          );
+          console.log("分数替换 / Fraction replaced:", placeholder);
+          
+          // 替换整个 \frac{...}{...}
+          result = result.substring(0, i) + placeholder + result.substring(denResult.endIndex + 2);
+          i += placeholder.length;
+          continue;
+        }
+      }
+    }
+    i++;
+  }
 
   // 处理根号 \sqrt{} / Handle square root \sqrt{}
-  result = result.replace(/\\sqrt{([^}]+)}/g, (_, content) => {
-    const placeholder = `§PLACEHOLDER§${placeholders.length}§`;
-    placeholders.push(`<m:rad><m:radPr><m:degHide m:val="1"/></m:radPr><m:deg/><m:e><m:r><m:t>${content}</m:t></m:r></m:e></m:rad>`);
-    console.log("根号替换 / Sqrt replaced:", placeholder);
-    return placeholder;
-  });
+  // 需要递归处理，因为根号内可能包含其他结构
+  i = 0;
+  while (i < result.length) {
+    if (result.substring(i, i + 6) === '\\sqrt{') {
+      const contentResult = extractBracedContent(result, i + 5);
+      if (contentResult) {
+        // 递归处理根号内容
+        const contentOmml = convertLatexToOmml(contentResult.content);
+        
+        const placeholder = `§PLACEHOLDER§${placeholders.length}§`;
+        placeholders.push(
+          `<m:rad>` +
+            `<m:radPr><m:degHide m:val="1"/></m:radPr>` +
+            `<m:deg/>` +
+            `<m:e>${contentOmml.replace(/<m:oMath[^>]*>|<\/m:oMath>/g, '')}</m:e>` +
+          `</m:rad>`
+        );
+        console.log("根号替换 / Sqrt replaced:", placeholder);
+        
+        // 替换整个 \sqrt{...}
+        result = result.substring(0, i) + placeholder + result.substring(contentResult.endIndex + 2);
+        i += placeholder.length;
+        continue;
+      }
+    }
+    i++;
+  }
 
   // 处理上标 ^{} / Handle superscript ^{}
   result = result.replace(/(\w)\^{([^}]+)}/g, (_, base, sup) => {
